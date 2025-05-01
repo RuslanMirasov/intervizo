@@ -1,18 +1,17 @@
 :root {
-  --500: "Inter", sans-serif;
-  --700: "Inter", sans-serif;
   --color: #0d99ff;
   --black: #030816;
   --white: #ffffff;
   --yellow: #f9e065;
+  --grey-dark: #323338;
   --grey: #6c727f;
   --grey-light: #f3f4f6;
-  --gradient: linear-gradient(
-    90deg,
-    rgba(238, 110, 245, 0.5) 0%,
-    rgba(87, 185, 255, 0.5) 100%
-  );
+  --gradient: linear-gradient(90deg, rgba(238, 110, 245, 0.5) 0%, rgba(87, 185, 255, 0.5) 100%);
 }
+
+// nextjs-portal {
+//   display: none !important;
+// }
 
 html,
 body {
@@ -61,4 +60,23 @@ h4,
 h5,
 h6 {
   font-size: 16px;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+main {
+  display: flex;
+  position: relative;
+  width: calc(100% - 80px);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  margin-left: auto;
+  height: auto;
+  min-height: 100vh;
+  border: 10px solid #ccc;
 }
