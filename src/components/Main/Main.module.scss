@@ -1,0 +1,14 @@
+.Main {
+  display: flex;
+  position: relative;
+  width: calc(100% - 80px);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  margin-left: auto;
+  height: auto;
+  min-height: 100vh;
+  padding: 70px;
+  gap: 56px;
+}

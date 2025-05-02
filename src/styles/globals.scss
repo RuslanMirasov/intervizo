@@ -1,11 +1,15 @@
 :root {
   --color: #0d99ff;
+  --hover: #28a3fc;
   --black: #030816;
   --white: #ffffff;
   --yellow: #f9e065;
   --grey-dark: #323338;
   --grey: #6c727f;
   --grey-light: #f3f4f6;
+  --grey-border: #e6e7eb;
+  --red: #ff0d0d;
+  --invalid: #ff0d0d;
   --gradient: linear-gradient(90deg, rgba(238, 110, 245, 0.5) 0%, rgba(87, 185, 255, 0.5) 100%);
 }
 
@@ -22,6 +26,8 @@ body {
 body {
   font-family: var(--500);
   color: var(--grey);
+  font-size: 14px;
+  line-height: 1.2;
   background: var(--white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -48,6 +54,15 @@ b,
 strong {
   color: var(--black);
   font-family: var(--700);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+p,
+a,
+span,
+ul li {
+  letter-spacing: -0.03em;
 }
 
 h1,
@@ -67,16 +82,45 @@ ol {
   list-style: none;
 }
 
-main {
-  display: flex;
+.link {
+  display: inline-block;
   position: relative;
-  width: calc(100% - 80px);
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  align-content: center;
-  margin-left: auto;
-  height: auto;
-  min-height: 100vh;
-  border: 10px solid #ccc;
+  color: var(--color);
+  font-family: var(--700);
+
+  &:before {
+    content: '';
+    width: 0%;
+    height: 1px;
+    transition: 0.3s;
+    background: var(--color);
+    position: absolute;
+    left: auto;
+    right: 0px;
+    bottom: 0px;
+  }
+  &:hover {
+    &:before {
+      width: 100%;
+      left: 0px;
+      right: auto;
+    }
+  }
+}
+
+@keyframes dashMove {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+.border-rect {
+  transition: stroke-dashoffset 0.3s;
+  animation-play-state: paused;
+}
+
+button:hover {
+  .border-rect {
+    animation: dashMove 0.3s linear infinite;
+  }
 }

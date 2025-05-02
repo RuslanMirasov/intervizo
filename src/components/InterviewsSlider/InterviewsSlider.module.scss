@@ -1,0 +1,15 @@
+.InterviewsSlider {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 12px;
+}
+
+.SliderWrapper {
+  flex: 1;
+  border: 1px solid red;
+}

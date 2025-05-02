@@ -54,8 +54,8 @@ const Question = ({ size = 15, color }) => (
 const Message = ({ size = 15, color }) => (
   <svg width={size} viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M1.49984 9.7021V2.00002V9.7021ZM1.49984 9.7021L2.76002 8.61623C2.95472 8.44846 3.20366 8.35443 3.46331 8.35443H3.49984V5.76045C3.49984 5.47561 3.61007 5.19922 3.81135 4.99291C4.01317 4.78603 4.29046 4.66669 4.58317 4.66669H10.1665V2.00002H1.49984M11.4998 4.66669V1.76045C11.4998 1.47561 11.3896 1.19922 11.1883 0.992906C10.9865 0.786031 10.7092 0.666687 10.4165 0.666687H1.24984C0.957126 0.666687 0.679837 0.786031 0.478014 0.992906C0.276738 1.19922 0.166504 1.47561 0.166504 1.76045V10.2396C0.166504 10.4444 0.223494 10.6462 0.332335 10.8212C0.441267 10.9964 0.59826 11.1384 0.786694 11.2284C0.975299 11.3184 1.18622 11.3518 1.39412 11.3236C1.60194 11.2954 1.79572 11.2072 1.95313 11.0716L3.49984 9.73879V12.594C3.49984 12.8788 3.61007 13.1552 3.81135 13.3615C4.01317 13.5684 4.29046 13.6878 4.58317 13.6878H11.4406L13.0465 15.0716C13.204 15.2072 13.3977 15.2954 13.6056 15.3236C13.8134 15.3518 14.0244 15.3184 14.213 15.2284C14.4014 15.1384 14.5584 14.9964 14.6673 14.8212C14.7762 14.6462 14.8332 14.4444 14.8332 14.2396V5.76045C14.8332 5.47561 14.7229 5.19922 14.5217 4.99291C14.3198 4.78603 14.0425 4.66669 13.7498 4.66669H11.4998ZM4.83317 6.00002V12.3544H11.5364C11.796 12.3544 12.045 12.4485 12.2397 12.6162L13.4998 13.7021V6.00002H4.83317Z"
       fill={color}
     />
@@ -129,6 +129,33 @@ const Call = ({ size = 25, color }) => (
   </svg>
 );
 
+const PlusBtn = ({ size = 15, color }) => (
+  <svg width={size} height={size} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="7.5" cy="7.5" r="7" stroke={color} />
+    <path d="M7.5 4V11" stroke={color} />
+    <path d="M11 7.5L4 7.5" stroke={color} />
+  </svg>
+);
+
+const Border = ({ color }) => (
+  <svg viewBox="0 0 162 250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <rect
+      className="border-rect"
+      x="1"
+      y="1"
+      width="160"
+      height="248"
+      rx="16"
+      ry="16"
+      fill="none"
+      stroke={color}
+      strokeWidth="1"
+      strokeDasharray="8 8"
+      strokeDashoffset="0"
+    ></rect>
+  </svg>
+);
+
 const Icon = ({ name, color = 'currentColor', size }) => {
   const props = { size, color };
   return (
@@ -137,6 +164,7 @@ const Icon = ({ name, color = 'currentColor', size }) => {
       {name === 'home' && <House {...props} />}
       {name === 'profile' && <ProfileIcon {...props} />}
       {name === 'plus' && <Plus {...props} />}
+      {name === 'plus-btn' && <PlusBtn {...props} />}
       {name === 'question' && <Question {...props} />}
       {name === 'message' && <Message {...props} />}
       {name === 'close' && <Close {...props} />}
@@ -145,6 +173,7 @@ const Icon = ({ name, color = 'currentColor', size }) => {
       {name === 'sound' && <Sound {...props} />}
       {name === 'video' && <Video {...props} />}
       {name === 'call' && <Call {...props} />}
+      {name === 'border' && <Border {...props} />}
     </>
   );
 };

@@ -1,0 +1,11 @@
+.Section {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  align-content: flex-end;
+  gap: 25px;
+  width: 100%;
+}

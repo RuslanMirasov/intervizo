@@ -1,4 +1,4 @@
-import { Header } from '@/components';
+import { Header, Main } from '@/components';
 import '@/styles/globals.scss';
 import { Inter } from 'next/font/google';
 
@@ -33,7 +33,7 @@ const RootLayout = ({ children }) => {
     <html lang="ru">
       <body className={`body ${inter500.variable} ${inter600.variable} ${inter700.variable}`}>
         <Header />
-        <main className="main">{children}</main>
+        <Main>{children}</Main>
       </body>
     </html>
   );
