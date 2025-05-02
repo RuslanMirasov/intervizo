@@ -25,13 +25,15 @@ const InterviewsSlider = () => {
         interview
       </Button>
       <div className={css.SliderWrapper}>
-        <Swiper slidesPerView={4}>
-          {interviews.slice(0, 8).map(interview => (
-            <SwiperSlide key={interview.slug}>
-              <InterviewArticle interview={interview} />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        {interviews.length > 0 && (
+          <Swiper slidesPerView={4}>
+            {interviews.slice(0, 8).map(interview => (
+              <SwiperSlide key={interview.slug}>
+                <InterviewArticle interview={interview} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </div>
     </div>
   );
