@@ -4,3 +4,7 @@ export { default as Main } from './Main/Main';
 export { default as Section } from './Section/Section';
 export { default as InterviewsSlider } from './InterviewsSlider/InterviewsSlider';
 export { default as Button } from './Button/Button';
+export { default as InterviewList } from './Interview/InterviewList/InterviewList';
+export { default as InterviewArticle } from './Interview/InterviewArticle/InterviewArticle';
+export { default as ResultsList } from './Results/ResultsList/ResultsList';
+export { default as ResultListItem } from './Results/ResultListItem/ResultListItem';

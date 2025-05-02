@@ -1,0 +1,66 @@
+[
+  {
+    "id": "user-1",
+    "name": "Alex Taylor",
+    "vacancy": "Data Analyst",
+    "avatar": "https://api.dicebear.com/7.x/thumbs/png?seed=alextaylor",
+    "date": "2025-03-03",
+    "rating": "3.1"
+  },
+  {
+    "id": "user-2",
+    "name": "David Brown",
+    "vacancy": "UX Designer",
+    "avatar": "https://api.dicebear.com/7.x/thumbs/png?seed=davidbrown",
+    "date": "2025-04-05",
+    "rating": "4.6"
+  },
+  {
+    "id": "user-3",
+    "name": "Emma Anderson",
+    "vacancy": "Frontend Developer",
+    "avatar": "https://api.dicebear.com/7.x/thumbs/png?seed=emmaanderson",
+    "date": "2025-03-20",
+    "rating": "3.6"
+  },
+  {
+    "id": "user-4",
+    "name": "Anna Moore",
+    "vacancy": "UX Designer",
+    "avatar": null,
+    "date": "2025-03-08",
+    "rating": "3.9"
+  },
+  {
+    "id": "user-5",
+    "name": "John Smith",
+    "vacancy": "Frontend Developer",
+    "avatar": null,
+    "date": "2025-03-24",
+    "rating": "5.0"
+  },
+  {
+    "id": "user-6",
+    "name": "David Moore",
+    "vacancy": "Frontend Developer",
+    "avatar": "https://api.dicebear.com/7.x/thumbs/png?seed=davidmoore",
+    "date": "2025-03-23",
+    "rating": "0.4"
+  },
+  {
+    "id": "user-7",
+    "name": "John Moore",
+    "vacancy": "QA Engineer",
+    "avatar": "https://api.dicebear.com/7.x/thumbs/png?seed=johnmoore",
+    "date": "2025-03-13",
+    "rating": "0.3"
+  },
+  {
+    "id": "user-8",
+    "name": "David Thomas",
+    "vacancy": "Frontend Developer",
+    "avatar": "https://api.dicebear.com/7.x/thumbs/png?seed=davidthomas",
+    "date": "2025-04-07",
+    "rating": "1.1"
+  }
+]

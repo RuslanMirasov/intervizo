@@ -1,0 +1,19 @@
+.Wrapper {
+  display: block;
+  position: relative;
+  width: 100%;
+  margin-top: 50px;
+}
+
+.ResultsList {
+  margin-top: 25px;
+  width: 100%;
+  li {
+    display: block;
+
+    margin-bottom: 12px;
+    &:last-child {
+      margin-bottom: 0px;
+    }
+  }
+}

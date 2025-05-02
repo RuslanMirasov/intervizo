@@ -1,0 +1,62 @@
+.ResultListItem {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  border-radius: 15px;
+  border: 1px solid var(--grey-border);
+  padding: 16px;
+  gap: 16px;
+  transition: 0.3s;
+  &:hover {
+    border: 1px solid var(--color);
+    h3 {
+      color: var(--color);
+    }
+  }
+}
+
+.ListProfile {
+  display: inline-flex;
+  position: relative;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 12px;
+
+  .Text {
+    h3 {
+      transition: 0.3s;
+    }
+    p {
+      margin-top: 4px;
+    }
+  }
+}
+
+.Avatar {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: var(--grey-light);
+}
+
+.ListInfo {
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  span {
+    font-size: 12px;
+    font-family: var(--600);
+    color: var(--green);
+    background: var(--green-light);
+    border-radius: 10px;
+    padding: 4.5px 10px;
+  }
+}

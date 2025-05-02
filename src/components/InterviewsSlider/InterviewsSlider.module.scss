@@ -4,12 +4,27 @@
   width: 100%;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  align-content: center;
+  align-items: flex-start;
+  align-content: flex-start;
   gap: 12px;
 }
 
 .SliderWrapper {
+  position: relative;
   flex: 1;
-  border: 1px solid red;
+  overflow: hidden;
+  min-height: 250px;
+  margin-top: -12px;
+
+  &:before {
+    content: '';
+    width: 250px;
+    height: 100%;
+    position: absolute;
+    background: linear-gradient(-90deg, #fff 10%, rgba(0, 0, 0, 0));
+    right: 0px;
+    top: 0px;
+    z-index: 2;
+    pointer-events: none;
+  }
 }
