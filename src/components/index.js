@@ -1,4 +1,5 @@
 export { default as Icon } from './Icon/Icon';
+export { default as Skeleton } from './Skeleton/Skeleton';
 export { default as Header } from './Header/Header';
 export { default as Main } from './Main/Main';
 export { default as Section } from './Section/Section';
@@ -6,5 +7,6 @@ export { default as InterviewsSlider } from './InterviewsSlider/InterviewsSlider
 export { default as Button } from './Button/Button';
 export { default as InterviewList } from './Interview/InterviewList/InterviewList';
 export { default as InterviewArticle } from './Interview/InterviewArticle/InterviewArticle';
+export { default as InterviewsSliderSkeleton } from './Interview/InterviewsSliderSkeleton/InterviewsSliderSkeleton';
 export { default as ResultsList } from './Results/ResultsList/ResultsList';
 export { default as ResultListItem } from './Results/ResultListItem/ResultListItem';

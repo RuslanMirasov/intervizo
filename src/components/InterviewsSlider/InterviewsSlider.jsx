@@ -1,41 +1,57 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { Button, Icon, InterviewArticle } from '@/components';
+
+import useSWR from 'swr';
+import fetcher from '@/lib/fetcher';
+import { Button, Icon, InterviewArticle, InterviewsSliderSkeleton } from '@/components';
+import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import css from './InterviewsSlider.module.scss';
 
 const InterviewsSlider = () => {
-  const [interviews, setInterviews] = useState([]);
+  const { data: interviews, isLoading, error } = useSWR('/interviews-demo.json', fetcher);
 
-  useEffect(() => {
-    fetch('/interviews-demo.json')
-      .then(res => res.json())
-      .then(data => setInterviews(data))
-      .catch(err => console.error('Ошибка загрузки интервью:', err));
-  }, []);
+  if (error) {
+    return <p>Ошибка загрузки данных.</p>;
+  }
 
   return (
-    <div className={css.InterviewsSlider}>
-      <Button href="./add-new-interview" className="add">
-        <Icon name="border" />
-        <Icon name="plus" size="56" />
-        Add
-        <br />
-        interview
-      </Button>
-      <div className={css.SliderWrapper}>
-        {interviews.length > 0 && (
-          <Swiper slidesPerView={4}>
-            {interviews.slice(0, 8).map(interview => (
-              <SwiperSlide key={interview.slug}>
-                <InterviewArticle interview={interview} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        )}
+    <>
+      <div className="titleBox">
+        <h1>Добро пожаловать</h1>
+        <p>Выберите интервью или создайте свой</p>
       </div>
-    </div>
+
+      {interviews?.length > 0 && (
+        <Link href="./interviews" className="link">
+          Смотреть все интервью
+        </Link>
+      )}
+
+      <div className={css.InterviewsSlider}>
+        <Button href="./add-new-interview" className="add">
+          <Icon name="border" />
+          <Icon name="plus" size="56" />
+          Добавить
+          <br />
+          интервью
+        </Button>
+
+        <div className={css.SliderWrapper}>
+          {isLoading ? (
+            <InterviewsSliderSkeleton />
+          ) : (
+            <Swiper slidesPerView={4} spaceBetween={12} className="swiper-wrapper-fixed">
+              {interviews?.slice(0, 8).map(interview => (
+                <SwiperSlide key={interview.slug}>
+                  <InterviewArticle interview={interview} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -1,20 +1,13 @@
-.InterviewsSlider {
-  display: flex;
-  position: relative;
-  width: 100%;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-  align-content: flex-start;
-  gap: 12px;
-}
-
 .SliderWrapper {
   position: relative;
   flex: 1;
   overflow: hidden;
-  min-height: 250px;
-  margin-top: -12px;
+  min-height: 284px;
+  margin-top: -15px;
+  margin-bottom: -15px;
+  article {
+    margin: 15px 12px;
+  }
 
   &:before {
     content: '';
@@ -27,4 +20,14 @@
     z-index: 2;
     pointer-events: none;
   }
+}
+
+.InterviewsSlider {
+  display: flex;
+  position: relative;
+  width: 100%;
+  min-height: 285px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 5px;
 }

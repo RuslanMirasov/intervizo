@@ -20,8 +20,8 @@ const InterviewArticle = ({ interview = {} }) => {
         {category && <span>{category}</span>}
       </div>
       <div className={css.TitleBox}>
-        <h3 className="one-line">{name ? name : 'Интервью'}</h3>
-        <p className="two-lines">{description ? description : 'Без описания...'}</p>
+        <h3 className="two-lines">{name ? name : 'Интервью'}</h3>
+        <p className="three-lines">{description ? description : 'Без описания...'}</p>
       </div>
       <ul className={css.Info}>
         {duration && (
