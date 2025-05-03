@@ -11,10 +11,6 @@ import css from './InterviewsSlider.module.scss';
 const InterviewsSlider = () => {
   const { data: interviews, isLoading, error } = useSWR('/interviews-demo.json', fetcher);
 
-  if (error) {
-    return <p>Ошибка загрузки данных.</p>;
-  }
-
   return (
     <>
       <div className="titleBox">
@@ -37,19 +33,21 @@ const InterviewsSlider = () => {
           интервью
         </Button>
 
-        <div className={css.SliderWrapper}>
-          {isLoading ? (
-            <InterviewsSliderSkeleton />
-          ) : (
-            <Swiper slidesPerView={4} spaceBetween={12} className="swiper-wrapper-fixed">
-              {interviews?.slice(0, 8).map(interview => (
-                <SwiperSlide key={interview.slug}>
-                  <InterviewArticle interview={interview} />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          )}
-        </div>
+        {!error && (
+          <div className={css.SliderWrapper}>
+            {isLoading ? (
+              <InterviewsSliderSkeleton />
+            ) : (
+              <Swiper slidesPerView={4} spaceBetween={12} className="swiper-wrapper-fixed">
+                {interviews?.slice(0, 8).map(interview => (
+                  <SwiperSlide key={interview.slug}>
+                    <InterviewArticle interview={interview} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

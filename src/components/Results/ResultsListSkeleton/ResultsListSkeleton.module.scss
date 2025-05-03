@@ -1,0 +1,21 @@
+.ResultsListSkeleton {
+  margin-top: 25px;
+  width: 100%;
+}
+
+.Item {
+  margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  border-radius: 15px;
+  border: 1px solid var(--grey-border);
+  padding: 16px;
+  gap: 16px;
+  span {
+    flex-shrink: 0;
+  }
+}

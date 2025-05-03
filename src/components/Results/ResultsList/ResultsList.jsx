@@ -1,24 +1,27 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { ResultListItem } from '@/components';
+import useSWR from 'swr';
+import fetcher from '@/lib/fetcher';
+
+import { ResultListItem, ResultsListSkeleton } from '@/components';
 import css from './ResultsList.module.scss';
 
 const ResultsList = () => {
-  const [results, setResults] = useState([]);
+  const { data: results = [], isLoading, error } = useSWR('/candidates-demo.json', fetcher);
 
-  useEffect(() => {
-    fetch('/candidates-demo.json')
-      .then(res => res.json())
-      .then(data => setResults(data))
-      .catch(err => console.log('Ошибка загрузки:', err));
-  }, []);
+  if (error) {
+    return <p className={css.NotFound}>Ошибка загрузки данных</p>;
+  }
 
   return (
     <div className={css.Wrapper}>
       <div className="titleBox">
         <h2>Список интервью</h2>
       </div>
-      {results.length > 0 ? (
+      {isLoading ? (
+        <ResultsListSkeleton />
+      ) : results.length === 0 ? (
+        <p className={css.NotFound}>Нет интервью</p>
+      ) : (
         <ul className={css.ResultsList}>
           {results.map(result => (
             <li key={result.id}>
@@ -26,8 +29,6 @@ const ResultsList = () => {
             </li>
           ))}
         </ul>
-      ) : (
-        <p className={css.NotFound}>Нет интервью</p>
       )}
     </div>
   );

@@ -9,4 +9,5 @@ export { default as InterviewList } from './Interview/InterviewList/InterviewLis
 export { default as InterviewArticle } from './Interview/InterviewArticle/InterviewArticle';
 export { default as InterviewsSliderSkeleton } from './Interview/InterviewsSliderSkeleton/InterviewsSliderSkeleton';
 export { default as ResultsList } from './Results/ResultsList/ResultsList';
+export { default as ResultsListSkeleton } from './Results/ResultsListSkeleton/ResultsListSkeleton';
 export { default as ResultListItem } from './Results/ResultListItem/ResultListItem';
