@@ -3,6 +3,7 @@ export { default as Skeleton } from './Skeleton/Skeleton';
 export { default as Header } from './Header/Header';
 export { default as Main } from './Main/Main';
 export { default as Section } from './Section/Section';
+export { default as Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
 export { default as InterviewsSlider } from './InterviewsSlider/InterviewsSlider';
 export { default as Button } from './Button/Button';
 export { default as InterviewList } from './Interview/InterviewList/InterviewList';
@@ -11,3 +12,4 @@ export { default as InterviewsSliderSkeleton } from './Interview/InterviewsSlide
 export { default as ResultsList } from './Results/ResultsList/ResultsList';
 export { default as ResultsListSkeleton } from './Results/ResultsListSkeleton/ResultsListSkeleton';
 export { default as ResultListItem } from './Results/ResultListItem/ResultListItem';
+export { default as AddNewInterviewForm } from './Forms/AddNewInterviewForm/AddNewInterviewForm';

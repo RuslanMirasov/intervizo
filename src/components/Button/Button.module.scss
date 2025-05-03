@@ -11,7 +11,8 @@
   padding: 16px 18px;
   background: var(--color);
   color: var(--white);
-  font-family: var(--700);
+  font-family: var(--inter);
+  font-weight: 700;
   font-size: 14px;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -22,11 +23,6 @@
   cursor: pointer;
   &:hover {
     background: var(--hover);
-  }
-
-  &:disabled {
-    pointer-events: none;
-    opacity: 0.3;
   }
 
   &.full {
@@ -90,5 +86,10 @@
         pointer-events: none;
       }
     }
+  }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.3;
   }
 }

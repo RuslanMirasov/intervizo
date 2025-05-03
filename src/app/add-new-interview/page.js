@@ -1,23 +1,24 @@
-import { Section, InterviewsSlider, Button, Icon } from '@/components';
-import Link from 'next/link';
+import { Section, Button, Breadcrumbs, AddNewInterviewForm } from '@/components';
+
+export const metadata = {
+  title: 'InterVizo | Добавить интервью',
+  description: 'Интервьюер',
+};
 
 const AddNewInterview = () => {
   return (
-    <Section intop width="1200px">
-      <div className="titleBox">
-        <h1>Добро пожаловать</h1>
-        <p>Выберите интервью или создайте свой</p>
-      </div>
+    <Section intop width="860px">
+      <Breadcrumbs />
 
-      <Link href="./interviews" className="link">
-        Смотреть все интервью
-      </Link>
+      <Button className="small border" disabled>
+        Тестовое интервью
+      </Button>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'flex-start', width: '100%' }}>
+      <AddNewInterviewForm />
+
+      {/* <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'flex-start', width: '100%' }}>
         <Button href="./">Создать</Button>
-        <Button href="./" className="small border">
-          Тестовое интервью
-        </Button>
+
         <Button href="./" className="small border full">
           + Добавить секцию
         </Button>
@@ -38,7 +39,7 @@ const AddNewInterview = () => {
         <Button href="./" className="small red">
           Удалить
         </Button>
-      </div>
+      </div> */}
     </Section>
   );
 };

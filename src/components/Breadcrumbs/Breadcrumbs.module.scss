@@ -1,0 +1,26 @@
+.Breadcrumbs {
+  display: inline-flex;
+
+  li {
+    font-family: var(--inter);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--black);
+    a {
+      transition: 0.3s;
+    }
+    a:hover {
+      color: var(--color);
+    }
+    &:after {
+      content: '>';
+      color: var(--black);
+      padding: 0px 6px;
+    }
+    &:last-child {
+      &:after {
+        content: none;
+      }
+    }
+  }
+}

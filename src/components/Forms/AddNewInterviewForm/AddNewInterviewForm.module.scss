@@ -1,0 +1,15 @@
+.AddNewInterviewForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 24px;
+  gap: 16px;
+
+  input[name='name'] {
+    width: 100%;
+    font-family: var(--inter);
+    font-weight: 700;
+    color: var(--black);
+    font-size: 24px;
+  }
+}

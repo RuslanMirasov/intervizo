@@ -30,7 +30,8 @@
     overflow: hidden;
     span {
       position: relative;
-      font-family: var(--600);
+      font-family: var(--inter);
+      font-weight: 600;
       display: inline-block;
       margin-bottom: auto;
       margin-right: auto;
@@ -86,7 +87,8 @@
         border-radius: 20px;
         padding: 4px 10px;
         white-space: nowrap;
-        font-family: var(--600);
+        font-family: var(--inter);
+        font-weight: 600;
         color: var(--grey-dark);
       }
 

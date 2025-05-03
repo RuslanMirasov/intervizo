@@ -27,7 +27,8 @@ body {
 }
 
 body {
-  font-family: var(--500);
+  font-family: var(--inter);
+  font-weight: 500;
   color: var(--grey);
   font-size: 14px;
   line-height: 1.2;
@@ -56,7 +57,8 @@ h6,
 b,
 strong {
   color: var(--black);
-  font-family: var(--700);
+  font-family: var(--inter);
+  font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -85,11 +87,38 @@ ol {
   list-style: none;
 }
 
+fieldset {
+  border: none;
+  outline: none;
+}
+
+input,
+textarea {
+  resize: none;
+  outline: none;
+  border: none;
+  border-radius: 0px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+::placeholder {
+  color: inherit;
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+
+:focus::placeholder {
+  opacity: 0;
+}
+
 .link {
   display: inline-block;
   position: relative;
   color: var(--color);
-  font-family: var(--700);
+  font-family: var(--inter);
+  font-weight: 700;
 
   &:before {
     content: '';

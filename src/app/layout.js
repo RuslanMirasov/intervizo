@@ -2,25 +2,11 @@ import { Header, Main } from '@/components';
 import '@/styles/globals.scss';
 import { Inter } from 'next/font/google';
 
-const inter500 = Inter({
-  weight: '500',
+const inter = Inter({
+  weight: ['500', '600', '700'],
   subsets: ['latin', 'cyrillic'],
   display: 'swap',
-  variable: '--500',
-});
-
-const inter600 = Inter({
-  weight: '600',
-  subsets: ['latin', 'cyrillic'],
-  display: 'swap',
-  variable: '--600',
-});
-
-const inter700 = Inter({
-  weight: '700',
-  subsets: ['latin', 'cyrillic'],
-  display: 'swap',
-  variable: '--700',
+  variable: '--inter',
 });
 
 export const metadata = {
@@ -31,7 +17,7 @@ export const metadata = {
 const RootLayout = ({ children }) => {
   return (
     <html lang="ru">
-      <body className={`body ${inter500.variable} ${inter600.variable} ${inter700.variable}`}>
+      <body className={`body ${inter.variable}`}>
         <Header />
         <Main>{children}</Main>
       </body>

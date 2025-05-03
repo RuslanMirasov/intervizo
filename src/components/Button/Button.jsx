@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import css from './Button.module.scss';
 
-const Button = ({ href, type = 'button', children, onClick, className }) => {
+const Button = ({ href, type = 'button', children, onClick, disabled, className }) => {
   const classes = [css.Button];
 
   if (className) {
@@ -15,7 +15,7 @@ const Button = ({ href, type = 'button', children, onClick, className }) => {
       {children}
     </Link>
   ) : (
-    <button type={type} className={classNames} onClick={onClick}>
+    <button type={type} className={classNames} onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );
