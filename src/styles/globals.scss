@@ -5,7 +5,7 @@
   --white: #ffffff;
   --yellow: #f9e065;
   --grey-dark: #323338;
-  --grey: #6c727f;
+  --grey: #888888;
   --grey-light: #f3f4f6;
   --grey-border: #e6e7eb;
   --green-light: #e2fbe9;
@@ -35,6 +35,7 @@ body {
   background: var(--white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-y: auto;
 }
 
 * {
@@ -94,13 +95,18 @@ fieldset {
 
 input,
 textarea {
+  width: 100%;
   resize: none;
   outline: none;
   border: none;
+  font-family: var(--inter);
   border-radius: 0px;
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.03em;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 0;
 }
 
 ::placeholder {

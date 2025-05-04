@@ -5,11 +5,21 @@
   margin-top: 24px;
   gap: 16px;
 
-  input[name='name'] {
+  > textarea {
+    min-height: 17px;
+    height: 17px;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  textarea[name='name'] {
     width: 100%;
+    min-height: 29px;
+    height: 29px;
     font-family: var(--inter);
     font-weight: 700;
     color: var(--black);
     font-size: 24px;
+    line-height: 1.2;
   }
 }
