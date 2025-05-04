@@ -83,7 +83,7 @@ const SectionsEditor = () => {
 
   const handleAddButtonClick = () => {
     openPopup({
-      type: 'ssssss',
+      type: 'add-section-popup',
       addSection: addSection,
     });
   };
