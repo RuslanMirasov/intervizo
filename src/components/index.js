@@ -1,4 +1,6 @@
 export { default as Icon } from './Icon/Icon';
+export { default as Popup } from './Popup/Popup';
+export { default as AddSectionPopup } from './Popup/AddSectionPopup/AddSectionPopup';
 export { default as Skeleton } from './Skeleton/Skeleton';
 export { default as Header } from './Header/Header';
 export { default as Main } from './Main/Main';

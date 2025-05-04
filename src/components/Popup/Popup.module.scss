@@ -1,0 +1,79 @@
+.Backdrop {
+  display: grid;
+  place-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  overflow: auto;
+  padding: 50px 20px;
+  transition: 0.4s;
+  opacity: 0;
+  &.Visible {
+    opacity: 1;
+  }
+}
+
+.Popup {
+  position: relative;
+  display: inline-block;
+  background-color: var(--white);
+  padding: 20px;
+  border-radius: 25px;
+  box-shadow: 0 0px 20px rgba(0, 0, 0, 0.2);
+  width: auto;
+  max-width: 358px;
+  text-align: center;
+  height: auto;
+  transition: background-color 0.4s, opacity 0.4s, transform 0.4s;
+  opacity: 0;
+  transform: translate(0px, 40px);
+  &.Visible {
+    opacity: 1;
+    transform: translate(0px, 0px);
+  }
+}
+
+.Content,
+.Title,
+.Subtitle {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 12px;
+  hr {
+    background: var(--white);
+    opacity: 0.2;
+    min-width: calc(100% + 40px);
+  }
+  button {
+    min-width: 100px;
+  }
+}
+
+.Title {
+  font-family: var(--inter);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.Subtitle {
+  max-width: 230px;
+  font-family: var(--inter);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.33;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  color: var(--black);
+}

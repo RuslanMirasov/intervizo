@@ -1,6 +1,7 @@
 'use client';
 
 import { useInterview } from '@/hooks/useInterview';
+import { usePopup } from '@/hooks/usePopup';
 import { Button, Icon } from '@/components';
 import { generateId } from '@/lib/generateId';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -46,6 +47,7 @@ const SortableSection = ({ section, onUpdate, children }) => {
 
 const SectionsEditor = () => {
   const { interview, setInterview } = useInterview();
+  const { openPopup } = usePopup();
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
 
   const addSection = type => {
@@ -77,6 +79,13 @@ const SectionsEditor = () => {
       const newData = arrayMove(interview.data, oldIndex, newIndex);
       setInterview(prev => ({ ...prev, data: newData }));
     }
+  };
+
+  const handleAddButtonClick = () => {
+    openPopup({
+      type: 'ssssss',
+      addSection: addSection,
+    });
   };
 
   return (
@@ -116,7 +125,9 @@ const SectionsEditor = () => {
           </SortableContext>
         </DndContext>
 
-        <Button className="small border full">+ Добавить секцию</Button>
+        <Button className="small border full" onClick={handleAddButtonClick}>
+          + Добавить секцию
+        </Button>
       </fieldset>
     </div>
   );

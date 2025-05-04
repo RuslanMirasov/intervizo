@@ -1,4 +1,5 @@
-import { Header, Main } from '@/components';
+import { PopupProvider } from '@/context/PopupContext';
+import { Header, Main, Popup } from '@/components';
 import '@/styles/globals.scss';
 import { Inter } from 'next/font/google';
 
@@ -18,8 +19,11 @@ const RootLayout = ({ children }) => {
   return (
     <html lang="ru">
       <body className={`body ${inter.variable}`}>
-        <Header />
-        <Main>{children}</Main>
+        <PopupProvider>
+          <Header />
+          <Main>{children}</Main>
+          <Popup />
+        </PopupProvider>
       </body>
     </html>
   );
