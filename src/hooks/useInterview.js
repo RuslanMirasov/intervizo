@@ -6,7 +6,7 @@ const defaultInterview = {
   category: '',
   description: '',
   thumbnail: '',
-  duration: 0,
+  duration: 20,
   difficulty: '',
   data: [],
 };

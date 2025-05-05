@@ -1,7 +1,7 @@
 'use client';
 
 import { usePopup } from '@/hooks/usePopup';
-import { AddSectionPopup } from '@/components';
+import { AddSectionPopup, ErrorPopup } from '@/components';
 import css from './Popup.module.scss';
 
 const Popup = () => {
@@ -15,6 +15,7 @@ const Popup = () => {
   return (
     <div className={`${css.Backdrop} ${isVisible ? css.Visible : ''}`} onClick={!locked ? closePopup : undefined}>
       <div className={PopupClasses} onClick={e => e.stopPropagation()}>
+        {type === 'error' && <ErrorPopup params={params} />}
         {type === 'add-section-popup' && <AddSectionPopup params={params} />}
       </div>
     </div>

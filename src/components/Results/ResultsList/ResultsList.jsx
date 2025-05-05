@@ -1,12 +1,11 @@
 'use client';
-import useSWR from 'swr';
-import fetcher from '@/lib/fetcher';
 
+import useRequest from '@/hooks/useRequest';
 import { ResultListItem, ResultsListSkeleton } from '@/components';
 import css from './ResultsList.module.scss';
 
 const ResultsList = () => {
-  const { data: results = [], isLoading, error } = useSWR('/candidates-demo.json', fetcher);
+  const { data: results = [], isLoading, error } = useRequest({ url: '/candidates-demo.json' });
 
   if (error) {
     return <p className={css.NotFound}>Ошибка загрузки данных</p>;

@@ -1,0 +1,27 @@
+.ErrorPopup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  align-content: center;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 320px;
+  background: var(--invalid);
+  padding: 40px 20px 30px 20px;
+  border-radius: 25px;
+  box-shadow: 0 0px 20px rgba(0, 0, 0, 0.2);
+  > * {
+    color: var(--white);
+  }
+
+  p {
+    display: block;
+    opacity: 0.8;
+    max-width: 200px;
+  }
+
+  button {
+    margin-top: 10px;
+  }
+}

@@ -1,12 +1,13 @@
 export { default as Icon } from './Icon/Icon';
 export { default as Popup } from './Popup/Popup';
 export { default as AddSectionPopup } from './Popup/AddSectionPopup/AddSectionPopup';
+export { default as ErrorPopup } from './Popup/ErrorPopup/ErrorPopup';
 export { default as Skeleton } from './Skeleton/Skeleton';
 export { default as Header } from './Header/Header';
 export { default as Main } from './Main/Main';
 export { default as Section } from './Section/Section';
 export { default as Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
-export { default as InterviewsSlider } from './InterviewsSlider/InterviewsSlider';
+export { default as InterviewsSlider } from './Interview/InterviewsSlider/InterviewsSlider';
 export { default as Button } from './Button/Button';
 export { default as InterviewList } from './Interview/InterviewList/InterviewList';
 export { default as InterviewArticle } from './Interview/InterviewArticle/InterviewArticle';

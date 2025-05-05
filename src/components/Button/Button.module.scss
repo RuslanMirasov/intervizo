@@ -43,6 +43,16 @@
     }
   }
 
+  &.white {
+    background: var(--white);
+    border: 1px solid var(--white);
+    color: var(--black);
+    &:hover {
+      border: 1px solid var(--yellow);
+      background: var(--yellow);
+    }
+  }
+
   &.grey {
     min-width: 120px;
     background: rgba(0, 0, 0, 0);

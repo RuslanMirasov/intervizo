@@ -1,7 +1,6 @@
 'use client';
 
-import useSWR from 'swr';
-import fetcher from '@/lib/fetcher';
+import useRequest from '@/hooks/useRequest';
 import { Button, Icon, InterviewArticle, InterviewsSliderSkeleton } from '@/components';
 import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -9,7 +8,7 @@ import 'swiper/css';
 import css from './InterviewsSlider.module.scss';
 
 const InterviewsSlider = () => {
-  const { data: interviews, isLoading, error } = useSWR('/interviews-demo.json', fetcher);
+  const { data: interviews, isLoading, error } = useRequest({ url: '/interviews-demo.json' });
 
   return (
     <>
