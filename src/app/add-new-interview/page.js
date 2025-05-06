@@ -1,4 +1,4 @@
-import { Section, Button, Breadcrumbs, AddNewInterviewForm } from '@/components';
+import { Section, Breadcrumbs, AddNewInterviewForm } from '@/components';
 
 export const metadata = {
   title: 'InterVizo | Добавить интервью',
@@ -9,10 +9,6 @@ const AddNewInterview = () => {
   return (
     <Section intop width="860px">
       <Breadcrumbs />
-
-      <Button className="small border" disabled>
-        Тестовое интервью
-      </Button>
 
       <AddNewInterviewForm />
 

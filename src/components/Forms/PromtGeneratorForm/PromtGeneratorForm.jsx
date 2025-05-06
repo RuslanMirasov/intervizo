@@ -2,22 +2,23 @@
 
 import { useState } from 'react';
 import { useInterview } from '@/hooks/useInterview';
+import { usePopup } from '@/hooks/usePopup';
 import useRequest from '@/hooks/useRequest';
 import { Button } from '@/components';
 import css from './PromtGeneratorForm.module.scss';
 
 const systemPrompt = `
-Ты выступаешь в роли HR-специалиста. Твоя задача — сгенерировать структуру интервью на основе запроса пользователя.  
+Ты выступаешь в роли HR-специалиста. Твоя задача — сгенерировать структуру интервью на основе запроса пользователя на русском языке.  
 Ответ должен быть в формате JSON — **без комментариев, пояснений или текста до или после**. Только чистый JSON-объект.
 
 Вот формат, в котором ты должен вернуть результат:
 
 {
-  "slug": "<Заполни только если поле пустое, используя значение из 'name'>",
-  "name": "<Придумай, только если поле пустое — на основе запроса пользователя>",
-  "category": "<Оставь как есть. Не заполняй! Если поле заполнено, просто используй категорию как подсказку при генерации интервью по запросу пользователя>",
-  "description": "<Заполни только если поле пустое — кратко, до 200 символов, по теме запроса пользователя>",
-  "thumbnail": "<Оставь как есть>",
+  "slug": "<Заполнить только если поле пустое! (используя значение из 'name')>",
+  "name": "<Заполнить только если поле пустое! (на основе запроса пользователя)>",
+  "category": "<Не трогать, оставить как есть!>",
+  "description": "<Заполни только если поле пустое! кратко, до 200 символов, по теме запроса пользователя>",
+  "thumbnail": "<Не трогать, оставить как есть!>",
   "duration": <Заполни только если поле пустое. Это примерная продолжительность интервью в минутах. Эту продолжительность возьми из запроса пользователя, по умолчанию 20>,
   "difficulty": "<Заполни только если поле пустое. Возможные значения: 'Легкое', 'Среднее', 'Сложное'. Определи сложность самостоятельно на основе запроса пользователя и сгенерированных вопросов>",
   "data": [
@@ -42,11 +43,18 @@ const systemPrompt = `
 const PromtGeneratorForm = () => {
   const [prompt, setPrompt] = useState('');
   const { interview, setInterview } = useInterview();
+  const { openPopup, closePopup } = usePopup();
 
   const { trigger, isMutating } = useRequest({ url: '/api/generate-interview', method: 'POST' });
 
   const handleSubmit = async e => {
     e.preventDefault();
+
+    openPopup({
+      type: 'loading',
+      locked: true,
+      subtitle: 'ИИ-ассистент составляет интервью по вашему запросу. Это займёт некоторое время.',
+    });
 
     const fullPrompt = `
       ${systemPrompt}
@@ -59,14 +67,22 @@ const PromtGeneratorForm = () => {
     const generated = await trigger({ prompt: fullPrompt });
 
     if (generated) {
-      console.log('✅ Интервью сгенерировано:', generated);
+      closePopup();
       setInterview(generated);
     }
   };
 
   return (
     <form className={css.PromtGeneratorForm} onSubmit={handleSubmit} noValidate>
-      <span>
+      <span
+        onClick={() =>
+          openPopup({
+            type: 'loading',
+            locked: true,
+            subtitle: 'Наш ИИ-ассистент составляет интервью по вашему запросу. Это займёт некоторое время.',
+          })
+        }
+      >
         Вы можете воспользоваться ИИ-ассистентом — он добавит необходимые вопросы. <br />
         Также вы сможете редактировать их далее.
       </span>
@@ -80,7 +96,7 @@ const PromtGeneratorForm = () => {
         />
       </label>
       <Button type="submit" disabled={isMutating}>
-        {isMutating ? 'Жди...' : 'Создать'}
+        Создать
       </Button>
     </form>
   );
