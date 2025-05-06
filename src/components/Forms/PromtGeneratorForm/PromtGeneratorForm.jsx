@@ -74,15 +74,7 @@ const PromtGeneratorForm = () => {
 
   return (
     <form className={css.PromtGeneratorForm} onSubmit={handleSubmit} noValidate>
-      <span
-        onClick={() =>
-          openPopup({
-            type: 'loading',
-            locked: true,
-            subtitle: 'Наш ИИ-ассистент составляет интервью по вашему запросу. Это займёт некоторое время.',
-          })
-        }
-      >
+      <span>
         Вы можете воспользоваться ИИ-ассистентом — он добавит необходимые вопросы. <br />
         Также вы сможете редактировать их далее.
       </span>
