@@ -15,13 +15,18 @@ const AddNewInterviewForm = () => {
     return cleanup;
   }, []);
 
+  useEffect(() => {
+    console.log(interview.data);
+    console.log(interview.data.length);
+  }, [interview]);
+
   const updateField = (field, value) => {
     setInterview(prev => ({ ...prev, [field]: value }));
   };
 
   return (
     <>
-      <Button className="small border" disabled={interview.data.length === 0}>
+      <Button href="./connect" className="small border" disabled={interview.data.length === 0}>
         Тестовое интервью
       </Button>
 

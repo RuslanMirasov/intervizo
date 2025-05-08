@@ -12,6 +12,7 @@ export { default as Section } from './Section/Section';
 export { default as Breadcrumbs } from './Breadcrumbs/Breadcrumbs';
 export { default as InterviewsSlider } from './Interview/InterviewsSlider/InterviewsSlider';
 export { default as Button } from './Button/Button';
+export { default as InterviewRunner } from './InterviewRunner/InterviewRunner';
 export { default as InterviewList } from './Interview/InterviewList/InterviewList';
 export { default as InterviewArticle } from './Interview/InterviewArticle/InterviewArticle';
 export { default as InterviewsSliderSkeleton } from './Interview/InterviewsSliderSkeleton/InterviewsSliderSkeleton';
@@ -21,3 +22,6 @@ export { default as ResultListItem } from './Results/ResultListItem/ResultListIt
 export { default as AddNewInterviewForm } from './Forms/AddNewInterviewForm/AddNewInterviewForm';
 export { default as SectionsEditor } from './Forms/SectionsEditor/SectionsEditor';
 export { default as PromtGeneratorForm } from './Forms/PromtGeneratorForm/PromtGeneratorForm';
+export { default as Connection } from './Connection/Connection';
+export { default as Camera } from './Camera/Camera';
+export { default as Room } from './Room/Room';

@@ -11,7 +11,7 @@ const Button = ({ href, type = 'button', children, onClick, disabled, className 
   const classNames = classes.join(' ');
 
   return href ? (
-    <Link href={href} className={classNames}>
+    <Link href={href} className={classNames} disabled={disabled}>
       {children}
     </Link>
   ) : (

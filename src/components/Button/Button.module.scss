@@ -78,6 +78,19 @@
     }
   }
 
+  &.call {
+    color: var(--white);
+    background: var(--red);
+    border: 1px solid var(--red);
+    width: 64px;
+    min-width: 64px;
+    border-radius: 64px;
+    &:hover {
+      background: var(--color);
+      border: 1px solid var(--color);
+    }
+  }
+
   &.add {
     width: 162px;
     min-height: 250px;
@@ -98,7 +111,8 @@
     }
   }
 
-  &:disabled {
+  &:disabled,
+  &[disabled] {
     pointer-events: none;
     opacity: 0.3;
   }

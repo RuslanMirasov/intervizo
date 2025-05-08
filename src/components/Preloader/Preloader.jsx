@@ -1,9 +1,9 @@
 import { Icon } from '@/components';
 import css from './Preloader.module.scss';
 
-const Preloader = () => {
+const Preloader = ({ className }) => {
   return (
-    <div className={css.Preloader}>
+    <div className={`${css.Preloader} ${className ? className : ''}`}>
       <div className={css.Logo}>
         <Icon name="logo" />
       </div>

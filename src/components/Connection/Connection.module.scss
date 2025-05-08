@@ -1,0 +1,47 @@
+.Connection {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  gap: 36px 80px;
+}
+
+.Titles {
+  width: 100%;
+  align-items: flex-start;
+}
+
+.Camera {
+  width: 590px;
+  height: 330px;
+  position: relative;
+}
+
+.Buttons {
+  width: 248px;
+  text-align: center;
+  p {
+    color: var(--grey-dark);
+  }
+  span {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+}
+
+.Logo {
+  display: flex;
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 56px;
+  z-index: 1;
+  border: 1px solid var(--grey-border);
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
