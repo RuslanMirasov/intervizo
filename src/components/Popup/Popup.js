@@ -1,7 +1,7 @@
 'use client';
 
 import { usePopup } from '@/hooks/usePopup';
-import { AddSectionPopup, ErrorPopup, LoadingPopup } from '@/components';
+import { AddSectionPopup, ErrorPopup, LoadingPopup, MessagePopup } from '@/components';
 import css from './Popup.module.scss';
 
 const Popup = () => {
@@ -15,6 +15,7 @@ const Popup = () => {
   return (
     <div className={`${css.Backdrop} ${isVisible ? css.Visible : ''}`} onClick={!locked ? closePopup : undefined}>
       <div className={PopupClasses} onClick={e => e.stopPropagation()}>
+        {type === 'message' && <MessagePopup params={params} />}
         {type === 'loading' && <LoadingPopup params={params} />}
         {type === 'error' && <ErrorPopup params={params} />}
         {type === 'add-section-popup' && <AddSectionPopup params={params} />}

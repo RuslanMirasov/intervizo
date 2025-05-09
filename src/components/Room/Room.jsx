@@ -1,17 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useInterview } from '@/hooks/useInterview';
 import { useCamera } from '@/hooks/useCamera';
-import { Camera, Preloader, InterviewRunner } from '@/components';
+import { Camera, Preloader, Button, Icon } from '@/components';
 import css from './Room.module.scss';
+import { useProgress } from '@/hooks/useProgress';
 
 const Room = () => {
-  const { interview } = useInterview();
   const { cameraStartTime, recordingStartTime, videoRef, startCamera, stopCamera, startRecording, error } = useCamera();
+  const { interview, stepPhase, countdown, loading, startInterview, finishAnswer } = useProgress();
   const [elapsedTime, setElapsedTime] = useState('00:00');
-  const [loading, setLoading] = useState(false);
-  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,14 +35,30 @@ const Room = () => {
         <Camera videoRef={videoRef} startCamera={startCamera} stopCamera={stopCamera} error={error} />
         <div className={`${css.Robot} ${loading ? css.Loading : ''}`} onClick={startRecording}>
           <Preloader className={css.RoomPreloader} />
-          {count > 0 && <div className={css.Counter}>{count}</div>}
+          {stepPhase === 'thinking' && countdown > 0 && countdown < 6 && <div className={css.Counter}>{countdown}</div>}
 
           <span>InterVizo</span>
         </div>
       </div>
       <div className={css.Panel}>
         <span className={`${css.Time} ${recordingStartTime ? css.Rec : ''}`}>{elapsedTime}</span>
-        <InterviewRunner interview={interview} loading={loading} setLoading={setLoading} setCount={setCount} />
+        {stepPhase === 'pause' && !loading && (
+          <Button className="small border" onClick={startInterview}>
+            Начать интервью
+          </Button>
+        )}
+
+        {stepPhase === 'answering' && (
+          <Button className="small" onClick={finishAnswer}>
+            Принять мой ответ
+          </Button>
+        )}
+
+        {((stepPhase !== 'pause' && stepPhase !== 'answering') || loading) && (
+          <Button href="./" className="small call">
+            <Icon name="call" size="25" color="var(--white)" />
+          </Button>
+        )}
       </div>
     </div>
   );

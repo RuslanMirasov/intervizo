@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import { bodyLock, bodyUnlock } from '../lib/popup';
 
 const PopupContext = createContext(null);
@@ -23,16 +23,16 @@ export const PopupProvider = ({ children }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isPopupOpen, params.locked]);
 
-  const openPopup = newParams => {
+  const openPopup = useCallback(newParams => {
     bodyLock();
     setParams({ ...newParams });
     setIsPopupOpen(true);
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       setIsVisible(true);
-    });
-  };
+    }, 100);
+  }, []);
 
-  const refreshPopup = newParams => {
+  const refreshPopup = useCallback(newParams => {
     setIsVisible(false);
     setTimeout(() => {
       setParams({ ...newParams });
@@ -40,16 +40,16 @@ export const PopupProvider = ({ children }) => {
     setTimeout(() => {
       setIsVisible(true);
     }, 400);
-  };
+  }, []);
 
-  const closePopup = () => {
+  const closePopup = useCallback(() => {
     setIsVisible(false);
     setTimeout(() => {
       setIsPopupOpen(false);
       setParams({});
       bodyUnlock();
     }, 400);
-  };
+  }, []);
 
   return (
     <PopupContext.Provider value={{ isPopupOpen, isVisible, params, openPopup, closePopup, refreshPopup }}>

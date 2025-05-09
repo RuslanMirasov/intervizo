@@ -1,0 +1,53 @@
+.MessagePopup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  align-content: center;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 350px;
+  background: var(--white);
+  padding: 40px 20px 30px 20px;
+  border-radius: 25px;
+  box-shadow: 0 0px 20px rgba(0, 0, 0, 0.2);
+
+  p {
+    display: block;
+    opacity: 0.8;
+    max-width: 260px;
+  }
+
+  button {
+    flex-direction: row;
+    margin-top: 10px;
+  }
+}
+
+.Close {
+  display: flex;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 20px;
+  background: none;
+  border: none;
+  right: 20px;
+  top: 10px;
+  cursor: pointer;
+  transform: rotate(0deg);
+  transition: 0.3s;
+  svg {
+    color: var(--grey);
+    width: 80%;
+    height: 80%;
+  }
+
+  &:hover {
+    transform: rotate(90deg);
+  }
+}

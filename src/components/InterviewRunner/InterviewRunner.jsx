@@ -1,133 +1,136 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { speak } from '@/lib/speak';
-import useLocalStorageState from 'use-local-storage-state';
+// import { useState, useEffect, useRef } from 'react';
+// import { speak } from '@/lib/speak';
+// import useLocalStorageState from 'use-local-storage-state';
 import { Button, Icon } from '@/components';
-import { useVoice } from '@/hooks/useVoice';
+// import { useVoice } from '@/hooks/useVoice';
+import { useProgress } from '@/hooks/useProgress';
 
-const InterviewRunner = ({ interview, loading, setLoading, setCount }) => {
-  const { isSpeaking, startListening, stopListening } = useVoice();
+const InterviewRunner = () => {
+  const { stepPhase, loading, startInterview, finishAnswer } = useProgress();
 
-  const [stepPhase, setStepPhase] = useState('pause'); // 'pause' | 'thinking' | 'answering' | 'done'
-  const [countdown, setCountdown] = useState(null);
+  // const { isSpeaking, startListening, stopListening } = useVoice();
 
-  const timerRef = useRef(null);
-  const lastSpeechTimeRef = useRef(0);
-  const isRunningRef = useRef(false);
-  const currentStepRef = useRef(0);
+  // const [stepPhase, setStepPhase] = useState('pause');
+  // const [countdown, setCountdown] = useState(null);
 
-  const [interviewProgress, setInterviewProgress] = useLocalStorageState('interview-progress', {
-    defaultValue: {
-      slug: interview.slug,
-      name: interview.name,
-      user: {
-        name: '',
-        email: '',
-        score: 0.0,
-      },
-      video: null,
-      answers: [],
-      done: false,
-    },
-  });
+  // const timerRef = useRef(null);
+  // const lastSpeechTimeRef = useRef(0);
+  // const isRunningRef = useRef(false);
+  // const currentStepRef = useRef(0);
 
-  const clearTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = null;
-  };
+  // const [interviewProgress, setInterviewProgress] = useLocalStorageState('interview-progress', {
+  //   defaultValue: {
+  //     slug: interview.slug,
+  //     name: interview.name,
+  //     user: {
+  //       name: '',
+  //       email: '',
+  //       score: 0.0,
+  //     },
+  //     video: null,
+  //     answers: [],
+  //     done: false,
+  //   },
+  // });
 
-  const startCountdown = (duration, onComplete) => {
-    clearTimer();
-    setCountdown(duration);
-    timerRef.current = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearTimer();
-          onComplete?.();
-          return null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+  // const clearTimer = () => {
+  //   if (timerRef.current) clearInterval(timerRef.current);
+  //   timerRef.current = null;
+  // };
 
-  const finishAndContinue = () => {
-    if (isRunningRef.current === false) return;
-    isRunningRef.current = false;
+  // const startCountdown = (duration, onComplete) => {
+  //   clearTimer();
+  //   setCountdown(duration);
+  //   timerRef.current = setInterval(() => {
+  //     setCountdown(prev => {
+  //       if (prev <= 1) {
+  //         clearTimer();
+  //         onComplete?.();
+  //         return null;
+  //       }
+  //       return prev - 1;
+  //     });
+  //   }, 1000);
+  // };
 
-    stopListening();
-    clearTimer();
-    setCountdown(null);
+  // const finishAndContinue = () => {
+  //   if (isRunningRef.current === false) return;
+  //   isRunningRef.current = false;
 
-    setStepPhase('done');
+  //   stopListening();
+  //   clearTimer();
+  //   setCountdown(null);
 
-    setTimeout(() => {
-      runStep(currentStepRef.current + 1);
-    }, 300);
-  };
+  //   setStepPhase('done');
 
-  const runStep = async step => {
-    if (isRunningRef.current) return;
-    isRunningRef.current = true;
+  //   setTimeout(() => {
+  //     runStep(currentStepRef.current + 1);
+  //   }, 300);
+  // };
 
-    if (step >= interview.data.length) {
-      setStepPhase('pause');
-      alert('Интервью завершено!');
-      return;
-    }
+  // const runStep = async step => {
+  //   if (isRunningRef.current) return;
+  //   isRunningRef.current = true;
 
-    currentStepRef.current = step;
-    const { text, type } = interview.data[step];
+  //   if (step >= interview.data.length) {
+  //     setStepPhase('pause');
+  //     alert('Интервью завершено!');
+  //     return;
+  //   }
 
-    try {
-      setLoading(true);
-      await speak(text);
-    } finally {
-      setLoading(false);
-    }
+  //   currentStepRef.current = step;
+  //   const { text, type } = interview.data[step];
 
-    startListening();
+  //   try {
+  //     setLoading(true);
+  //     await speak(text);
+  //   } finally {
+  //     setLoading(false);
+  //   }
 
-    if (type === 'message') {
-      setStepPhase('done');
-      isRunningRef.current = false;
-      setTimeout(() => runStep(step + 1), 300);
-      return;
-    }
+  //   startListening();
 
-    setStepPhase('thinking');
+  //   if (type === 'message') {
+  //     setStepPhase('done');
+  //     isRunningRef.current = false;
+  //     setTimeout(() => runStep(step + 1), 300);
+  //     return;
+  //   }
 
-    lastSpeechTimeRef.current = 0;
-    startCountdown(15, finishAndContinue);
-  };
+  //   setStepPhase('thinking');
 
-  useEffect(() => {
-    setCount(countdown);
-  }, [countdown, setCount]);
+  //   lastSpeechTimeRef.current = 0;
+  //   startCountdown(15, finishAndContinue);
+  // };
 
-  useEffect(() => {
-    if (stepPhase === 'thinking' && isSpeaking) {
-      setStepPhase('answering');
-      return;
-    }
+  // useEffect(() => {
+  //   setCount(countdown);
+  // }, [countdown, setCount]);
 
-    if (stepPhase === 'answering' && isSpeaking) {
-      lastSpeechTimeRef.current = Date.now();
-      startCountdown(8, finishAndContinue);
-    }
-  }, [stepPhase, isSpeaking]);
+  // useEffect(() => {
+  //   if (stepPhase === 'thinking' && isSpeaking) {
+  //     setStepPhase('answering');
+  //     return;
+  //   }
+
+  //   if (stepPhase === 'answering' && isSpeaking) {
+  //     lastSpeechTimeRef.current = Date.now();
+  //     startCountdown(8, finishAndContinue);
+  //   }
+  // }, [stepPhase, isSpeaking]);
 
   return (
     <>
       {stepPhase === 'pause' && !loading && (
-        <Button className="small border" onClick={() => runStep(0)}>
+        <Button className="small border" onClick={startInterview}>
           Начать интервью
         </Button>
       )}
 
       {stepPhase === 'answering' && (
-        <Button className="small" onClick={finishAndContinue}>
+        <Button className="small" onClick={finishAnswer}>
           Принять мой ответ
         </Button>
       )}

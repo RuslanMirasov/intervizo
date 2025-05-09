@@ -4,10 +4,13 @@ import { useCamera } from '@/hooks/useCamera';
 import { Flex, Icon, Button, Camera } from '@/components';
 import { useInterview } from '@/hooks/useInterview';
 import css from './Connection.module.scss';
+import { useIntro } from '@/hooks/useIntro';
 
 const Connection = () => {
   const { interview } = useInterview();
   const { videoRef, startCamera, stopCamera, error } = useCamera();
+
+  useIntro();
 
   return (
     <div className={css.Connection}>

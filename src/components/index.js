@@ -5,6 +5,7 @@ export { default as Popup } from './Popup/Popup';
 export { default as AddSectionPopup } from './Popup/AddSectionPopup/AddSectionPopup';
 export { default as ErrorPopup } from './Popup/ErrorPopup/ErrorPopup';
 export { default as LoadingPopup } from './Popup/LoadingPopup/LoadingPopup';
+export { default as MessagePopup } from './Popup/MessagePopup/MessagePopup';
 export { default as Skeleton } from './Skeleton/Skeleton';
 export { default as Header } from './Header/Header';
 export { default as Main } from './Main/Main';
