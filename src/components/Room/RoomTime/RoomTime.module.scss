@@ -1,0 +1,17 @@
+.Time {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  left: 30px;
+  &.Rec {
+    &:before {
+      content: '';
+      display: block;
+      width: 14px;
+      height: 14px;
+      border-radius: 14px;
+      background: var(--red);
+    }
+  }
+}

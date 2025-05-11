@@ -114,7 +114,6 @@ const SectionsEditor = () => {
                 <button
                   type="button"
                   onClick={e => {
-                    console.log(e);
                     removeSection(section.id);
                   }}
                 >

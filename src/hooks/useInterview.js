@@ -12,9 +12,10 @@ const defaultInterview = {
 };
 
 export const useInterview = () => {
-  const [interview, setInterview] = useLocalStorageState('interview', {
+  const [interview, setInterview, { isPersistent }] = useLocalStorageState('interview', {
     defaultValue: defaultInterview,
+    ssr: false,
   });
 
-  return { interview, setInterview };
+  return { interview, setInterview, isPersistent };
 };

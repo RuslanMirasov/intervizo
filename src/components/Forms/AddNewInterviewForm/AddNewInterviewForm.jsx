@@ -15,11 +15,6 @@ const AddNewInterviewForm = () => {
     return cleanup;
   }, []);
 
-  useEffect(() => {
-    console.log(interview.data);
-    console.log(interview.data.length);
-  }, [interview]);
-
   const updateField = (field, value) => {
     setInterview(prev => ({ ...prev, [field]: value }));
   };

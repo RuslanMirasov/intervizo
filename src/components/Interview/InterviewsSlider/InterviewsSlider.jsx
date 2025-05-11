@@ -9,7 +9,6 @@ import css from './InterviewsSlider.module.scss';
 
 const InterviewsSlider = () => {
   const { data: interviews, isLoading, error } = useRequest({ url: '/interviews-demo.json' });
-
   return (
     <>
       <div className="titleBox">

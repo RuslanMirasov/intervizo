@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useCamera } from '@/context/CameraContext';
 import css from './Camera.module.scss';
 
-const Camera = ({ videoRef, startCamera, stopCamera, error }) => {
+const Camera = () => {
+  const { videoRef, startCamera, stopCamera, error } = useCamera();
   useEffect(() => {
     startCamera?.();
     return () => {

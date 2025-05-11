@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { createContext, useContext, useRef, useState, useEffect, useCallback } from 'react';
 
-export const useCamera = () => {
+const CameraContext = createContext(null);
+
+export const CameraProvider = ({ children }) => {
   const videoRef = useRef(null);
   const mediaStreamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -32,6 +34,7 @@ export const useCamera = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
+
       setIsCameraOn(true);
       setCameraStartTime(Date.now());
     } catch (err) {
@@ -41,27 +44,34 @@ export const useCamera = () => {
   }, []);
 
   const stopCamera = useCallback(() => {
-    const recorder = mediaRecorderRef.current;
-    if (recorder && (recorder.state === 'recording' || recorder.state === 'paused')) {
-      recorder.stop();
-      setIsRecording(false);
-      setRecordingStartTime(null);
+    if (mediaRecorderRef.current) {
+      const recorder = mediaRecorderRef.current;
+      if (recorder.state === 'recording' || recorder.state === 'paused') {
+        recorder.stop();
+      }
+      mediaRecorderRef.current = null;
     }
 
-    mediaStreamRef.current?.getTracks().forEach(track => track.stop());
-    mediaStreamRef.current = null;
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
+    }
+
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+
     setIsCameraOn(false);
     setCameraStartTime(null);
     setRecordingStartTime(null);
+    setIsRecording(false);
   }, []);
 
   const startRecording = useCallback(() => {
     if (!mediaStreamRef.current) return;
 
     chunksRef.current = [];
+
     const recorder = new MediaRecorder(mediaStreamRef.current, {
       mimeType: 'video/webm; codecs=vp8',
     });
@@ -79,8 +89,8 @@ export const useCamera = () => {
       setVideoUrl(url);
     };
 
-    recorder.start();
     mediaRecorderRef.current = recorder;
+    recorder.start();
     setIsRecording(true);
     setRecordingStartTime(Date.now());
   }, []);
@@ -99,17 +109,14 @@ export const useCamera = () => {
     setRecordingStartTime(null);
   }, []);
 
-  // Очистка URL
   useEffect(() => {
     return () => {
-      if (videoUrl) {
-        URL.revokeObjectURL(videoUrl);
-      }
+      if (videoUrl) URL.revokeObjectURL(videoUrl);
       stopCamera();
     };
   }, [videoUrl, stopCamera]);
 
-  return {
+  const value = {
     videoRef,
     isCameraOn,
     isRecording,
@@ -125,4 +132,14 @@ export const useCamera = () => {
     resumeRecording,
     stopRecording,
   };
+
+  return <CameraContext.Provider value={value}>{children}</CameraContext.Provider>;
+};
+
+export const useCamera = () => {
+  const context = useContext(CameraContext);
+  if (!context) {
+    throw new Error('useCamera должен использоваться внутри <CameraProvider>');
+  }
+  return context;
 };

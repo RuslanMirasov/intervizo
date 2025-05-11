@@ -1,4 +1,5 @@
 import { PopupProvider } from '@/context/PopupContext';
+
 import { Header, Main, Popup } from '@/components';
 import '@/styles/globals.scss';
 import { Inter } from 'next/font/google';

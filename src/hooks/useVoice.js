@@ -1,4 +1,3 @@
-// useVoice.js — хук для ручного управления слежением за речью
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';

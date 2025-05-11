@@ -1,0 +1,70 @@
+.Robot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  position: absolute;
+  z-index: 2;
+  right: 20px;
+  bottom: 20px;
+  background: var(--color);
+  width: 236px;
+  height: 140px;
+  border-radius: 25px;
+  overflow: hidden;
+  z-index: 1;
+
+  span {
+    position: absolute;
+    left: 20px;
+    bottom: 16px;
+  }
+
+  svg {
+    circle {
+      color: var(--white);
+      display: none;
+    }
+  }
+
+  &.Loading {
+    svg {
+      circle {
+        display: block;
+      }
+    }
+  }
+}
+
+.RoomPreloader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -40px;
+  margin-left: -40px;
+  div svg {
+    color: #45caff;
+    width: 50px;
+    height: 50px;
+  }
+  > svg {
+    width: 80px;
+    height: 80px;
+    opacity: 1;
+  }
+}
+
+.Counter {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--color);
+  font-weight: 700;
+  font-size: 80px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  position: absolute;
+}

@@ -3,9 +3,10 @@
 import { useEffect, useRef } from 'react';
 import { usePopup } from '@/hooks/usePopup';
 
-export function useIntro(src = './interview_intro.mp3') {
+export function useIntro(src = './interview_intro.mp3', onEnd) {
   const audioRef = useRef(null);
   const { openPopup, closePopup } = usePopup();
+  console.log('%c🔄 useIntro инициализируется', 'color: red');
 
   useEffect(() => {
     const audio = new Audio(src);
@@ -13,7 +14,9 @@ export function useIntro(src = './interview_intro.mp3') {
 
     const popupAction = () => {
       closePopup();
-      audio.play();
+      audio.play().catch(err => {
+        console.warn('Ошибка воспроизведения аудио:', err);
+      });
     };
 
     const tryPlay = async () => {
@@ -34,15 +37,21 @@ export function useIntro(src = './interview_intro.mp3') {
       }
     };
 
+    const handleEnded = () => {
+      if (typeof onEnd === 'function') {
+        onEnd();
+      }
+    };
+
+    audio.addEventListener('ended', handleEnded);
     tryPlay();
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
+      audio.removeEventListener('ended', handleEnded);
+      audio.pause();
+      audio.currentTime = 0;
     };
-  }, [src, openPopup]);
+  }, [src, onEnd, openPopup, closePopup]);
 
   return audioRef;
 }

@@ -16,7 +16,8 @@ const InterviewArticle = ({ interview = {} }) => {
   return (
     <article className={css.InterviewArticle}>
       <div className={css.Thumbnail}>
-        {thumbnail && <Image src={thumbnail} alt={name} width={260} height={138} />}
+        {/* {thumbnail && <Image src={thumbnail} alt={name} width={260} height={138} />} */}
+        {thumbnail && <Image src={thumbnail} alt={name} fill sizes="100%" priority />}
         {category && <span>{category}</span>}
       </div>
       <div className={css.TitleBox}>
