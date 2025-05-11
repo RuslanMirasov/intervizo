@@ -12,6 +12,10 @@ export function useVoice({ threshold = 15 } = {}) {
   const dataArrayRef = useRef(null);
   const intervalRef = useRef(null);
 
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+
+  // 🔊 Только анализ речи (без записи)
   const startListening = useCallback(async () => {
     if (isActive) return;
 
@@ -44,8 +48,55 @@ export function useVoice({ threshold = 15 } = {}) {
     }
   }, [threshold, isActive]);
 
+  // ⏺️ Отдельно начать запись (если стрим уже есть)
+  const startRecording = useCallback(() => {
+    if (!streamRef.current) {
+      console.warn('Нет активного микрофона для записи');
+      return;
+    }
+
+    try {
+      const mediaRecorder = new MediaRecorder(streamRef.current);
+      chunksRef.current = [];
+
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.start();
+      mediaRecorderRef.current = mediaRecorder;
+    } catch (err) {
+      console.error('Ошибка запуска записи:', err);
+    }
+  }, []);
+
+  // ⏹️ Остановить только запись и вернуть blob
+  const stopRecording = useCallback(() => {
+    return new Promise(resolve => {
+      if (!mediaRecorderRef.current) return resolve(null);
+
+      const recorder = mediaRecorderRef.current;
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        chunksRef.current = [];
+        resolve(blob);
+      };
+
+      if (recorder.state === 'recording') {
+        recorder.stop();
+      } else {
+        resolve(null);
+      }
+    });
+  }, []);
+
+  // 🛑 Полная остановка микрофона + анализатора
   const stopListening = useCallback(() => {
     if (!isActive) return;
+
     if (intervalRef.current) clearInterval(intervalRef.current);
     if (audioContextRef.current) audioContextRef.current.close();
     if (streamRef.current) {
@@ -67,5 +118,12 @@ export function useVoice({ threshold = 15 } = {}) {
     };
   }, [stopListening]);
 
-  return { isSpeaking, isActive, startListening, stopListening };
+  return {
+    isSpeaking,
+    isActive,
+    startListening, // только анализ речи
+    stopListening, // остановка всего
+    startRecording, // включение записи (при active микрофоне)
+    stopRecording, // завершение записи и получение blob
+  };
 }
