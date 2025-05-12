@@ -17,7 +17,7 @@ const RoomButtons = () => {
       )}
 
       {stepPhase === 'answering' && (
-        <Button className="small white radius" onClick={() => saveAnswer(step)}>
+        <Button className={`${css.Next} small white radius`} onClick={() => saveAnswer(step)}>
           Следующий вопрос
         </Button>
       )}
