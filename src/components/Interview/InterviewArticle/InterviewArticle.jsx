@@ -37,7 +37,7 @@ const InterviewArticle = ({ interview = {} }) => {
           </li>
         )}
       </ul>
-      {slug && <Link href={`./interviews/${slug}`} className={css.Link}></Link>}
+      {slug && <Link href={`./`} className={css.Link}></Link>}
     </article>
   );
 };
