@@ -1,3 +1,4 @@
+import { Score } from '@/components';
 import Link from 'next/link';
 import css from './ResultListItem.module.scss';
 
@@ -17,7 +18,8 @@ const ResultListItem = ({ result }) => {
       </div>
       <div className={css.ListInfo}>
         {date && <p>{date}</p>}
-        <span>{String(rating)}</span>
+        <Score score={rating} size="small" />
+        {/* <span>{String(rating)}</span> */}
       </div>
     </Link>
   );

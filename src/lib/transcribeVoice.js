@@ -1,3 +1,5 @@
+import { isBadText } from './isBadText';
+
 export async function transcribeVoice(id, blob, setProgress) {
   try {
     const form = new FormData();
@@ -14,7 +16,13 @@ export async function transcribeVoice(id, blob, setProgress) {
       throw new Error(error || 'Ошибка транскрибации');
     }
 
-    const { text } = await res.json();
+    let { text } = await res.json();
+    text = text.trim();
+
+    if (isBadText(text)) {
+      console.warn(`Ответ от Whisper признан мусором и заменён на пустую строку: "${text}"`);
+      text = '';
+    }
 
     // Обновляем progress через setProgress
     setProgress(prev => prev.map(entry => (entry.id === id ? { ...entry, answer: text } : entry)));

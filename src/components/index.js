@@ -28,3 +28,6 @@ export { default as Room } from './Room/Room';
 export { default as RoomTime } from './Room/RoomTime/RoomTime';
 export { default as RoomButtons } from './Room/RoomButtons/RoomButtons';
 export { default as RoomPanel } from './Room/RoomPanel/RoomPanel';
+export { default as Scoring } from './Scoring/Scoring';
+export { default as ScoringResult } from './Scoring/ScoringResult/ScoringResult';
+export { default as Score } from './Scoring/Score/Score';

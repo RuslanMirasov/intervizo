@@ -1,0 +1,25 @@
+.Score {
+  min-width: 68px;
+  font-size: 32px;
+  color: var(--brown);
+  background: var(--yellow-light);
+  border-radius: 50px;
+  padding: 10px;
+  text-align: center;
+
+  &.Green {
+    color: var(--green);
+    background: var(--green-light);
+  }
+
+  &.Red {
+    color: var(--red);
+    background: var(--red-light);
+  }
+
+  &.Small {
+    min-width: 38px;
+    font-size: 12px;
+    padding: 4.5px 10px;
+  }
+}

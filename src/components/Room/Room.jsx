@@ -16,10 +16,6 @@ const Room = () => {
     if (isPersistent && interview.data.length > 0) {
       startInterview();
     }
-
-    return () => {
-      stopInterview();
-    };
   }, [isPersistent, interview.data, startInterview, stopInterview]);
 
   if (!isPersistent) return null;

@@ -43,13 +43,18 @@
     }
   }
 
+  &.radius {
+    border-radius: 50px;
+  }
+
   &.white {
     background: var(--white);
     border: 1px solid var(--white);
     color: var(--black);
     &:hover {
-      border: 1px solid var(--yellow);
-      background: var(--yellow);
+      border: 1px solid var(--color);
+      background: var(--color);
+      color: var(--white);
     }
   }
 
@@ -86,8 +91,13 @@
     min-width: 64px;
     border-radius: 64px;
     &:hover {
-      background: var(--color);
-      border: 1px solid var(--color);
+      background: var(--red-hover);
+      border: 1px solid var(--red-hover);
+    }
+    &:active {
+      transition: 0s;
+      background: var(--red-active);
+      border: 1px solid var(--red-active);
     }
   }
 

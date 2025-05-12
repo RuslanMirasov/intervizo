@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 import { useInterview } from '@/hooks/useInterview';
@@ -9,16 +10,16 @@ import { ProgressUiProvider } from './ProgressUiContext';
 import { loadAudio } from '@/lib/loadAudio';
 import { playAudio } from '@/lib/playAudio';
 import { transcribeVoice } from '@/lib/transcribeVoice';
-import { speak } from '@/lib/speak';
 
 const ProgressContext = createContext(null);
 
 export const ProgressProvider = ({ children }) => {
+  const router = useRouter();
   const [progress, setProgress] = useLocalStorageState('interview-progress', {
     defaultValue: [],
   });
   const { interview } = useInterview();
-  const { isSpeaking, startListening, startRecording, stopRecording } = useVoice();
+  const { isSpeaking, startListening, stopListening, startRecording, stopRecording } = useVoice();
 
   const [stepPhase, setStepPhase] = useState('stop'); // 'stop' | 'thinking' | 'answering'
   const [step, setStep] = useState(null);
@@ -32,7 +33,7 @@ export const ProgressProvider = ({ children }) => {
     if (stepPhase === 'thinking') {
       startCountdown(15, () => saveAnswer(step), setCountdown);
     } else if (stepPhase === 'answering') {
-      startCountdown(4, () => saveAnswer(step), setCountdown);
+      startCountdown(8, () => saveAnswer(step), setCountdown);
     } else {
       startCountdown();
     }
@@ -47,20 +48,27 @@ export const ProgressProvider = ({ children }) => {
   // СЛУШАЕМ РЕЧЬ
   useEffect(() => {
     if (stepPhase === 'thinking') setStepPhase('answering');
-    else if (stepPhase === 'answering') startCountdown(4, () => saveAnswer(step), setCountdown);
+    else if (stepPhase === 'answering') startCountdown(8, () => saveAnswer(step), setCountdown);
   }, [isSpeaking]);
 
   // ОСТАНАВЛИВАЕМ ИНТЕРВЬЮ
-  const stopInterview = useCallback(() => {
-    console.log(progress);
-    alert('Интервью закончено');
-  }, []);
+  const stopInterview = useCallback(async () => {
+    try {
+      startCountdown();
+      stopListening();
+      await stopRecording();
+    } catch (err) {
+      console.warn('Ошибка при завершении интервью:', err);
+    }
+
+    router.push('/scoring');
+  }, [stopListening, stopRecording, router]);
 
   // ЗАПУСКАЕМ ИНТЕРВЬЮ
   const startInterview = useCallback(() => {
     startListening();
     setStep(0);
-  }, [interview, stopInterview]);
+  }, [startListening]);
 
   const saveAnswer = async step => {
     try {
@@ -127,7 +135,6 @@ export const ProgressProvider = ({ children }) => {
 
     const { type, text } = interview.data[step];
 
-    //await speak(text);
     preloadNextAudio(step);
     await getAndPlayAudio(step, text);
 
@@ -159,8 +166,10 @@ export const ProgressProvider = ({ children }) => {
     () => ({
       startInterview,
       stopInterview,
+      step,
+      saveAnswer,
     }),
-    [startInterview, stopInterview]
+    [startInterview, stopInterview, step, saveAnswer]
   );
 
   const uiValue = useMemo(
