@@ -1,23 +1,20 @@
 import { Button, Icon, RoomTime } from '@/components';
 import { useProgressUi } from '@/context/ProgressUiContext';
-import { useProgress } from '@/context/ProgressContext';
+//import { useProgress } from '@/context/ProgressContext';
 import css from './RoomButtons.module.scss';
 
 const RoomButtons = () => {
-  const { stepPhase } = useProgressUi();
-  const { step, saveAnswer } = useProgress();
+  const { showNextButton, saveAnswer } = useProgressUi();
   return (
     <div className={css.Panel}>
       <RoomTime />
 
-      {stepPhase !== 'answering' && (
-        <Button href="./" className="small call">
-          <Icon name="call" size="25" color="var(--white)" />
-        </Button>
-      )}
+      <Button href="./" className="small call">
+        <Icon name="call" size="25" color="var(--white)" />
+      </Button>
 
-      {stepPhase === 'answering' && (
-        <Button className={`${css.Next} small white radius`} onClick={() => saveAnswer(step)}>
+      {showNextButton && (
+        <Button className="small white radius nextQuestion" onClick={() => saveAnswer()}>
           Следующий вопрос
         </Button>
       )}

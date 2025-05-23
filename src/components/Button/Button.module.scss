@@ -121,6 +121,11 @@
     }
   }
 
+  &.nextQuestion {
+    position: absolute;
+    right: 30px;
+  }
+
   &:disabled,
   &[disabled] {
     pointer-events: none;

@@ -15,10 +15,16 @@ export const loadAudio = async text => {
   }
 
   const audioBuffer = await response.arrayBuffer();
+
+  if (!audioBuffer || audioBuffer.byteLength === 0) {
+    throw new Error('Пустой аудиофайл');
+  }
+
   const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
   const url = URL.createObjectURL(blob);
 
   const audio = new Audio(url);
   audio.preload = 'auto';
+
   return audio;
 };
