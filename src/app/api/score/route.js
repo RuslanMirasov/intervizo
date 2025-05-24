@@ -1,69 +1,91 @@
-import { OpenAI } from 'openai';
+import { NextResponse } from 'next/server';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-export async function POST(req) {
-  const { progress } = await req.json();
-
-  if (!progress) {
-    return Response.json(
-      { message: 'Данные для обработки не были переданы. Либо переданы не корректно.' },
-      { status: 400 }
-    );
-  }
-
-  const prompt = `
-Ты — опытный технический интервьюер. Вот список вопросов и ответов кандидата. Для каждого:
-1. Оцени ответ по шкале от 0.0 до 5.0
-2. Напиши краткий и полезный feedback, если ответ неполный, поверхностный или неточный.
-3. Верни результат в формате того же массива, но с заполненными полями "score" и "feedback".
-4. Также укажи общий средний балл интервью отдельным полем "totalScore".
-
-Пример входа:
-[
-  {
-    "id": 1,
-    "question": "...",
-    "answer": "...",
-    "feedback": null,
-    "score": 0
-  }
-]
-
-Ответ: верни **ТОЛЬКО** валидный JSON внутри тройных кавычек НИКАКИХ ОБЬЯСНЕНИЙ ИЛИ ТЕКСТА:
-{
-  "progress": [ ...с заполненными feedback и score... ],
-  "totalScore": от 0.0 до 5.0
-}
-
-Вот входные данные:
-${JSON.stringify(progress)}
-`;
-
-  console.log(progress);
-
+export async function POST(request) {
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.4,
-    });
+    const { progress } = await request.json();
 
-    console.log(response);
-
-    const content = response.choices[0].message.content;
-
-    const match = content.match(/```json([\s\S]*?)```/i);
-
-    if (!match || !match[1]) {
-      throw new Error('Ответ от OpenAI не содержит корректного JSON');
+    if (!progress || !Array.isArray(progress)) {
+      return NextResponse.json({ error: 'Некорректные данные прогресса' }, { status: 400 });
     }
 
-    const json = match[1].trim();
-    const parsed = JSON.parse(json);
-    return Response.json(parsed);
-  } catch (err) {
-    console.error('Ошибка при оценке:', err);
-    return Response.json({ error: 'Ошибка оценки интервью' }, { status: 500 });
+    console.log('Получены данные для оценки:', progress);
+
+    const prompt = `
+Ты эксперт по проведению интервью. Твоя задача - оценить ответы кандидата.
+
+Верни точно такой же JSON массив, но заполни поля:
+- score: оценка от 0.0 до 5.0 (где 5.0 - отличный ответ, 0.0 - плохой)
+- feedback: конструктивная обратная связь на русском языке
+
+Критерии оценки: полнота ответа, релевантность, четкость, профессионализм.
+
+ВАЖНО: Технические фразы типа "Следующий вопрос", "Повторите вопрос", "Можно следующий" и подобные НЕ ДОЛЖНЫ влиять на оценку. Это команды управления приложением, а не часть профессионального ответа. Оценивай только содержательную часть ответа.
+
+Массив для оценки:
+${JSON.stringify(progress, null, 2)}
+
+ВАЖНО: Верни ТОЛЬКО чистый JSON массив без markdown разметки, без \`\`\`json и без дополнительного текста.
+`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.3,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    let content = data.choices[0].message.content;
+
+    console.log('Ответ от OpenAI:', content);
+
+    // Убираем markdown разметку если она есть
+    content = content
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .trim();
+
+    console.log('Очищенный контент:', content);
+
+    // Парсим JSON ответ
+    let evaluatedProgress;
+    try {
+      evaluatedProgress = JSON.parse(content);
+    } catch (parseError) {
+      console.error('Ошибка парсинга JSON:', parseError);
+      console.error('Контент для парсинга:', content);
+      throw new Error('Некорректный ответ от OpenAI');
+    }
+
+    console.log('Обработанный результат:', evaluatedProgress);
+
+    return NextResponse.json({
+      success: true,
+      data: evaluatedProgress,
+    });
+  } catch (error) {
+    console.error('Ошибка при оценке интервью:', error);
+    return NextResponse.json(
+      {
+        error: 'Ошибка при обработке запроса',
+        details: error.message,
+      },
+      { status: 500 }
+    );
   }
 }

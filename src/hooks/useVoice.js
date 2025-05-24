@@ -1,275 +1,909 @@
+// 'use client';
+
+// import { useEffect, useRef, useState, useCallback } from 'react';
+
+// const AUDIO_CONFIG = {
+//   echoCancellation: true,
+//   noiseSuppression: true,
+//   autoGainControl: true,
+// };
+
+// const ANALYSER_CONFIG = {
+//   fftSize: 1024,
+//   minSamples: 5,
+//   volumeThreshold: 128,
+// };
+
+// const SPEECH_RECOGNITION_CONFIG = {
+//   continuous: true,
+//   interimResults: true,
+//   restartDelay: 100,
+// };
+
+// const AUDIO_FORMAT = 'audio/webm';
+
+// export function useVoice({
+//   threshold = 15,
+//   checkInterval = 100,
+//   lang = 'ru-RU',
+//   repeatTriggers = [
+//     'повторите вопрос',
+//     'повтори вопрос',
+//     'вопрос ещё раз',
+//     'вопрос повторить',
+//     'повторите пожалуйста вопрос',
+//     'повторить вопрос',
+//     'можно ещё раз вопрос',
+//     'не расслышал вопрос',
+//     'что вы сказали',
+//     'не понял вопрос',
+//     'можно повтор',
+//     'ещё раз пожалуйста',
+//     'скажите ещё раз',
+//     'повторите пожалуйста',
+//     'повторить пожалуйста',
+//   ],
+//   nextTriggers = [
+//     'следующий вопрос',
+//     'к следующему вопросу',
+//     'пропустить вопрос',
+//     'вопрос пропустить',
+//     'пропустить вопрос',
+//   ],
+// } = {}) {
+//   const [isSpeaking, setIsSpeaking] = useState(false);
+//   const [triggerDetected, setTriggerDetected] = useState(null);
+//   const [isRecording, setIsRecording] = useState(false);
+//   const [isPaused, setIsPaused] = useState(false);
+
+//   const audioRefs = useRef({
+//     stream: null,
+//     context: null,
+//     analyser: null,
+//     dataArray: null,
+//     detectionInterval: null,
+//   });
+
+//   const recordingRefs = useRef({
+//     mediaRecorder: null,
+//     chunks: [],
+//     lastBlob: null,
+//   });
+
+//   const speechRefs = useRef({
+//     recognition: null,
+//     isActive: false,
+//     isPaused: false,
+//   });
+
+//   const cleanupAudioResources = useCallback(() => {
+//     const { stream, context, detectionInterval } = audioRefs.current;
+
+//     if (detectionInterval) {
+//       clearInterval(detectionInterval);
+//       audioRefs.current.detectionInterval = null;
+//     }
+
+//     if (context && context.state !== 'closed') {
+//       context.close();
+//     }
+
+//     if (stream) {
+//       stream.getTracks().forEach(track => track.stop());
+//     }
+
+//     audioRefs.current = {
+//       stream: null,
+//       context: null,
+//       analyser: null,
+//       dataArray: null,
+//       detectionInterval: null,
+//     };
+//   }, []);
+
+//   const cleanupRecordingResources = useCallback(() => {
+//     const { mediaRecorder } = recordingRefs.current;
+
+//     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+//       try {
+//         mediaRecorder.stop();
+//       } catch (error) {
+//         console.error('Ошибка остановки MediaRecorder:', error);
+//       }
+//     }
+
+//     recordingRefs.current.mediaRecorder = null;
+//     recordingRefs.current.chunks = [];
+//   }, []);
+
+//   const cleanupSpeechResources = useCallback(() => {
+//     const { recognition } = speechRefs.current;
+
+//     if (recognition) {
+//       try {
+//         recognition.stop();
+//       } catch (error) {
+//         console.error('Ошибка остановки распознавания речи:', error);
+//       }
+//     }
+
+//     speechRefs.current.recognition = null;
+//   }, []);
+
+//   const cleanupAllResources = useCallback(() => {
+//     cleanupSpeechResources();
+//     cleanupRecordingResources();
+//     cleanupAudioResources();
+
+//     speechRefs.current.isActive = false;
+//     speechRefs.current.isPaused = false;
+
+//     setIsSpeaking(false);
+//     setTriggerDetected(null);
+//   }, [cleanupAudioResources, cleanupRecordingResources, cleanupSpeechResources]);
+
+//   const initializeAudio = useCallback(async () => {
+//     try {
+//       const stream = await navigator.mediaDevices.getUserMedia({
+//         audio: AUDIO_CONFIG,
+//       });
+
+//       const audioContext = new AudioContext();
+//       const analyser = audioContext.createAnalyser();
+//       analyser.fftSize = ANALYSER_CONFIG.fftSize;
+
+//       const microphone = audioContext.createMediaStreamSource(stream);
+//       microphone.connect(analyser);
+
+//       const dataArray = new Uint8Array(analyser.fftSize);
+
+//       audioRefs.current = {
+//         ...audioRefs.current,
+//         stream,
+//         context: audioContext,
+//         analyser,
+//         dataArray,
+//       };
+
+//       return true;
+//     } catch (error) {
+//       console.error('Ошибка инициализации аудио:', error);
+//       return false;
+//     }
+//   }, []);
+
+//   const startVoiceDetection = useCallback(() => {
+//     const { analyser, dataArray, detectionInterval } = audioRefs.current;
+
+//     if (detectionInterval || !analyser || !dataArray) {
+//       return;
+//     }
+
+//     audioRefs.current.detectionInterval = setInterval(() => {
+//       const { analyser: currentAnalyser, dataArray: currentDataArray } = audioRefs.current;
+
+//       if (!currentAnalyser || !currentDataArray) return;
+
+//       currentAnalyser.getByteTimeDomainData(currentDataArray);
+
+//       let voiceDetected = 0;
+//       const { minSamples, volumeThreshold } = ANALYSER_CONFIG;
+
+//       for (let i = 0; i < currentDataArray.length; i++) {
+//         if (Math.abs(currentDataArray[i] - volumeThreshold) > threshold) {
+//           voiceDetected++;
+//           if (voiceDetected >= minSamples) break;
+//         }
+//       }
+
+//       setIsSpeaking(voiceDetected >= minSamples);
+//     }, checkInterval);
+//   }, [threshold, checkInterval]);
+
+//   const stopVoiceDetection = useCallback(() => {
+//     const { detectionInterval } = audioRefs.current;
+
+//     if (detectionInterval) {
+//       clearInterval(detectionInterval);
+//       audioRefs.current.detectionInterval = null;
+//     }
+
+//     setIsSpeaking(false);
+//   }, []);
+
+//   const handleSpeechResult = useCallback(
+//     event => {
+//       if (speechRefs.current.isPaused) return;
+
+//       let transcript = '';
+//       for (let i = event.resultIndex; i < event.results.length; i++) {
+//         transcript += event.results[i][0].transcript.toLowerCase();
+//       }
+
+//       const isRepeatTrigger = repeatTriggers.some(phrase => transcript.includes(phrase));
+//       const isNextTrigger = nextTriggers.some(phrase => transcript.includes(phrase));
+
+//       if (isRepeatTrigger) {
+//         setTriggerDetected('repeat');
+//         pauseRecord();
+//       } else if (isNextTrigger) {
+//         setTriggerDetected('next');
+//         stopRecord();
+//       }
+//     },
+//     [repeatTriggers, nextTriggers]
+//   );
+
+//   const handleSpeechError = useCallback(event => {
+//     console.warn('Ошибка распознавания речи:', event.error);
+
+//     const { isActive, isPaused } = speechRefs.current;
+//     const { recognition } = speechRefs.current;
+
+//     if (isActive && event.error === 'no-speech' && !isPaused && recognition) {
+//       try {
+//         recognition.stop();
+//         setTimeout(() => {
+//           if (speechRefs.current.isActive && !speechRefs.current.isPaused) {
+//             recognition.start();
+//           }
+//         }, SPEECH_RECOGNITION_CONFIG.restartDelay);
+//       } catch (error) {
+//         console.error('Ошибка перезапуска распознавания:', error);
+//       }
+//     }
+//   }, []);
+
+//   const handleSpeechEnd = useCallback(() => {
+//     const { isActive, isPaused } = speechRefs.current;
+//     const { recognition } = speechRefs.current;
+
+//     if (isActive && !isPaused && recognition) {
+//       try {
+//         setTimeout(() => {
+//           if (speechRefs.current.isActive && !speechRefs.current.isPaused) {
+//             recognition.start();
+//           }
+//         }, SPEECH_RECOGNITION_CONFIG.restartDelay);
+//       } catch (error) {
+//         console.error('Ошибка перезапуска распознавания:', error);
+//       }
+//     }
+//   }, []);
+
+//   const initializeSpeechRecognition = useCallback(() => {
+//     if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+//       console.error('Распознавание речи не поддерживается в этом браузере');
+//       return false;
+//     }
+
+//     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+//     const recognition = new SpeechRecognition();
+
+//     Object.assign(recognition, {
+//       ...SPEECH_RECOGNITION_CONFIG,
+//       lang,
+//     });
+
+//     recognition.onresult = handleSpeechResult;
+//     recognition.onerror = handleSpeechError;
+//     recognition.onend = handleSpeechEnd;
+
+//     speechRefs.current.recognition = recognition;
+//     return true;
+//   }, [lang, handleSpeechResult, handleSpeechError, handleSpeechEnd]);
+
+//   const createAudioBlob = useCallback(() => {
+//     const { chunks } = recordingRefs.current;
+
+//     if (chunks.length === 0) return null;
+
+//     const blob = new Blob(chunks, { type: AUDIO_FORMAT });
+//     recordingRefs.current.lastBlob = blob;
+//     recordingRefs.current.chunks = [];
+
+//     return blob;
+//   }, []);
+
+//   const startRecord = useCallback(async () => {
+//     if (speechRefs.current.isActive) return;
+
+//     recordingRefs.current.lastBlob = null;
+//     speechRefs.current.isPaused = false;
+
+//     const audioInitialized = await initializeAudio();
+//     if (!audioInitialized) return;
+
+//     const speechInitialized = initializeSpeechRecognition();
+//     if (!speechInitialized) return;
+
+//     try {
+//       const mediaRecorder = new MediaRecorder(audioRefs.current.stream);
+//       recordingRefs.current.chunks = [];
+
+//       mediaRecorder.ondataavailable = event => {
+//         if (event.data.size > 0) {
+//           recordingRefs.current.chunks.push(event.data);
+//         }
+//       };
+
+//       mediaRecorder.start();
+//       recordingRefs.current.mediaRecorder = mediaRecorder;
+
+//       startVoiceDetection();
+//       speechRefs.current.recognition.start();
+
+//       speechRefs.current.isActive = true;
+//       setIsRecording(true);
+//       setIsPaused(false);
+//       setTriggerDetected(null);
+//     } catch (error) {
+//       console.error('Ошибка запуска записи:', error);
+//       speechRefs.current.isActive = false;
+//       cleanupAllResources();
+//     }
+//   }, [initializeAudio, initializeSpeechRecognition, startVoiceDetection, cleanupAllResources]);
+
+//   const stopRecord = useCallback(() => {
+//     if (!speechRefs.current.isActive) {
+//       return Promise.resolve(recordingRefs.current.lastBlob);
+//     }
+
+//     return new Promise(resolve => {
+//       speechRefs.current.isActive = false;
+//       speechRefs.current.isPaused = false;
+//       setIsRecording(false);
+//       setIsPaused(false);
+//       setTriggerDetected(null);
+
+//       cleanupSpeechResources();
+
+//       stopVoiceDetection();
+
+//       const { mediaRecorder } = recordingRefs.current;
+
+//       if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
+//         mediaRecorder.onstop = () => {
+//           const blob = createAudioBlob();
+//           cleanupAllResources();
+//           resolve(blob);
+//         };
+//         mediaRecorder.stop();
+//       } else {
+//         const blob = createAudioBlob();
+//         cleanupAllResources();
+//         resolve(blob);
+//       }
+//     });
+//   }, [cleanupSpeechResources, stopVoiceDetection, createAudioBlob, cleanupAllResources]);
+
+//   const pauseRecord = useCallback(() => {
+//     const { isActive, isPaused } = speechRefs.current;
+
+//     if (!isActive || isPaused) return;
+
+//     speechRefs.current.isPaused = true;
+//     setIsPaused(true);
+//     setIsSpeaking(false);
+
+//     cleanupSpeechResources();
+//     stopVoiceDetection();
+
+//     const { mediaRecorder } = recordingRefs.current;
+//     if (mediaRecorder && mediaRecorder.state === 'recording') {
+//       mediaRecorder.pause();
+//     }
+//   }, [cleanupSpeechResources, stopVoiceDetection]);
+
+//   const resumeRecord = useCallback(() => {
+//     if (!speechRefs.current.isActive) return;
+
+//     speechRefs.current.isPaused = false;
+//     setIsPaused(false);
+//     setTriggerDetected(null);
+//     setIsSpeaking(false);
+
+//     const { mediaRecorder } = recordingRefs.current;
+//     if (mediaRecorder && mediaRecorder.state === 'paused') {
+//       mediaRecorder.resume();
+//     }
+
+//     startVoiceDetection();
+
+//     const speechInitialized = initializeSpeechRecognition();
+//     if (speechInitialized && speechRefs.current.recognition) {
+//       try {
+//         speechRefs.current.recognition.start();
+//       } catch (error) {
+//         console.error('Ошибка запуска распознавания речи:', error);
+//       }
+//     }
+//   }, [startVoiceDetection, initializeSpeechRecognition]);
+
+//   useEffect(() => {
+//     return () => {
+//       cleanupAllResources();
+//     };
+//   }, [cleanupAllResources]);
+
+//   return {
+//     isSpeaking,
+//     triggerDetected,
+//     isRecording,
+//     isPaused,
+//     startRecord,
+//     stopRecord,
+//     pauseRecord,
+//     resumeRecord,
+//   };
+// }
+
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 
+const AUDIO_CONFIG = {
+  echoCancellation: true,
+  noiseSuppression: true,
+  autoGainControl: true,
+};
+
+const ANALYSER_CONFIG = {
+  fftSize: 1024,
+  minSamples: 5,
+  volumeThreshold: 128,
+};
+
+const SPEECH_CONFIG = {
+  continuous: true,
+  interimResults: true,
+  restartDelay: 100,
+};
+
+const AUDIO_FORMAT = 'audio/webm';
+
+const DEFAULT_REPEAT_TRIGGERS = [
+  'повторите вопрос',
+  'повтори вопрос',
+  'вопрос ещё раз',
+  'вопрос повторить',
+  'повторите пожалуйста вопрос',
+  'повторить вопрос',
+  'можно ещё раз вопрос',
+  'не расслышал вопрос',
+  'что вы сказали',
+  'не понял вопрос',
+  'можно повтор',
+  'ещё раз пожалуйста',
+  'скажите ещё раз',
+  'повторите пожалуйста',
+  'повторить пожалуйста',
+];
+
+const DEFAULT_NEXT_TRIGGERS = ['следующий вопрос', 'к следующему вопросу', 'пропустить вопрос', 'вопрос пропустить'];
+
 export function useVoice({
-  // Порог чувствительности: 10-15 для тихих помещений, 20-25 для шумных
   threshold = 15,
-  // Интервал проверки аудио в мс
   checkInterval = 100,
-  // Язык распознавания речи
   lang = 'ru-RU',
-  // Триггеры для повтора вопроса
-  repeatTriggers = [
-    'повторите вопрос',
-    'повтори вопрос',
-    'вопрос ещё раз',
-    'вопрос повторить',
-    'повторите пожалуйста вопрос',
-    'повторить вопрос',
-    'можно ещё раз вопрос',
-    'не расслышал вопрос',
-    'что вы сказали',
-    'не понял вопрос',
-    'можно повтор',
-    'ещё раз пожалуйста',
-    'скажите ещё раз',
-    'повторите пожалуйста',
-    'повторить пожалуйста',
-  ],
-  // Триггеры для следующего вопроса
-  nextTriggers = [
-    'следующий вопрос',
-    'к следующему вопросу',
-    'пропустить вопрос',
-    'вопрос пропустить',
-    'пропустить вопрос',
-  ],
+  repeatTriggers = DEFAULT_REPEAT_TRIGGERS,
+  nextTriggers = DEFAULT_NEXT_TRIGGERS,
 } = {}) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [triggerDetected, setTriggerDetected] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Ссылки для аудио-анализа
-  const streamRef = useRef(null);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-  const dataArrayRef = useRef(null);
-  const intervalRef = useRef(null);
+  const audioRefs = useRef({
+    stream: null,
+    context: null,
+    analyser: null,
+    dataArray: null,
+    detectionInterval: null,
+  });
 
-  // Ссылки для записи
-  const mediaRecorderRef = useRef(null);
-  const chunksRef = useRef([]);
+  const recordingRefs = useRef({
+    mediaRecorder: null,
+    chunks: [],
+    lastBlob: null,
+  });
 
-  // Ссылка для распознавания речи
-  const recognitionRef = useRef(null);
-  const isActiveRef = useRef(false);
+  const speechRefs = useRef({
+    recognition: null,
+    isActive: false,
+    isPaused: false,
+  });
 
-  // Запуск прослушивания микрофона и распознавания речи
-  const startListening = useCallback(async () => {
-    if (isActiveRef.current) return;
-    isActiveRef.current = true;
+  const isMountedRef = useRef(true);
 
+  const cleanupAudioResources = useCallback(() => {
+    const { stream, context, detectionInterval } = audioRefs.current;
+
+    if (detectionInterval) {
+      clearInterval(detectionInterval);
+      audioRefs.current.detectionInterval = null;
+    }
+
+    if (context && context.state !== 'closed') {
+      try {
+        context.close();
+      } catch (error) {
+        console.error('Audio context cleanup error:', error);
+      }
+    }
+
+    if (stream) {
+      try {
+        stream.getTracks().forEach(track => {
+          if (track.readyState !== 'ended') {
+            track.stop();
+          }
+        });
+      } catch (error) {
+        console.error('Stream cleanup error:', error);
+      }
+    }
+
+    audioRefs.current = {
+      stream: null,
+      context: null,
+      analyser: null,
+      dataArray: null,
+      detectionInterval: null,
+    };
+  }, []);
+
+  const cleanupRecordingResources = useCallback(() => {
+    const { mediaRecorder } = recordingRefs.current;
+
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      try {
+        mediaRecorder.stop();
+      } catch (error) {
+        console.error('MediaRecorder cleanup error:', error);
+      }
+    }
+
+    recordingRefs.current.mediaRecorder = null;
+    recordingRefs.current.chunks = [];
+  }, []);
+
+  const cleanupSpeechResources = useCallback(() => {
+    const { recognition } = speechRefs.current;
+
+    if (recognition) {
+      try {
+        recognition.stop();
+      } catch (error) {
+        console.error('Speech recognition cleanup error:', error);
+      }
+    }
+
+    speechRefs.current.recognition = null;
+  }, []);
+
+  const cleanupAllResources = useCallback(() => {
+    cleanupSpeechResources();
+    cleanupRecordingResources();
+    cleanupAudioResources();
+
+    speechRefs.current.isActive = false;
+    speechRefs.current.isPaused = false;
+
+    if (isMountedRef.current) {
+      setIsSpeaking(false);
+      setTriggerDetected(null);
+    }
+  }, [cleanupAudioResources, cleanupRecordingResources, cleanupSpeechResources]);
+
+  const initializeAudio = useCallback(async () => {
     try {
-      // 1. Инициализация микрофона для определения речи
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
-      streamRef.current = stream;
-
-      // Настройка аудио-анализатора
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: AUDIO_CONFIG });
       const audioContext = new AudioContext();
       const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 1024;
 
-      const mic = audioContext.createMediaStreamSource(stream);
-      mic.connect(analyser);
+      analyser.fftSize = ANALYSER_CONFIG.fftSize;
+
+      const microphone = audioContext.createMediaStreamSource(stream);
+      microphone.connect(analyser);
 
       const dataArray = new Uint8Array(analyser.fftSize);
 
-      audioContextRef.current = audioContext;
-      analyserRef.current = analyser;
-      dataArrayRef.current = dataArray;
+      audioRefs.current = {
+        ...audioRefs.current,
+        stream,
+        context: audioContext,
+        analyser,
+        dataArray,
+      };
 
-      // Запуск интервала для определения наличия речи
-      intervalRef.current = setInterval(() => {
-        analyser.getByteTimeDomainData(dataArray);
+      return true;
+    } catch (error) {
+      console.error('Audio initialization error:', error);
+      return false;
+    }
+  }, []);
 
-        let voiceDetected = 0;
-        const minSamples = 5;
+  const startVoiceDetection = useCallback(() => {
+    const { analyser, dataArray, detectionInterval } = audioRefs.current;
 
-        for (let i = 0; i < dataArray.length; i++) {
-          if (Math.abs(dataArray[i] - 128) > threshold) {
-            voiceDetected++;
-            if (voiceDetected >= minSamples) break;
-          }
+    if (detectionInterval || !analyser || !dataArray) return;
+
+    audioRefs.current.detectionInterval = setInterval(() => {
+      const { analyser: currentAnalyser, dataArray: currentDataArray } = audioRefs.current;
+
+      if (!currentAnalyser || !currentDataArray) return;
+
+      currentAnalyser.getByteTimeDomainData(currentDataArray);
+
+      let voiceDetected = 0;
+      const { minSamples, volumeThreshold } = ANALYSER_CONFIG;
+
+      for (let i = 0; i < currentDataArray.length; i++) {
+        if (Math.abs(currentDataArray[i] - volumeThreshold) > threshold) {
+          voiceDetected++;
+          if (voiceDetected >= minSamples) break;
         }
-
-        setIsSpeaking(voiceDetected >= minSamples);
-      }, checkInterval);
-
-      // 2. Инициализация распознавания речи
-      if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-        console.error('Распознавание речи не поддерживается в этом браузере');
-        return;
       }
 
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
+      setIsSpeaking(voiceDetected >= minSamples);
+    }, checkInterval);
+  }, [threshold, checkInterval]);
 
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = lang;
+  const stopVoiceDetection = useCallback(() => {
+    const { detectionInterval } = audioRefs.current;
 
-      recognition.onresult = event => {
-        let transcript = '';
+    if (detectionInterval) {
+      clearInterval(detectionInterval);
+      audioRefs.current.detectionInterval = null;
+    }
 
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript.toLowerCase();
+    setIsSpeaking(false);
+  }, []);
+
+  const handleSpeechResult = useCallback(
+    event => {
+      if (speechRefs.current.isPaused) return;
+
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript.toLowerCase();
+      }
+
+      const isRepeatTrigger = repeatTriggers.some(phrase => transcript.includes(phrase));
+      const isNextTrigger = nextTriggers.some(phrase => transcript.includes(phrase));
+
+      if (isRepeatTrigger) {
+        setTriggerDetected('repeat');
+        pauseRecord();
+      } else if (isNextTrigger) {
+        setTriggerDetected('next');
+        stopRecord();
+      }
+    },
+    [repeatTriggers, nextTriggers]
+  );
+
+  const restartRecognition = useCallback(() => {
+    setTimeout(() => {
+      const { isActive, isPaused } = speechRefs.current;
+      const { recognition } = speechRefs.current;
+
+      if (isActive && !isPaused && recognition?.state === 'inactive') {
+        try {
+          recognition.start();
+        } catch (error) {
+          console.error('Recognition restart error:', error);
         }
+      }
+    }, SPEECH_CONFIG.restartDelay);
+  }, []);
 
-        // Проверяем триггеры
-        if (repeatTriggers.some(phrase => transcript.includes(phrase))) {
-          setTriggerDetected('repeat');
-          stopListening();
-        } else if (nextTriggers.some(phrase => transcript.includes(phrase))) {
-          setTriggerDetected('next');
-          stopListening();
-        }
-      };
+  const handleSpeechError = useCallback(
+    event => {
+      const { isActive, isPaused } = speechRefs.current;
+      const { recognition } = speechRefs.current;
 
-      recognition.onerror = event => {
-        console.warn('Ошибка распознавания речи:', event.error);
-
-        // Перезапускаем распознавание при ошибке, если всё ещё активно
-        if (isActiveRef.current && event.error === 'no-speech') {
-          try {
+      if (isActive && event.error === 'no-speech' && !isPaused && recognition) {
+        try {
+          if (recognition.state !== 'inactive') {
             recognition.stop();
-            setTimeout(() => {
-              if (isActiveRef.current) recognition.start();
-            }, 100);
-          } catch (err) {
-            console.error('Ошибка перезапуска распознавания:', err);
           }
+          restartRecognition();
+        } catch (error) {
+          console.error('Speech error handling error:', error);
         }
-      };
+      }
+    },
+    [restartRecognition]
+  );
 
-      recognition.onend = () => {
-        // Перезапускаем распознавание, если оно всё ещё должно быть активно
-        if (isActiveRef.current) {
-          try {
-            setTimeout(() => {
-              if (isActiveRef.current) recognition.start();
-            }, 100);
-          } catch (err) {
-            console.error('Ошибка перезапуска распознавания:', err);
-          }
-        }
-      };
+  const handleSpeechEnd = useCallback(() => {
+    const { isActive, isPaused } = speechRefs.current;
+    const { recognition } = speechRefs.current;
 
-      recognitionRef.current = recognition;
-
-      // Запускаем распознавание речи
-      recognition.start();
-    } catch (err) {
-      console.error('Ошибка запуска прослушивания:', err);
-      isActiveRef.current = false;
+    if (isActive && !isPaused && recognition) {
+      restartRecognition();
     }
-  }, [threshold, checkInterval, lang, repeatTriggers, nextTriggers]);
+  }, [restartRecognition]);
 
-  // Начало записи аудио
-  const startRecording = useCallback(() => {
-    if (!streamRef.current) {
-      console.warn('Нет активного микрофона для записи');
-      return;
+  const initializeSpeechRecognition = useCallback(() => {
+    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+      console.error('Speech recognition not supported');
+      return false;
     }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    Object.assign(recognition, { ...SPEECH_CONFIG, lang });
+
+    recognition.onresult = handleSpeechResult;
+    recognition.onerror = handleSpeechError;
+    recognition.onend = handleSpeechEnd;
+
+    speechRefs.current.recognition = recognition;
+    return true;
+  }, [lang, handleSpeechResult, handleSpeechError, handleSpeechEnd]);
+
+  const createAudioBlob = useCallback(() => {
+    const { chunks } = recordingRefs.current;
+
+    if (chunks.length === 0) return null;
+
+    const blob = new Blob(chunks, { type: AUDIO_FORMAT });
+    recordingRefs.current.lastBlob = blob;
+    recordingRefs.current.chunks = [];
+
+    return blob;
+  }, []);
+
+  const startRecord = useCallback(async () => {
+    if (speechRefs.current.isActive) return;
+
+    recordingRefs.current.lastBlob = null;
+    speechRefs.current.isPaused = false;
+
+    const audioInitialized = await initializeAudio();
+    if (!audioInitialized) return;
+
+    const speechInitialized = initializeSpeechRecognition();
+    if (!speechInitialized) return;
 
     try {
-      const mediaRecorder = new MediaRecorder(streamRef.current);
-      chunksRef.current = [];
+      const mediaRecorder = new MediaRecorder(audioRefs.current.stream);
+      recordingRefs.current.chunks = [];
 
-      mediaRecorder.ondataavailable = e => {
-        if (e.data.size > 0) {
-          chunksRef.current.push(e.data);
+      mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+          recordingRefs.current.chunks.push(event.data);
         }
       };
 
       mediaRecorder.start();
-      mediaRecorderRef.current = mediaRecorder;
-    } catch (err) {
-      console.error('Ошибка запуска записи:', err);
+      recordingRefs.current.mediaRecorder = mediaRecorder;
+
+      startVoiceDetection();
+      speechRefs.current.recognition.start();
+
+      speechRefs.current.isActive = true;
+      setIsRecording(true);
+      setIsPaused(false);
+      setTriggerDetected(null);
+    } catch (error) {
+      console.error('Recording start error:', error);
+      speechRefs.current.isActive = false;
+      cleanupAllResources();
     }
-  }, []);
+  }, [initializeAudio, initializeSpeechRecognition, startVoiceDetection, cleanupAllResources]);
 
-  // Остановка записи и получение аудио-блоба
-  const stopRecording = useCallback(() => {
+  const stopRecord = useCallback(() => {
+    if (!speechRefs.current.isActive) {
+      return Promise.resolve(recordingRefs.current.lastBlob);
+    }
+
     return new Promise(resolve => {
-      if (!mediaRecorderRef.current) return resolve(null);
+      speechRefs.current.isActive = false;
+      speechRefs.current.isPaused = false;
+      setIsRecording(false);
+      setIsPaused(false);
+      setTriggerDetected(null);
 
-      const recorder = mediaRecorderRef.current;
+      cleanupSpeechResources();
+      stopVoiceDetection();
 
-      recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        chunksRef.current = [];
-        mediaRecorderRef.current = null;
-        resolve(blob);
-      };
+      const { mediaRecorder } = recordingRefs.current;
 
-      if (recorder.state === 'recording') {
-        recorder.stop();
+      if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
+        mediaRecorder.onstop = () => {
+          const blob = createAudioBlob();
+          cleanupAllResources();
+          resolve(blob);
+        };
+        mediaRecorder.stop();
       } else {
-        resolve(null);
+        const blob = createAudioBlob();
+        cleanupAllResources();
+        resolve(blob);
       }
     });
-  }, []);
+  }, [cleanupSpeechResources, stopVoiceDetection, createAudioBlob, cleanupAllResources]);
 
-  // Остановка прослушивания и освобождение ресурсов
-  const stopListening = useCallback(() => {
-    if (!isActiveRef.current) return;
-    isActiveRef.current = false;
+  const pauseRecord = useCallback(() => {
+    const { isActive, isPaused } = speechRefs.current;
 
-    // Останавливаем распознавание речи
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch (err) {
-        console.error('Ошибка остановки распознавания речи:', err);
-      }
-      recognitionRef.current = null;
-    }
+    if (!isActive || isPaused) return;
 
-    // Очищаем интервал
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    // Закрываем аудио-контекст
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-
-    // Останавливаем все треки
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-
-    // Сбрасываем ссылки и состояния
-    analyserRef.current = null;
-    dataArrayRef.current = null;
+    speechRefs.current.isPaused = true;
+    setIsPaused(true);
     setIsSpeaking(false);
-    setTriggerDetected(null);
-  }, []);
 
-  // Очистка при размонтировании
+    cleanupSpeechResources();
+    stopVoiceDetection();
+
+    const { mediaRecorder } = recordingRefs.current;
+    if (mediaRecorder?.state === 'recording') {
+      mediaRecorder.pause();
+    }
+  }, [cleanupSpeechResources, stopVoiceDetection]);
+
+  const resumeRecord = useCallback(() => {
+    if (!speechRefs.current.isActive) return;
+
+    speechRefs.current.isPaused = false;
+    setIsPaused(false);
+    setTriggerDetected(null);
+    setIsSpeaking(false);
+
+    const { mediaRecorder } = recordingRefs.current;
+    if (mediaRecorder?.state === 'paused') {
+      mediaRecorder.resume();
+    }
+
+    startVoiceDetection();
+
+    const speechInitialized = initializeSpeechRecognition();
+    if (speechInitialized && speechRefs.current.recognition) {
+      try {
+        speechRefs.current.recognition.start();
+      } catch (error) {
+        console.error('Speech recognition resume error:', error);
+      }
+    }
+  }, [startVoiceDetection, initializeSpeechRecognition]);
+
   useEffect(() => {
-    return () => {
-      stopListening();
+    const handleBeforeUnload = () => {
+      isMountedRef.current = false;
+      cleanupAllResources();
     };
-  }, [stopListening]);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden && speechRefs.current.isActive) {
+        isMountedRef.current = false;
+        cleanupAllResources();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      isMountedRef.current = false;
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      cleanupAllResources();
+    };
+  }, [cleanupAllResources]);
 
   return {
     isSpeaking,
     triggerDetected,
-    setTriggerDetected,
-    startListening,
-    stopListening,
-    startRecording,
-    stopRecording,
+    isRecording,
+    isPaused,
+    startRecord,
+    stopRecord,
+    pauseRecord,
+    resumeRecord,
   };
 }

@@ -1,18 +1,20 @@
 'use client';
 
 import React from 'react';
-import { Icon, Score } from '@/components';
+import { Icon, Preloader, Score } from '@/components';
 import useLocalStorageState from 'use-local-storage-state';
 import css from './ScoringResult.module.scss';
 
 const ScoringResult = () => {
-  const [progress] = useLocalStorageState('interview-progress', {
+  const [progress] = useLocalStorageState('progress', {
     defaultValue: [],
   });
 
   const [interview] = useLocalStorageState('interview', {
     defaultValue: [],
   });
+
+  if (!progress || !interview) return <Preloader />;
 
   return (
     <div className={css.ScoringResult}>

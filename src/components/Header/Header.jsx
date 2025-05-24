@@ -9,7 +9,7 @@ const Header = () => {
       <nav>
         <ul className={css.Navigation}>
           <li>
-            <Link href="./">
+            <Link href="/">
               <Icon name="home" size="22" color="currentColor" />
               <span>Главная</span>
             </Link>

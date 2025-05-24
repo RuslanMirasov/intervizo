@@ -7,14 +7,16 @@ import { Button, Preloader, Score } from '@/components';
 import css from './Scoring.module.scss';
 
 const Scoring = () => {
-  const [score, setScore] = useState(null);
+  const [isScoring, setIsScoring] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [hasAttempted, setHasAttempted] = useState(false);
 
-  const [progress, setProgress] = useLocalStorageState('interview-progress', {
+  const [progress, setProgress] = useLocalStorageState('progress', {
     defaultValue: [],
   });
 
   const [interview, setInterview] = useLocalStorageState('interview', {
-    defaultValue: [],
+    defaultValue: {},
   });
 
   const { trigger, isMutating } = useRequest({
@@ -23,40 +25,109 @@ const Scoring = () => {
   });
 
   useEffect(() => {
-    const shouldScore = progress.length > 0 && interview.data?.length > 0 && !interview.score;
+    const scoreInterview = async () => {
+      if (!progress || progress.length === 0) return;
 
-    if (!shouldScore) return;
+      // Проверяем, есть ли уже оценки в progress
+      const hasScores = progress.some(item => item.score > 0 || item.feedback);
 
-    console.log(progress);
+      // Если есть оценки и есть общий балл в interview, показываем результат
+      if (hasScores && interview.score !== undefined) {
+        setIsComplete(true);
+        return;
+      }
 
-    trigger({ progress })
-      .then(data => {
-        if (!data?.progress || typeof data.totalScore !== 'number') return;
+      // Если нет оценок, нужно оценить
+      const needsScoring = progress.every(item => item.score === 0 && !item.feedback);
 
-        // Обновляем общий балл и локальное хранилище
-        setScore(data.totalScore);
-        setProgress(data.progress);
-        setInterview(prev => ({ ...prev, score: data.totalScore }));
-      })
-      .catch(err => {
-        console.error('Ошибка при оценке интервью:', err);
-      });
-  }, [progress, interview, trigger, setProgress, setInterview]);
+      if (needsScoring && !isScoring && !hasAttempted) {
+        setIsScoring(true);
+        setHasAttempted(true);
+
+        try {
+          console.log('Отправляем данные на оценку:', progress);
+          const result = await trigger({ progress });
+
+          if (result?.data) {
+            console.log('Результат оценки от OpenAI:', result.data);
+
+            // Обновляем progress с новыми данными
+            setProgress(result.data);
+
+            // Вычисляем средний балл и сохраняем в interview
+            const totalScore = result.data.reduce((sum, item) => sum + item.score, 0);
+            const averageScore = totalScore / result.data.length;
+            const roundedScore = Math.round(averageScore * 10) / 10;
+
+            setInterview(prev => ({
+              ...prev,
+              score: roundedScore,
+            }));
+
+            setIsComplete(true);
+          }
+        } catch (error) {
+          console.error('Ошибка при оценке интервью:', error);
+          setHasAttempted(false);
+        } finally {
+          setIsScoring(false);
+        }
+      }
+    };
+
+    scoreInterview();
+  }, [progress, interview, trigger, isScoring, hasAttempted, setProgress, setInterview]);
+
+  useEffect(() => {
+    if (progress && progress.length > 0) {
+      console.log('Данные progress:', progress);
+    }
+  }, [progress]);
+
+  useEffect(() => {
+    if (interview) {
+      console.log('Данные interview:', interview);
+    }
+  }, [interview]);
+
+  const retryScoring = () => {
+    setHasAttempted(false);
+    setIsComplete(false);
+
+    // Сбрасываем оценки в progress
+    const resetProgress = progress.map(item => ({
+      ...item,
+      score: 0,
+      feedback: null,
+    }));
+    setProgress(resetProgress);
+
+    // Убираем общий балл из interview
+    setInterview(prev => {
+      const { score, ...rest } = prev;
+      return rest;
+    });
+  };
+
+  if (!progress || progress.length === 0) return <Preloader />;
 
   return (
     <div className={css.Scoring}>
-      {score === null && !interview.score && (
+      {!isComplete ? (
         <>
-          {isMutating && <h1>Идет оценка интервью</h1>}
+          <h1>Идет оценка интервью</h1>
           <Preloader />
-          {isMutating && <p>Так же готовим обратную связь для улучшения ваших навыков</p>}
+          <p>Так же готовим обратную связь для улучшения ваших навыков</p>
+          {hasAttempted && !isScoring && (
+            <Button onClick={retryScoring} className="retry">
+              Попробовать снова
+            </Button>
+          )}
         </>
-      )}
-
-      {(score !== null || interview.score) && (
+      ) : (
         <>
           <h1>Вы набрали</h1>
-          <Score score={score || interview.score} />
+          <Score score={interview.score} />
           <Button href="./scoring/result" className="full radius">
             Смотреть результат
           </Button>

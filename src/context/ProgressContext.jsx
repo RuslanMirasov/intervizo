@@ -1,12 +1,14 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 import { useVoice } from '@/hooks/useVoice';
 
 import { useProgressStorage } from '@/hooks/useProgressStorage';
 import { startCountdown } from '@/lib/startCountdown';
 import { getRandomItemFromArray } from '@/lib/getRandomItemFromArray';
+import { transcribeVoice } from '@/lib/transcribeVoice';
 import { playAudio } from '@/lib/playAudio';
 import { saveAudio } from '@/lib/save';
 import { speak } from '@/lib/speak';
@@ -17,38 +19,31 @@ import { Preloader } from '@/components';
 const ProgressContext = createContext(null);
 
 export const ProgressProvider = ({ children }) => {
+  const router = useRouter();
   const [interview, , { isPersistent }] = useLocalStorageState('interview');
 
-  const {
-    isSpeaking,
-    startListening,
-    stopListening,
-    startRecording,
-    stopRecording,
-    triggerDetected,
-    setTriggerDetected,
-  } = useVoice();
-  const { addQuestion } = useProgressStorage();
+  const { isSpeaking, triggerDetected, startRecord, stopRecord, resumeRecord } = useVoice();
+  const { addQuestion, updateAnswer } = useProgressStorage();
 
   const [step, setStep] = useState(null);
   const [showNextButton, setShowNextButton] = useState(false);
   const [countdown, setCountdown] = useState(null);
 
+  const transcriptionPromises = useRef([]);
+
   // ЗАПУСКАЕМ ИНТЕРВЬЮ
 
   const startInterview = useCallback(async () => {
     if (interview?.data?.length > 0) {
-      await playAudio('./intro.mp3');
+      //await playAudio('./intro.mp3');
       setStep(0);
     }
   }, [interview]);
 
   const finishInterview = useCallback(async () => {
-    await stopListening();
-    await setShowNextButton(false);
-    await startCountdown(0, () => setCountdown(0), setCountdown);
-    console.log('Интервью завершено');
-  }, []);
+    await Promise.allSettled(transcriptionPromises.current);
+    router.push('/scoring');
+  }, [router]);
 
   //ПЕРЕХОД К CЛЕДУЮЩЕМУ ШАГУ
   const goToNextStep = useCallback(() => {
@@ -66,14 +61,14 @@ export const ProgressProvider = ({ children }) => {
 
   //ПЕРЕХОД К ШАГУ
   const goToStep = useCallback(
-    async number => {
+    async (number, isRepeat = false) => {
       const stepData = interview?.data?.[number];
       if (!stepData) return;
 
       const { text, type } = stepData;
 
-      //await speakInBrowser(text);
-      await speak(text);
+      await speakInBrowser(text);
+      //await speak(text);
       //await saveAudio(text, { filename: 'repeat.mp3', voice: 'onyx' }); //nova
 
       if (type === 'message') {
@@ -83,27 +78,52 @@ export const ProgressProvider = ({ children }) => {
       }
 
       addQuestion({ id: number, question: text });
-      startListening();
+
+      if (isRepeat) {
+        await resumeRecord();
+      } else {
+        await startRecord();
+      }
+
       startCountdown(15, () => saveAnswer(), setCountdown);
     },
     [interview]
   );
 
+  const transcribeAnswer = async (id, blob) => {
+    const transcriptionPromise = transcribeVoice(blob)
+      .then(transcription => {
+        updateAnswer(id, transcription);
+        return { id, transcription, success: true };
+      })
+      .catch(error => {
+        return { id, transcription: null, success: false, error };
+      });
+
+    transcriptionPromises.current.push(transcriptionPromise);
+    return transcriptionPromise;
+  };
+
   const saveAnswer = async () => {
-    await stopListening();
     await startCountdown(0, () => setCountdown(0), setCountdown);
     await setShowNextButton(false);
+    const recordedBlob = await stopRecord();
+
+    if (recordedBlob) {
+      transcribeAnswer(step, recordedBlob);
+    }
+
     goToNextStep();
   };
 
   const repeatQuastion = async () => {
     await playAudio(getRandomItemFromArray(['/repeat.mp3', '/repeat2.mp3', '/repeat3.mp3']));
-    goToStep(step);
+    goToStep(step, true);
   };
 
   const nextQuastion = async () => {
     await playAudio(getRandomItemFromArray(['/next.mp3', '/next2.mp3', '/next3.mp3']));
-    goToNextStep();
+    saveAnswer();
   };
   // ========================================================================= ЭФФЕКТЫ
 
@@ -124,14 +144,13 @@ export const ProgressProvider = ({ children }) => {
   useEffect(() => {
     if (!isSpeaking) return;
     setShowNextButton(true);
-    startCountdown(3, () => saveAnswer(), setCountdown);
+    startCountdown(5, () => saveAnswer(), setCountdown);
   }, [isSpeaking]);
 
-  // РЕАГИРУЕМ НА ГОЛОС
+  // РЕАГИРУЕМ НА ТРИГЕРЫ
   useEffect(() => {
     if (!triggerDetected) return;
 
-    console.log(triggerDetected);
     startCountdown(0, () => setCountdown(0), setCountdown);
     setShowNextButton(false);
     if (triggerDetected === 'repeat') {

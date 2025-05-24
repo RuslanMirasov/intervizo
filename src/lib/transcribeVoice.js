@@ -1,9 +1,19 @@
 import { isBadText } from './isBadText';
 
-export async function transcribeVoice(id, blob, setProgress) {
+export async function transcribeVoice(blob) {
+  // Валидация входных данных
+  if (!blob || !(blob instanceof Blob)) {
+    console.error('transcribeVoice: Некорректный blob');
+    return '';
+  }
+
+  if (blob.size === 0) {
+    console.warn('transcribeVoice: Пустой blob');
+    return '';
+  }
+
   try {
     const form = new FormData();
-    form.append('id', id);
     form.append('audio', blob, 'audio.webm');
 
     const res = await fetch('/api/transcribe', {
@@ -12,21 +22,28 @@ export async function transcribeVoice(id, blob, setProgress) {
     });
 
     if (!res.ok) {
-      const { error } = await res.json().catch(() => ({}));
-      throw new Error(error || 'Ошибка транскрибации');
+      throw new Error(`HTTP error! status: ${res.status}`);
     }
 
-    let { text } = await res.json();
+    const data = await res.json();
+
+    // Проверка структуры ответа
+    if (!data || typeof data.text !== 'string') {
+      throw new Error('Некорректный формат ответа от API при транскрибации аудио');
+    }
+
+    let { text } = data;
     text = text.trim();
 
+    // Проверка на "мусорный" текст
     if (isBadText(text)) {
       console.warn(`Ответ от Whisper признан мусором и заменён на пустую строку: "${text}"`);
       text = '';
     }
 
-    // Обновляем progress через setProgress
-    setProgress(prev => prev.map(entry => (entry.id === id ? { ...entry, answer: text } : entry)));
+    return text;
   } catch (err) {
-    console.error('Ошибка transcribeVoice:', err);
+    console.error('Ошибка транскрибации:', err);
+    return '';
   }
 }
