@@ -1,48 +1,35 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useInterview } from '@/hooks/useInterview';
-import { Button, SectionsEditor, PromtGeneratorForm } from '@/components';
+import { useState, useEffect } from 'react';
+import { Button, SectionsEditor, PromtGeneratorForm, Flex, Textarea, InterviewInputs } from '@/components';
 import { initTextareaAutoResize } from '@/lib/initTextareaAutoResize';
-import { slugify } from '@/lib/slugify';
+import { debounce } from '@/lib/debounce';
+
 import css from './AddNewInterviewForm.module.scss';
 
 const AddNewInterviewForm = () => {
-  const { interview, setInterview } = useInterview();
+  console.log('AddNewInterviewForm RERENDER');
 
   useEffect(() => {
     const cleanup = initTextareaAutoResize();
     return cleanup;
   }, []);
 
-  const updateField = (field, value) => {
-    setInterview(prev => ({ ...prev, [field]: value }));
-  };
-
   return (
     <>
-      <Button href="./connect" className="small border" disabled={interview.data.length === 0}>
-        Тестовое интервью
-      </Button>
+      <Flex className={css.Buttons}>
+        <Button href="./connect" className="small border">
+          Тестовое интервью
+        </Button>
+        <Button href="./connect" className="small">
+          Сохранить
+        </Button>
+      </Flex>
 
       <div className={css.AddNewInterviewForm}>
-        <textarea
-          name="name"
-          placeholder="Введите название"
-          value={interview.name}
-          onChange={e => {
-            updateField('name', e.target.value);
-            updateField('slug', slugify(e.target.value));
-          }}
-        ></textarea>
-
-        <textarea
-          name="description"
-          placeholder="Введите описание вакансии"
-          value={interview.description}
-          onChange={e => updateField('description', e.target.value)}
-        ></textarea>
-
+        <Textarea name="name" placeholder="Введите название" />
+        <Textarea name="description" placeholder="Введите описание вакансии" />
+        <InterviewInputs />
         <PromtGeneratorForm />
         <SectionsEditor />
       </div>

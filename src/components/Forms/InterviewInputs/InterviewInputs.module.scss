@@ -1,0 +1,12 @@
+.InterviewInputs {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  z-index: 20;
+}

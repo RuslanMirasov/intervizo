@@ -61,8 +61,9 @@
   &.grey {
     min-width: 120px;
     background: rgba(0, 0, 0, 0);
-    color: var(--grey);
+    color: var(--color);
     border: 1px solid var(--grey-border);
+    line-height: 1.1;
     &.color {
       color: var(--color);
     }

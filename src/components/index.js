@@ -22,6 +22,10 @@ export { default as ResultListItem } from './Results/ResultListItem/ResultListIt
 export { default as AddNewInterviewForm } from './Forms/AddNewInterviewForm/AddNewInterviewForm';
 export { default as SectionsEditor } from './Forms/SectionsEditor/SectionsEditor';
 export { default as PromtGeneratorForm } from './Forms/PromtGeneratorForm/PromtGeneratorForm';
+export { default as InterviewInputs } from './Forms/InterviewInputs/InterviewInputs';
+export { default as Input } from './Forms/Input/Input';
+export { default as InputSelect } from './Forms/InputSelect/InputSelect';
+export { default as Textarea } from './Forms/Textarea/Textarea';
 export { default as Connection } from './Connection/Connection';
 export { default as Camera } from './Camera/Camera';
 export { default as Room } from './Room/Room';
