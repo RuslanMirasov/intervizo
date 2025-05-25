@@ -36,3 +36,4 @@ export { default as RoomQuestion } from './Room/RoomQuestion/RoomQuestion';
 export { default as Scoring } from './Scoring/Scoring';
 export { default as ScoringResult } from './Scoring/ScoringResult/ScoringResult';
 export { default as Score } from './Scoring/Score/Score';
+export { default as ProgressBar } from './ProgressBar/ProgressBar';

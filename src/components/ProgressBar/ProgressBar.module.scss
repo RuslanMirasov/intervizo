@@ -1,0 +1,108 @@
+.ProgressBar {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 20px;
+}
+
+.Progress {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  height: 32px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f3f4f6;
+
+  span {
+    position: relative;
+    z-index: 2;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.Range {
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  height: 100%;
+  background: var(--color);
+  z-index: 1;
+  transition: 0.3s;
+}
+
+.ProgressItems {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 5px;
+  margin-top: 10px;
+  :global(.pending) {
+    color: var(--grey);
+    border-bottom: 1px dotted var(--grey);
+  }
+
+  :global(.rejected) {
+    color: var(--invalid);
+    border-bottom: 1px dotted var(--invalid);
+  }
+
+  :global(.fullfield) {
+    color: var(--green);
+    border-bottom: 1px dotted var(--green);
+  }
+  li {
+    display: flex;
+    position: relative;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    gap: 4px;
+    width: 100%;
+    font-size: 12px;
+
+    span {
+      padding: 2px 6px;
+      position: relative;
+      bottom: -5px;
+      background: var(--white);
+      line-height: 1;
+    }
+  }
+}
+
+.Spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 12px;
+  position: relative;
+  border-top: 1px solid var(--grey);
+  border-right: 1px solid var(--grey);
+  border-bottom: rgba(0, 0, 0, 0);
+  border-left: rgba(0, 0, 0, 0);
+  animation: rotate 0.5s linear infinite;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
