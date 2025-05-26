@@ -1,7 +1,7 @@
-export const speak = async text => {
+export const speak = async (text, route = '/api/speak') => {
   if (!text) throw new Error('Текст для озвучки отсутствует');
 
-  const response = await fetch('/api/speak', {
+  const response = await fetch(route, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
