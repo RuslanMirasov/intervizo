@@ -54,7 +54,6 @@ const Scoring = () => {
     if (hasStartedScoring || !progress || progress.length === 0) return;
 
     setHasStartedScoring(true);
-    console.log('Запускаем скорирование для', progress.length, 'вопросов');
 
     try {
       // Создаем промисы для всех вопросов
@@ -134,7 +133,6 @@ const Scoring = () => {
         score: Math.round(averageScore * 10) / 10, // Округляем до 1 знака после запятой
       }));
 
-      console.log('Скорирование завершено. Средний балл:', averageScore);
       setIsComplete(true);
     } catch (error) {
       console.error('Ошибка при скорировании:', error);
@@ -146,7 +144,6 @@ const Scoring = () => {
   // Автоматический запуск скорирования при загрузке
   useEffect(() => {
     if (progressItems.length > 0 && !hasStartedScoring && !isComplete) {
-      // Небольшая задержка для плавности UI
       const timer = setTimeout(() => {
         startScoring();
       }, 1000);
@@ -156,8 +153,6 @@ const Scoring = () => {
   }, [progressItems, hasStartedScoring, isComplete]);
 
   if (!progress || progress.length === 0) return <Preloader />;
-
-  console.log(progressItems);
 
   return (
     <div className={css.Scoring}>

@@ -75,6 +75,7 @@
     align-content: center;
     gap: 4px;
     width: 100%;
+    min-height: 20px;
     font-size: 12px;
 
     span {
@@ -88,6 +89,7 @@
 }
 
 .Spinner {
+  display: block;
   width: 12px;
   height: 12px;
   border-radius: 12px;
