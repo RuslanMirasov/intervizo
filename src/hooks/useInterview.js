@@ -1,13 +1,16 @@
 import useLocalStorageState from 'use-local-storage-state';
 
 const defaultInterview = {
+  company: 'my company',
+  owners: ['info@mirasov.dev', 'hello@brainst.pro'],
   slug: '',
   name: '',
   category: '',
   description: '',
   thumbnail: '',
-  duration: '',
+  duration: null,
   difficulty: '',
+  video: '',
   data: [],
 };
 

@@ -13,7 +13,10 @@
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@fontsource/inter": "^5.2.5",
+    "dotenv": "^16.5.0",
+    "firebase": "^11.8.1",
     "mongodb": "^6.16.0",
+    "mongoose": "^8.15.1",
     "next": "15.3.1",
     "openai": "^4.97.0",
     "react": "^19.0.0",
@@ -22,7 +25,8 @@
     "sass": "^1.87.0",
     "swiper": "^11.2.6",
     "swr": "^2.3.3",
-    "use-local-storage-state": "^19.5.0"
+    "use-local-storage-state": "^19.5.0",
+    "zod": "^3.25.30"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

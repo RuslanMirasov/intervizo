@@ -67,7 +67,7 @@ const InterviewInputs = () => {
         value={difficultyValue}
       />
       <Input
-        type="text"
+        type="number"
         size="small"
         name="duration"
         placeholder="Длительность (мин.)"

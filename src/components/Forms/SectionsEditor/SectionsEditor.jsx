@@ -51,7 +51,7 @@ const SectionsEditor = () => {
   const addSection = type => {
     setInterview(prev => ({
       ...prev,
-      data: [...prev.data, { id: generateId(), type, text: '' }],
+      data: [...prev.data, { id: generateId(), type, text: '', audio: '' }],
     }));
   };
 
