@@ -8,35 +8,50 @@ export async function GET(req) {
 
     const { searchParams } = new URL(req.url);
 
-    const s = searchParams.get('s');
-    const category = searchParams.get('category');
-    const difficulty = searchParams.get('difficulty');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '16');
-    const count = parseInt(searchParams.get('count') || '0');
+    const search = searchParams.get('s')?.trim() || '';
+    const category = searchParams.get('category')?.trim() || '';
+    const difficulty = searchParams.get('difficulty')?.trim() || '';
+    const page = Math.max(1, parseInt(searchParams.get('page')) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit')) || 16));
 
     const query = {};
 
     if (category) query.category = category;
     if (difficulty) query.difficulty = difficulty;
-    if (s) query.name = { $regex: s, $options: 'i' };
+    if (search) {
+      query.$or = [{ name: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }];
+    }
 
-    const interviews = await Interview.find(query)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(count || limit);
+    const [interviews, totalCount] = await Promise.all([
+      Interview.find(query)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select('company owners category name description difficulty thumbnail duration')
+        .lean(),
 
-    const total = await Interview.countDocuments(query);
+      Interview.countDocuments(query),
+    ]);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
-      data: interviews,
-      total,
-      page,
-      pages: Math.ceil(total / limit),
+      interviews,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+        totalCount,
+        limit,
+        hasNextPage: page < Math.ceil(totalCount / limit),
+        hasPrevPage: page > 1,
+      },
     });
+
+    // Кэшируем на 4 минуты с возможностью stale-while-revalidate
+    response.headers.set('Cache-Control', 'public, s-maxage=240, stale-while-revalidate=300');
+
+    return response;
   } catch (error) {
     console.error('Ошибка при получении интервью:', error);
-    return NextResponse.json({ success: false, error: 'Ошибка сервера' }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Ошибка при получении данных' }, { status: 500 });
   }
 }

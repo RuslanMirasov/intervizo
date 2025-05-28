@@ -121,7 +121,6 @@ const InterviewSchema = new mongoose.Schema(
       type: String,
       required: true,
       index: true,
-      unique: true,
     },
     name: {
       type: String,
@@ -161,7 +160,6 @@ const InterviewSchema = new mongoose.Schema(
 
 InterviewSchema.index({ company: 1, createdAt: -1 });
 InterviewSchema.index({ owners: 1 });
-InterviewSchema.index({ slug: 1 }, { unique: true });
 
 // ==================== MIDDLEWARE ====================
 
