@@ -31,7 +31,6 @@ const InterviewInputs = () => {
   ];
 
   const updateInterview = e => {
-    console.log(e.target);
     const { name, value, label, thumbnail } = e.target;
 
     if (!name) return;
@@ -72,7 +71,7 @@ const InterviewInputs = () => {
         name="duration"
         placeholder="Длительность (мин.)"
         onChange={updateInterview}
-        value={interview.duration || ''}
+        value={interview?.duration ? interview.duration : ''}
       />
     </div>
   );

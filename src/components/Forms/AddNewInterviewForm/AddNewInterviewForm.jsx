@@ -1,7 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, SectionsEditor, PromtGeneratorForm, Flex, Textarea, InterviewInputs } from '@/components';
+import {
+  Button,
+  SectionsEditor,
+  PromtGeneratorForm,
+  Flex,
+  Textarea,
+  InterviewInputs,
+  AddNewInterviewButtons,
+} from '@/components';
 import { initTextareaAutoResize } from '@/lib/initTextareaAutoResize';
 import { debounce } from '@/lib/debounce';
 
@@ -18,14 +26,8 @@ const AddNewInterviewForm = () => {
   return (
     <>
       <Flex className={css.Buttons}>
-        <Button href="./connect" className="small border">
-          Тестовое интервью
-        </Button>
-        <Button href="./connect" className="small">
-          Сохранить
-        </Button>
+        <AddNewInterviewButtons />
       </Flex>
-
       <div className={css.AddNewInterviewForm}>
         <Textarea name="name" placeholder="Введите название" />
         <Textarea name="description" placeholder="Введите описание вакансии" />

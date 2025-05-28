@@ -1,20 +1,21 @@
 import { Icon, Preloader } from '@/components';
 import css from './ProgressBar.module.scss';
 
-const ProgressBar = ({ progress, procent = 100 }) => {
+const ProgressBar = ({ progress, procent = 0 }) => {
   return (
     <div className={css.ProgressBar}>
       <ul className={css.ProgressItems}>
-        {progress.map((item, index) => (
-          <li key={index} className={item.status}>
-            <span>{item.name}</span>
-            <span>
-              {item.status === 'fullfield' && <Icon name="ok" size="12" />}
-              {item.status === 'rejected' && <Icon name="close" size="12" />}
-              {item.status === 'pending' && <div className={css.Spinner}></div>}
-            </span>
-          </li>
-        ))}
+        {progress &&
+          progress.map((item, index) => (
+            <li key={index} className={item.status}>
+              <span>{item.name}</span>
+              <span>
+                {item.status === 'fullfield' && <Icon name="ok" size="12" />}
+                {item.status === 'rejected' && <Icon name="close" size="12" />}
+                {item.status === 'pending' && <div className={css.Spinner}></div>}
+              </span>
+            </li>
+          ))}
       </ul>
 
       {/* <Preloader /> */}

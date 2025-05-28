@@ -1,7 +1,7 @@
 'use client';
 
 import { usePopup } from '@/hooks/usePopup';
-import { AddSectionPopup, ErrorPopup, LoadingPopup, MessagePopup } from '@/components';
+import { AddSectionPopup, ErrorPopup, LoadingPopup, MessagePopup, ProgressPopup } from '@/components';
 import css from './Popup.module.scss';
 
 const Popup = () => {
@@ -18,6 +18,7 @@ const Popup = () => {
         {type === 'message' && <MessagePopup params={params} />}
         {type === 'loading' && <LoadingPopup params={params} />}
         {type === 'error' && <ErrorPopup params={params} />}
+        {type === 'progress' && <ProgressPopup params={params} />}
         {type === 'add-section-popup' && <AddSectionPopup params={params} />}
       </div>
     </div>

@@ -20,5 +20,9 @@ export const useInterview = () => {
     ssr: false,
   });
 
-  return { interview, setInterview, isPersistent };
+  const resetInterview = () => {
+    setInterview(defaultInterview);
+  };
+
+  return { interview, setInterview, resetInterview, isPersistent };
 };

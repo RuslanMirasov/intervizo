@@ -11,6 +11,7 @@ const InterviewDataItemSchema = z.object({
     .string()
     .min(1, 'Вы пытаетесь сохранить пустое поле вопроса или сообщения. Убедитесь, что все поля заполнены текстом.'),
   audio: z.string().optional().default(''),
+  video: z.string().optional().default(''),
 });
 
 // Основная схема интервью
@@ -28,12 +29,32 @@ export const InterviewValidationSchema = z.object({
     .min(1, 'Владелец не указан, добавьте e-mail'),
   slug: z.string().min(1, 'slug не передан'),
   name: z.string().min(1, 'Введите название интервью!'),
-  category: z.string().max(50, 'Category too long').optional().default(''),
-  description: z.string().max(500, 'Description too long').optional().default(''),
-  thumbnail: z.string().url('Не верный формат ссылки').optional().or(z.literal('')).default(''),
-  duration: z.number().min(1, 'Duration must be positive').max(300, 'Duration too long').nullable().optional(),
-  difficulty: z.enum(['', 'Легкое', 'Среднее', 'Сложное']).optional().default(''),
-  video: z.string().url('Не верный формат ссылки').optional().or(z.literal('')).default(''),
+  category: z.string().min(1, 'Выберите категорию'),
+  description: z.string().optional().default(''),
+  thumbnail: z
+    .string()
+    .optional()
+    .refine(val => val === undefined || val === '' || /^#([0-9A-Fa-f]{6})$/.test(val) || /^https?:\/\/.+/.test(val), {
+      message: 'Для превью опустимы: пустая строка, ссылка или цвет #RRGGBB',
+    })
+    .default(''),
+  duration: z.preprocess(
+    val => {
+      if (val === null || val === undefined || (typeof val === 'string' && val.trim() === '')) {
+        return undefined; // вызовет ошибку "Required"
+      }
+      return typeof val === 'string' ? Number(val) : val;
+    },
+    z
+      .number({
+        required_error: 'Продолжительность интервью не указана',
+        invalid_type_error: 'Введите число',
+      })
+      .min(1, 'Длительность интервью не указана')
+  ),
+  difficulty: z.enum(['Легкое', 'Среднее', 'Сложное'], {
+    errorMap: () => ({ message: 'Выберите уровень сложности' }),
+  }),
   data: z.array(InterviewDataItemSchema).min(1, 'Вы не добавили ни одного вопроса'),
 });
 
@@ -71,6 +92,10 @@ const InterviewDataSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    video: {
+      type: String,
+      default: '',
+    },
   },
   { _id: false }
 );
@@ -104,7 +129,7 @@ const InterviewSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      default: '',
+      required: true,
     },
     description: {
       type: String,
@@ -118,63 +143,25 @@ const InterviewSchema = new mongoose.Schema(
       type: Number,
       default: null,
       min: 0,
+      required: true,
     },
     difficulty: {
       type: String,
-      enum: ['', 'Легкое', 'Среднее', 'Сложное'],
-      default: '',
-    },
-    video: {
-      type: String,
-      default: '',
+      enum: ['Легкое', 'Среднее', 'Сложное'],
+      required: true,
     },
     data: [InterviewDataSchema],
-    audioGenerated: {
-      type: Boolean,
-      default: false,
-    },
-    audioStatus: {
-      type: String,
-      enum: ['pending', 'processing', 'ready', 'failed'],
-      default: 'pending',
-      index: true,
-    },
-    audioError: {
-      type: String,
-      default: '',
-    },
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   }
 );
-
-// ==================== ВИРТУАЛЬНЫЕ ПОЛЯ ====================
-
-InterviewSchema.virtual('questionsCount').get(function () {
-  return this.data.filter(item => item.type === 'question').length;
-});
-
-InterviewSchema.virtual('messagesCount').get(function () {
-  return this.data.filter(item => item.type === 'message').length;
-});
-
-InterviewSchema.virtual('hasAudio').get(function () {
-  return this.data.some(item => item.audio && item.audio.length > 0);
-});
-
-InterviewSchema.virtual('isReady').get(function () {
-  return this.audioStatus === 'ready' && this.audioGenerated;
-});
 
 // ==================== ИНДЕКСЫ ====================
 
 InterviewSchema.index({ company: 1, createdAt: -1 });
 InterviewSchema.index({ owners: 1 });
 InterviewSchema.index({ slug: 1 }, { unique: true });
-InterviewSchema.index({ audioStatus: 1 });
 
 // ==================== MIDDLEWARE ====================
 
