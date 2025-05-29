@@ -1,21 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import {
-  Button,
-  SectionsEditor,
-  PromtGeneratorForm,
-  Flex,
-  Textarea,
-  InterviewInputs,
-  AddNewInterviewButtons,
-} from '@/components';
+import { useEffect } from 'react';
+import { SectionsEditor, PromtGeneratorForm, Textarea, InterviewInputs, InterviewButtons } from '@/components';
 import { initTextareaAutoResize } from '@/lib/initTextareaAutoResize';
-import { debounce } from '@/lib/debounce';
 
 import css from './AddNewInterviewForm.module.scss';
 
-const AddNewInterviewForm = () => {
+const AddNewInterviewForm = ({ currentInterview }) => {
   console.log('AddNewInterviewForm RERENDER');
 
   useEffect(() => {
@@ -25,9 +16,7 @@ const AddNewInterviewForm = () => {
 
   return (
     <>
-      <Flex className={css.Buttons}>
-        <AddNewInterviewButtons />
-      </Flex>
+      <InterviewButtons currentInterview={currentInterview} />
       <div className={css.AddNewInterviewForm}>
         <Textarea name="name" placeholder="Введите название" />
         <Textarea name="description" placeholder="Введите описание вакансии" />

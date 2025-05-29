@@ -8,7 +8,6 @@ import css from './InterviewCatalog.module.scss';
 const InterviewCatalog = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-
   const categories = [
     { value: 'empty', label: 'Все категории' },
     { value: 'Разработка', label: 'Разработка' },

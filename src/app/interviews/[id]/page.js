@@ -1,5 +1,10 @@
 import { notFound } from 'next/navigation';
-import { Breadcrumbs, Section, InterviewSingle, Button, InterviewButtons } from '@/components';
+import { Breadcrumbs, Section, InterviewSingle, InterviewButtons } from '@/components';
+
+export const metadata = {
+  title: 'InterVizo | Отдельная страница интервью',
+  description: 'Интервьюер',
+};
 
 async function getInterview(id) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/interview/${id}`);

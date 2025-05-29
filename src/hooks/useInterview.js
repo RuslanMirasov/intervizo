@@ -20,9 +20,27 @@ export const useInterview = () => {
     ssr: false,
   });
 
+  const [updates, setUpdates, { isPersistent: isUpdatesPersistent }] = useLocalStorageState('updates', {
+    defaultValue: {},
+    ssr: false,
+  });
+
   const resetInterview = () => {
     setInterview(defaultInterview);
   };
 
-  return { interview, setInterview, resetInterview, isPersistent };
+  const resetUpdates = () => {
+    setUpdates({});
+  };
+
+  return {
+    interview,
+    updates,
+    isPersistent,
+    isUpdatesPersistent,
+    setInterview,
+    setUpdates,
+    resetInterview,
+    resetUpdates,
+  };
 };
