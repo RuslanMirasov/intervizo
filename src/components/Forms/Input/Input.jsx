@@ -9,9 +9,7 @@ const Input = ({ name, type, size, placeholder, onChange, invalid, value }) => {
   const classes = [css.Input, size === 'small' && css.Small, invalid && css.Invalid].filter(Boolean).join(' ');
 
   useEffect(() => {
-    if (value) {
-      setInputValue(value);
-    }
+    setInputValue(value ?? '');
   }, [value]);
 
   const handleChange = e => {

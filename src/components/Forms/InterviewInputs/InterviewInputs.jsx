@@ -48,6 +48,7 @@ const InterviewInputs = () => {
 
   const categoryValue = categories.find(item => item.label === interview.category) || null;
   const difficultyValue = difficulty.find(item => item.label === interview.difficulty) || null;
+  const durationValue = interview.duration || '';
 
   return (
     <div className={css.InterviewInputs}>
@@ -71,7 +72,7 @@ const InterviewInputs = () => {
         name="duration"
         placeholder="Длительность (мин.)"
         onChange={updateInterview}
-        value={interview?.duration ? interview.duration : ''}
+        value={durationValue}
       />
     </div>
   );
