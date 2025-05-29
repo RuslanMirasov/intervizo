@@ -10,6 +10,8 @@ import css from './SectionsEditor.module.scss';
 
 const SortableSection = ({ section, onUpdate, children }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
+  const { updates } = useInterview();
+  const isUpdated = updates?.data?.some(item => item?.id === section.id);
 
   const style = {
     transform: isDragging
@@ -32,7 +34,15 @@ const SortableSection = ({ section, onUpdate, children }) => {
     <div ref={setNodeRef} className={css.Section} style={style} {...attributes}>
       <p className={css.DragHandle} style={styleP}>
         <Icon name={section.type} size="16" color="currentColor" />
-        <span {...listeners}>{section.type === 'question' ? 'Вопрос' : 'Сообщение'}</span>
+        <span {...listeners}>
+          {section.type === 'question' ? 'Вопрос' : 'Сообщение'}
+          {section.audio && (
+            <span className={css.SoundIndicator}>
+              <Icon name="sound" size="16" color={isUpdated ? 'var(--invalid)' : 'var(--green)'} />
+            </span>
+          )}
+        </span>
+
         {children}
       </p>
       <textarea
