@@ -3,7 +3,7 @@ import Link from 'next/link';
 import css from './InterviewArticle.module.scss';
 
 const InterviewArticle = ({ interview = {} }) => {
-  const { slug, name, category, description, thumbnail, duration, difficulty } = interview;
+  const { _id, name, category, description, thumbnail, duration, difficulty } = interview;
 
   const difficultyClassMap = {
     Легкое: css.Green,
@@ -15,9 +15,8 @@ const InterviewArticle = ({ interview = {} }) => {
 
   return (
     <article className={css.InterviewArticle}>
-      <div className={css.Thumbnail}>
+      <div className={css.Thumbnail} style={{ backgroundColor: thumbnail }}>
         {/* {thumbnail && <Image src={thumbnail} alt={name} width={260} height={138} />} */}
-        {thumbnail && <Image src={thumbnail} alt={name} fill sizes="100%" priority />}
         {category && <span>{category}</span>}
       </div>
       <div className={css.TitleBox}>
@@ -37,7 +36,7 @@ const InterviewArticle = ({ interview = {} }) => {
           </li>
         )}
       </ul>
-      {slug && <Link href={`./`} className={css.Link}></Link>}
+      {_id && <Link href={`/interviews/${_id}`} className={css.Link}></Link>}
     </article>
   );
 };

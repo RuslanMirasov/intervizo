@@ -8,7 +8,7 @@ export const metadata = {
 const AddNewInterview = () => {
   return (
     <Section intop width="860px">
-      <Breadcrumbs />
+      <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Добавить интервью' }]} />
       <AddNewInterviewForm />
     </Section>
   );

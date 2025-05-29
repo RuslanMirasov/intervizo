@@ -1,0 +1,70 @@
+.InterviewSingle {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: 8px;
+  min-height: 84px;
+  gap: 20px;
+}
+
+.Category {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 50px;
+  background: var(--white);
+  border: 1px solid #e3e8ef;
+}
+
+.Description {
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  margin-top: -13px;
+}
+
+.InfoList {
+  display: inline-flex;
+  width: auto;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--grey-dark);
+
+  li {
+    display: inline-flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    padding: 5px 10px;
+    background: var(--white);
+    border-radius: 50px;
+    border: 1px solid #e3e8ef;
+    &.Yellow {
+      background: var(--yellow);
+      border: 1px solid var(--yellow);
+      b {
+        color: var(--brown);
+      }
+    }
+
+    &.Green {
+      background: var(--green-light);
+      border: var(--green-light);
+      b {
+        color: var(--green);
+      }
+    }
+
+    &.Black {
+      background: var(--grey-dark);
+      border: var(--grey-dark);
+      b {
+        color: var(--white);
+      }
+    }
+  }
+}

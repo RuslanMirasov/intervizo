@@ -74,10 +74,20 @@
     }
   }
 
+  &.shere {
+    background: #f3f4f6;
+    color: var(--grey-dark);
+    border: 1px solid #f3f4f6;
+    line-height: 1.1;
+    &:hover {
+      border: 1px solid var(--color);
+    }
+  }
+
   &.red {
     color: var(--red);
-    background: rgba(0, 0, 0, 0);
-    border: 1px solid rgba(0, 0, 0, 0);
+    background: #f3f4f6;
+    border: 1px solid #f3f4f6;
     &:hover {
       background: rgba(0, 0, 0, 0);
       border: 1px solid var(--red);
@@ -104,7 +114,7 @@
 
   &.add {
     width: 162px;
-    min-height: 250px;
+    //min-height: 250px;
     background: rgba(0, 0, 0, 0);
     color: var(--color);
     font-size: 18px;

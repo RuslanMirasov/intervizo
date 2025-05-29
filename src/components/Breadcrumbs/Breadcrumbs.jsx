@@ -1,15 +1,15 @@
 import Link from 'next/link';
 import css from './Breadcrumbs.module.scss';
 
-const Breadcrumbs = () => {
+const Breadcrumbs = ({ items }) => {
+  if (!items) return null;
+
   return (
     <ul className={css.Breadcrumbs}>
-      <li>
-        <Link href="./">Главная</Link>
-      </li>
-      <li>
-        <span>Добавить интервью</span>
-      </li>
+      {items.map((item, index) => {
+        const { label, href } = item;
+        return <li key={index}>{href ? <Link href={href}>{label}</Link> : <span>{label}</span>}</li>;
+      })}
     </ul>
   );
 };

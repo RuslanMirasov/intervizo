@@ -1,10 +1,35 @@
+.Wrapper {
+  display: block;
+  width: calc(100% - 200px);
+  margin-bottom: auto;
+  > button {
+    display: flex;
+    min-width: 206.5px;
+    margin: 0 auto;
+    margin-top: 26px;
+  }
+}
+
 .InterviewList {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  padding-left: 200px;
   gap: 14px;
   .Item {
     width: calc((100% - 42px) / 4);
   }
+}
+
+.Empty {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  width: 100%;
+  min-height: 80px;
+  text-align: center;
+  color: var(--grey);
+  opacity: 0.5;
+  flex: 1;
 }

@@ -1,0 +1,46 @@
+.Wrapper {
+  display: block;
+  width: calc(100% - 200px);
+  margin-bottom: auto;
+}
+
+.InterviewList {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 14px;
+  .Item {
+    width: calc((100% - 42px) / 4);
+  }
+}
+
+.InterviewArticle {
+  display: flex;
+  position: relative;
+  width: 100%;
+  min-height: 230px;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  overflow: hidden;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0px 4px 10px rgba(6, 98, 237, 0.149);
+  border: 1px solid var(--grey-border);
+
+  .Info {
+    display: flex;
+    position: relative;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: center;
+    gap: 12px;
+    li {
+      display: inline-block;
+      flex-shrink: 0;
+    }
+  }
+}

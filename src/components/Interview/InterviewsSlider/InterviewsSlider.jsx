@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import useRequest from '@/hooks/useRequest';
 import { Button, Icon, InterviewArticle, InterviewsSliderSkeleton } from '@/components';
 import Link from 'next/link';
@@ -8,7 +9,15 @@ import 'swiper/css';
 import css from './InterviewsSlider.module.scss';
 
 const InterviewsSlider = () => {
-  const { data: interviews, isLoading, error } = useRequest({ url: '/interviews-demo.json' });
+  const [interviews, setInterviews] = useState([]);
+  const { data, isLoading, error } = useRequest({ url: '/api/interview?limit=10' });
+
+  useEffect(() => {
+    if (data) {
+      setInterviews(data.interviews);
+    }
+  }, [data]);
+
   return (
     <>
       <div className="titleBox">
@@ -37,11 +46,12 @@ const InterviewsSlider = () => {
               <InterviewsSliderSkeleton />
             ) : (
               <Swiper slidesPerView={4} spaceBetween={12} className="swiper-wrapper-fixed">
-                {interviews?.slice(0, 8).map(interview => (
-                  <SwiperSlide key={interview.slug}>
-                    <InterviewArticle interview={interview} />
-                  </SwiperSlide>
-                ))}
+                {interviews &&
+                  interviews?.map(interview => (
+                    <SwiperSlide key={interview._id}>
+                      <InterviewArticle interview={interview} />
+                    </SwiperSlide>
+                  ))}
               </Swiper>
             )}
           </div>

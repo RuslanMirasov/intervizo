@@ -2,7 +2,7 @@
   display: flex;
   position: relative;
   width: 100%;
-  min-height: 250px;
+  min-height: 200px;
   height: 100%;
   flex-direction: column;
   justify-content: space-between;
@@ -22,9 +22,8 @@
     justify-content: center;
     align-items: center;
     align-content: center;
-    background: var(--gradient);
     padding: 12px;
-    height: 138px;
+    height: 84px;
     position: relative;
     border-radius: 8px;
     overflow: hidden;
@@ -38,7 +37,7 @@
       background: var(--white);
       color: var(--grey-dark);
       border-radius: 20px;
-      padding: 4px 10px;
+      padding: 5px 10px;
       z-index: 2;
     }
     img {
@@ -80,6 +79,7 @@
     li {
       display: inline-block;
       flex-shrink: 0;
+
       span {
         display: inline-block;
         flex-shrink: 0;
@@ -110,9 +110,9 @@
 
       &.Black {
         span {
-          background: var(--grey-light);
-          border: var(--grey-light);
-          color: var(--grey);
+          background: var(--grey-dark);
+          border: var(--grey-dark);
+          color: var(--white);
         }
       }
     }

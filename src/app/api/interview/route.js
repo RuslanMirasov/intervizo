@@ -10,14 +10,20 @@ export async function GET(req) {
 
     const search = searchParams.get('s')?.trim() || '';
     const category = searchParams.get('category')?.trim() || '';
-    const difficulty = searchParams.get('difficulty')?.trim() || '';
+    const rawDifficulty = searchParams.get('difficulty') || '';
+    const difficulty = rawDifficulty
+      .split(',')
+      .map(v => v.trim())
+      .filter(Boolean);
     const page = Math.max(1, parseInt(searchParams.get('page')) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit')) || 16));
 
     const query = {};
 
     if (category) query.category = category;
-    if (difficulty) query.difficulty = difficulty;
+    if (difficulty.length > 0) {
+      query.difficulty = { $in: difficulty };
+    }
     if (search) {
       query.$or = [{ name: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }];
     }
