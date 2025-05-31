@@ -4,6 +4,8 @@ export { default as Flex } from './Flex/Flex';
 export { default as Popup } from './Popup/Popup';
 export { default as AddSectionPopup } from './Popup/AddSectionPopup/AddSectionPopup';
 export { default as ProgressPopup } from './Popup/ProgressPopup/ProgressPopup';
+export { default as ConfirmPopup } from './Popup/ConfirmPopup/ConfirmPopup';
+export { default as DeleteInterviewPopup } from './Popup/DeleteInterviewPopup/DeleteInterviewPopup';
 export { default as UpdateInterviewPopup } from './Popup/UpdateInterviewPopup/UpdateInterviewPopup';
 export { default as ErrorPopup } from './Popup/ErrorPopup/ErrorPopup';
 export { default as LoadingPopup } from './Popup/LoadingPopup/LoadingPopup';

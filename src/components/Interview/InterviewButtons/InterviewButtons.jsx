@@ -7,8 +7,27 @@ import { useEffect } from 'react';
 import css from './InterviewButtons.module.scss';
 
 const InterviewButtons = ({ _id, currentInterview = null, mutateCurrentInterview = null }) => {
-  const { openPopup } = usePopup();
+  const { openPopup, closePopup } = usePopup();
   const { interview, updates, setInterview, resetInterview, setUpdates } = useInterview();
+
+  const handleDeleteInterview = async () => {
+    openPopup({
+      type: 'confirm',
+      title: 'Вы уверены?',
+      button: 'Удалить',
+      subtitle: `При подтверждении все данные интервью, а\u00A0также все сгенерированные для него медиа ресусры будут безвозвратно удалены.`,
+      action: () => {
+        closePopup();
+        setTimeout(() => {
+          openPopup({
+            type: 'delete-interview',
+            locked: true,
+            id: _id || currentInterview._id,
+          });
+        }, 400);
+      },
+    });
+  };
 
   const handleSaveInterview = async () => {
     openPopup({
@@ -80,7 +99,9 @@ const InterviewButtons = ({ _id, currentInterview = null, mutateCurrentInterview
     <div className={css.InterviewButtons}>
       {(_id || currentInterview?._id) && (
         <>
-          <Button className="small red">Удалить</Button>
+          <Button className="small red" onClick={handleDeleteInterview}>
+            Удалить
+          </Button>
           <Button className="small shere">Поделиться</Button>
         </>
       )}

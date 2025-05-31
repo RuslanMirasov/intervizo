@@ -3,7 +3,7 @@ import useSWRMutation from 'swr/mutation';
 import fetcher from '@/lib/fetcher';
 import { usePopup } from '@/hooks/usePopup';
 
-const useRequest = ({ url, method = 'GET', data = null, options = {} }) => {
+const useRequest = ({ url, method = 'GET', data = null, options = {}, showPopup = true }) => {
   const { openPopup, closePopup } = usePopup();
   const isGet = method.toUpperCase() === 'GET';
 
@@ -13,12 +13,15 @@ const useRequest = ({ url, method = 'GET', data = null, options = {} }) => {
       try {
         return await fetcher(url);
       } catch (error) {
-        openPopup({
-          type: 'error',
-          status: error.status,
-          message: error.message,
-          closePopup,
-        });
+        if (showPopup) {
+          openPopup({
+            type: 'error',
+            status: error.status,
+            message: error.message,
+            closePopup,
+          });
+        }
+        throw error;
       }
     },
     options
@@ -33,12 +36,15 @@ const useRequest = ({ url, method = 'GET', data = null, options = {} }) => {
           body: data instanceof FormData ? data : JSON.stringify(arg || data),
         });
       } catch (error) {
-        openPopup({
-          type: 'error',
-          status: error.status,
-          message: error.message,
-          closePopup,
-        });
+        if (showPopup) {
+          openPopup({
+            type: 'error',
+            status: error.status,
+            message: error.message,
+            closePopup,
+          });
+        }
+        throw error;
       }
     },
     options
