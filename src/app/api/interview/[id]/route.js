@@ -25,7 +25,7 @@ export async function GET(req, { params }) {
     });
 
     // Только Cache-Control без ETag
-    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=900');
+    response.headers.set('Cache-Control', 'no-store');
 
     return response;
   } catch (error) {

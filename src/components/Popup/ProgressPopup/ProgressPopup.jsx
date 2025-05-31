@@ -5,11 +5,12 @@ import { useInterview } from '@/hooks/useInterview';
 import { usePopup } from '@/hooks/usePopup';
 import { ProgressBar } from '@/components';
 import useRequest from '@/hooks/useRequest';
-
 import css from './ProgressPopup.module.scss';
 import { useRouter } from 'next/navigation';
 
 const ProgressPopup = ({ params }) => {
+  const { mutateCurrentInterview } = params;
+  const [isRunning, setIsRunning] = useState(false);
   const router = useRouter();
   const { closePopup } = usePopup();
   const { interview, resetInterview } = useInterview();
@@ -35,10 +36,9 @@ const ProgressPopup = ({ params }) => {
   };
 
   useEffect(() => {
+    if (isRunning || !interview || !interview.data.length) return;
     const run = async () => {
-      if (!interview || !interview.data.length) return;
-
-      // 1. Инициализируем задачи
+      setIsRunning(true);
       const tasks = [
         { name: 'Сохранение интервью в базу данных', status: 'pending' },
         ...interview.data.map((item, index) => ({
@@ -51,6 +51,7 @@ const ProgressPopup = ({ params }) => {
       await new Promise(res => setTimeout(res, 0));
 
       await saveInterview();
+      setIsRunning(false);
     };
 
     run();
@@ -104,10 +105,19 @@ const ProgressPopup = ({ params }) => {
       updateProgressItem(0, 'fullfield');
 
       await generateAudioForAllQuestions(newInterview.newinterview);
-      await new Promise(res => setTimeout(res, 2000));
+
+      await new Promise(res => setTimeout(res, 0));
+
       resetInterview();
+
+      if (typeof mutateCurrentInterview === 'function') {
+        await mutateCurrentInterview(undefined, { revalidate: true });
+      }
+
+      router.replace(`/add-new-interview?id=${newInterview.newinterview._id}`);
+
+      await new Promise(res => setTimeout(res, 1500));
       closePopup();
-      router.push('/');
     } catch (error) {
       console.log('При сохранении интервью в MongoDB произошла ошибка', error);
       updateProgressItem(0, 'rejected');

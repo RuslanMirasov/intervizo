@@ -5,19 +5,18 @@ import { useInterview } from '@/hooks/useInterview';
 import { usePopup } from '@/hooks/usePopup';
 import { ProgressBar } from '@/components';
 import useRequest from '@/hooks/useRequest';
-
 import css from './UpdateInterviewPopup.module.scss';
-import { useRouter } from 'next/navigation';
 
 const UpdateInterviewPopup = ({ params }) => {
-  const router = useRouter();
+  const { id, mutateCurrentInterview } = params;
+  const [isRunning, setIsRunning] = useState(false);
   const { closePopup } = usePopup();
-  const { interview, resetInterview } = useInterview();
+  const { updates, resetUpdates } = useInterview();
   const [progressItems, setProgressItems] = useState([]);
 
-  const { trigger: saveInterviewToMongoDB } = useRequest({
-    url: '/api/interview/add',
-    method: 'POST',
+  const { trigger: updateInterviewInMongoDB } = useRequest({
+    url: '/api/interview/update',
+    method: 'PATCH',
   });
 
   const percent =
@@ -35,31 +34,25 @@ const UpdateInterviewPopup = ({ params }) => {
   };
 
   useEffect(() => {
-    const run = async () => {
-      if (!interview || !interview.data.length) return;
+    if (isRunning || !updates || Object.keys(updates).length === 0) return;
 
-      // 1. Инициализируем задачи
-      const tasks = [
-        { name: 'Сохранение интервью в базу данных', status: 'pending' },
-        ...interview.data.map((item, index) => ({
-          name: `Генерация аудио для ${index + 1}-го ${item.type === 'message' ? 'сообщения' : 'вопроса'}`,
-          status: 'pending',
-        })),
-      ];
+    const run = async () => {
+      setIsRunning(true);
+      const tasks = [{ name: 'Обновление в базе данных', status: 'pending' }];
       setProgressItems(tasks);
 
-      await new Promise(res => setTimeout(res, 0));
-
-      //await saveInterview();
+      await new Promise(res => setTimeout(res, 1000));
+      await updateInterview();
+      setIsRunning(false);
     };
 
     run();
-  }, [interview]);
+  }, [updates]);
 
-  const generateAudioForAllQuestions = async newData => {
+  const updateDataInFirebase = async newData => {
     const { _id, company, data } = newData;
 
-    const queue = [...data]; // копируем массив
+    const queue = [...data];
     let index = 0;
 
     const workers = Array.from({ length: 3 }, async () => {
@@ -68,12 +61,16 @@ const UpdateInterviewPopup = ({ params }) => {
         const currentIndex = index++;
 
         try {
-          const response = await fetch('/api/firebase', {
-            method: 'POST',
+          let method = 'POST';
+          if (item.todo === 'delete') method = 'DELETE';
+          else if (item.todo === 'generate' && item.audio) method = 'PATCH';
+
+          const response = await fetch('/api/firebase/update', {
+            method,
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ _id, company, index: currentIndex, item }),
+            body: JSON.stringify({ _id, company, item }),
           });
 
           if (!response.ok) {
@@ -83,7 +80,7 @@ const UpdateInterviewPopup = ({ params }) => {
 
           updateProgressItem(currentIndex + 1, 'fullfield');
         } catch (error) {
-          console.log('Ошибка генерации аудио:', error);
+          console.log('Ошибка в обработке Firebase:', error);
           updateProgressItem(currentIndex + 1, 'rejected');
         }
       }
@@ -92,24 +89,41 @@ const UpdateInterviewPopup = ({ params }) => {
     await Promise.all(workers);
   };
 
-  const saveInterview = async () => {
+  const updateInterview = async () => {
     try {
-      const newInterview = await saveInterviewToMongoDB(interview);
+      const updateData = { ...updates, _id: id };
+      const newInterview = await updateInterviewInMongoDB(updateData);
 
       if (!newInterview.success) {
         updateProgressItem(0, 'rejected');
         return;
       }
 
+      if (newInterview.updatedinterview.data.length > 0) {
+        const newTasks = newInterview.updatedinterview.data.map((item, index) => ({
+          name: `${index}. Генерация нового аудиофайла`,
+          status: 'pending',
+        }));
+
+        setProgressItems(prev => [...prev, ...newTasks]);
+      }
+
       updateProgressItem(0, 'fullfield');
 
-      await generateAudioForAllQuestions(newInterview.newinterview);
-      await new Promise(res => setTimeout(res, 2000));
-      resetInterview();
+      if (newInterview.updatedinterview?.data?.length) {
+        await updateDataInFirebase(newInterview.updatedinterview);
+      }
+
+      resetUpdates();
+
+      if (typeof mutateCurrentInterview === 'function') {
+        await mutateCurrentInterview(undefined, { revalidate: true });
+      }
+
+      await new Promise(res => setTimeout(res, 1500));
       closePopup();
-      router.push('/');
     } catch (error) {
-      console.log('При сохранении интервью в MongoDB произошла ошибка', error);
+      console.log('При обновлении интервью в MongoDB произошла ошибка', error);
       updateProgressItem(0, 'rejected');
     }
   };

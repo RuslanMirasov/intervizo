@@ -35,7 +35,7 @@ export const ProgressProvider = ({ children }) => {
 
   const startInterview = useCallback(async () => {
     if (interview?.data?.length > 0) {
-      await playAudio('./intro.mp3');
+      //await playAudio('./intro.mp3');
       setStep(0);
     }
   }, [interview]);
@@ -65,10 +65,11 @@ export const ProgressProvider = ({ children }) => {
       const stepData = interview?.data?.[number];
       if (!stepData) return;
 
-      const { text, type } = stepData;
+      const { text, type, audio } = stepData;
 
       //await speakInBrowser(text);
-      await speak(text, '/api/speak-eleven');
+      //await speak(text, '/api/speak-eleven');
+      await playAudio(audio);
       //await saveAudio(text, { filename: 'repeat.mp3', voice: 'onyx' }); //nova
 
       if (type === 'message') {

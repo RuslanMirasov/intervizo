@@ -53,7 +53,7 @@ export async function GET(req) {
     });
 
     // Кэшируем на 4 минуты с возможностью stale-while-revalidate
-    response.headers.set('Cache-Control', 'public, s-maxage=240, stale-while-revalidate=300');
+    response.headers.set('Cache-Control', 'no-store');
 
     return response;
   } catch (error) {

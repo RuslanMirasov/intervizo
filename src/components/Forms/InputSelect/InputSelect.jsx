@@ -8,14 +8,18 @@ import css from './InputSelect.module.scss';
 const InputSelect = ({ name, options, placeholder, onChange, value }) => {
   const [selected, setSelected] = useState(null);
 
-  // Если value явно передан — синхронизируем его (контролируемый режим)
   useEffect(() => {
     if (value !== undefined) {
+      let resolvedValue = null;
+
       if (typeof value === 'object' && value?.value) {
-        setSelected(value);
+        resolvedValue = value;
       } else {
-        const match = options.find(opt => opt.value === value);
-        setSelected(match || null);
+        resolvedValue = options.find(opt => opt.value === value) || null;
+      }
+
+      if (selected?.value !== resolvedValue?.value || selected?.label !== resolvedValue?.label) {
+        setSelected(resolvedValue);
       }
     }
   }, [value, options]);

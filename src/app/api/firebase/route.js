@@ -41,7 +41,7 @@ export async function POST(req) {
     const audioBuffer = await elevenLabsRes.arrayBuffer();
 
     // Путь в Firebase Storage
-    const fileRef = ref(storage, `InterVizo/${company}/${_id}/${index}.mp3`);
+    const fileRef = ref(storage, `InterVizo/${company}/${_id}/audio_${item.id}.mp3`);
 
     // Загрузка в Firebase
     await uploadBytes(fileRef, new Uint8Array(audioBuffer), {

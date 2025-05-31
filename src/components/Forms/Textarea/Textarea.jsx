@@ -16,7 +16,7 @@ const Textarea = ({ name, placeholder }) => {
         setInterview(prev => ({
           ...prev,
           [name]: e.target.value,
-          slug: name === 'name' ? slugify(e.target.value) : interview.slug,
+          slug: name === 'name' ? slugify(e.target.value) : prev.slug,
         }))
       }
     ></textarea>

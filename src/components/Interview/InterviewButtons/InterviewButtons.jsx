@@ -6,7 +6,7 @@ import { usePopup } from '@/hooks/usePopup';
 import { useEffect } from 'react';
 import css from './InterviewButtons.module.scss';
 
-const InterviewButtons = ({ _id, currentInterview }) => {
+const InterviewButtons = ({ _id, currentInterview = null, mutateCurrentInterview = null }) => {
   const { openPopup } = usePopup();
   const { interview, updates, setInterview, resetInterview, setUpdates } = useInterview();
 
@@ -14,6 +14,7 @@ const InterviewButtons = ({ _id, currentInterview }) => {
     openPopup({
       type: 'save-interview',
       locked: true,
+      mutateCurrentInterview,
     });
   };
 
@@ -21,6 +22,8 @@ const InterviewButtons = ({ _id, currentInterview }) => {
     openPopup({
       type: 'update-interview',
       locked: false,
+      id: currentInterview._id,
+      mutateCurrentInterview,
     });
   };
 
@@ -31,29 +34,17 @@ const InterviewButtons = ({ _id, currentInterview }) => {
       const diff = {};
 
       for (const key in a) {
-        // Специальная логика для data
         if (key === 'data' && Array.isArray(a.data) && Array.isArray(b.data)) {
-          const changed = [];
+          const aJson = JSON.stringify(a.data);
+          const bJson = JSON.stringify(b.data);
 
-          const maxLength = Math.max(a.data.length, b.data.length);
-
-          for (let i = 0; i < maxLength; i++) {
-            const itemA = a.data[i];
-            const itemB = b.data[i];
-
-            if (!itemA || !itemB || JSON.stringify(itemA) !== JSON.stringify(itemB)) {
-              changed.push(itemA);
-            }
-          }
-
-          if (changed.length > 0) {
-            diff.data = changed;
+          if (aJson !== bJson) {
+            diff.data = a.data; // просто передаём весь массив
           }
 
           continue;
         }
 
-        // Глубокое сравнение других объектов
         if (typeof a[key] === 'object' && a[key] !== null && b[key] !== null && !Array.isArray(a[key])) {
           const nestedDiff = getDiff(a[key], b[key]);
           if (Object.keys(nestedDiff).length > 0) {
@@ -72,10 +63,10 @@ const InterviewButtons = ({ _id, currentInterview }) => {
   }, [interview, currentInterview, setUpdates]);
 
   useEffect(() => {
-    if (interview._id && !currentInterview) {
+    if (interview._id && !currentInterview && !_id) {
       resetInterview();
     }
-  }, [interview._id, currentInterview, resetInterview]);
+  }, [interview._id, currentInterview, _id, resetInterview]);
 
   useEffect(() => {
     if (currentInterview) {
