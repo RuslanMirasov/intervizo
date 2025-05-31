@@ -1,6 +1,7 @@
 'use client';
 
-import { Button } from '@/components';
+import { toast } from 'react-toastify';
+import { Button, Icon } from '@/components';
 import { useInterview } from '@/hooks/useInterview';
 import { usePopup } from '@/hooks/usePopup';
 import { useEffect } from 'react';
@@ -9,6 +10,22 @@ import css from './InterviewButtons.module.scss';
 const InterviewButtons = ({ _id, currentInterview = null, mutateCurrentInterview = null }) => {
   const { openPopup, closePopup } = usePopup();
   const { interview, updates, setInterview, resetInterview, setUpdates } = useInterview();
+
+  const handleShere = async () => {
+    const interviewId = _id || currentInterview._id;
+    if (!interviewId) return;
+
+    const link = `${window.location.origin}/connect?id=${interviewId}`;
+
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success('Скопировано в буфер обмена!', {
+        icon: <Icon name="ok" size={16} color="#59F928" />,
+      });
+    } catch (err) {
+      toast.error('Что-то пошло не так');
+    }
+  };
 
   const handleDeleteInterview = async () => {
     openPopup({
@@ -102,7 +119,9 @@ const InterviewButtons = ({ _id, currentInterview = null, mutateCurrentInterview
           <Button className="small red" onClick={handleDeleteInterview}>
             Удалить
           </Button>
-          <Button className="small shere">Поделиться</Button>
+          <Button className="small shere" onClick={handleShere}>
+            Поделиться
+          </Button>
         </>
       )}
 

@@ -1,4 +1,6 @@
 import { PopupProvider } from '@/context/PopupContext';
+import { ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { Header, Main, Popup } from '@/components';
 import '@/styles/globals.scss';
@@ -25,6 +27,13 @@ const RootLayout = ({ children }) => {
           <Main>{children}</Main>
           <Popup />
         </PopupProvider>
+        <ToastContainer
+          position="bottom-center"
+          hideProgressBar={true}
+          closeButton={false}
+          transition={Zoom}
+          autoClose={3000}
+        />
       </body>
     </html>
   );

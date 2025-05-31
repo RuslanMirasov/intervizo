@@ -226,3 +226,23 @@ a:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.Toastify__toast {
+  border-radius: 12px;
+  border: none;
+  background: #f3f4f6;
+  font-size: 14px;
+  letter-spacing: -0.03em;
+  font-family: var(--inter);
+  font-weight: 500;
+  color: var(--black);
+  padding: 16px 20px;
+  box-shadow: none;
+}
+
+.Toastify__toast-icon {
+  margin-inline-end: 8px;
+  width: 16px;
+  height: 16px;
+  color: var(--green);
+}
