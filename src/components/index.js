@@ -27,6 +27,7 @@ export { default as InterviewCatalog } from './Interview/InterviewCatalog/Interv
 export { default as ResultsList } from './Results/ResultsList/ResultsList';
 export { default as ResultsListSkeleton } from './Results/ResultsListSkeleton/ResultsListSkeleton';
 export { default as ResultListItem } from './Results/ResultListItem/ResultListItem';
+export { default as ConnectForm } from './Forms/ConnectForm/ConnectForm';
 export { default as AddNewInterviewForm } from './Forms/AddNewInterviewForm/AddNewInterviewForm';
 export { default as SectionsEditor } from './Forms/SectionsEditor/SectionsEditor';
 export { default as PromtGeneratorForm } from './Forms/PromtGeneratorForm/PromtGeneratorForm';

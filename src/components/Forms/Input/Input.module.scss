@@ -10,6 +10,11 @@
   font-weight: 500;
   color: var(--black);
   transition: 0.3s;
+
+  &.Invalid {
+    border: 1px solid var(--invalid);
+  }
+
   &::placeholder {
     color: #888888;
     opacity: 1;

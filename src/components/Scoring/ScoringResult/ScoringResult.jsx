@@ -14,18 +14,18 @@ const ScoringResult = () => {
     defaultValue: [],
   });
 
-  if (!progress || !interview) return <Preloader />;
+  if (!progress.data || !interview) return <Preloader />;
 
   return (
     <div className={css.ScoringResult}>
       <h1>{interview.name}</h1>
-      <Score score={interview.score} size="small" />
+      <Score score={progress.totalScore} size="small" />
       <div className={css.Video}>
         <strong>Видео в процессе</strong>
         <p>Время обработки 5-10 минут</p>
       </div>
       <ul className={css.Interview}>
-        {progress.map(({ id, question, answer, score, feedback }) => (
+        {progress?.data?.map(({ id, question, answer, score, feedback }) => (
           <React.Fragment key={id}>
             <li className={css.Question}>{question}</li>
             <li className={css.Answer}>

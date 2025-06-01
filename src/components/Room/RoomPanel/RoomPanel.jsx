@@ -7,7 +7,6 @@ const RoomPanel = () => {
   return (
     <div className={`${css.Robot} ${loading ? css.Loading : ''}`}>
       <Preloader className={css.RoomPreloader} />
-      {/* {stepPhase === 'thinking' && countdown > 0 && countdown < 6 && <div className={css.Counter}>{countdown}</div>} */}
       {countdown > 0 && <div className={css.Counter}>{countdown}</div>}
 
       <span>InterVizo</span>

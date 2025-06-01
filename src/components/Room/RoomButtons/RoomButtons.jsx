@@ -3,13 +3,13 @@ import { useProgressUi } from '@/context/ProgressUiContext';
 //import { useProgress } from '@/context/ProgressContext';
 import css from './RoomButtons.module.scss';
 
-const RoomButtons = () => {
+const RoomButtons = ({ id }) => {
   const { showNextButton, saveAnswer } = useProgressUi();
   return (
     <div className={css.Panel}>
       <RoomTime />
 
-      <Button href="./" className="small call">
+      <Button href={`/connect/${id}`} className="small call">
         <Icon name="call" size="25" color="var(--white)" />
       </Button>
 

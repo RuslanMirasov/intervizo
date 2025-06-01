@@ -2,15 +2,25 @@ import { useRef } from 'react';
 
 const KEY = 'progress';
 
+const defaultProgress = {
+  company: '',
+  interviewId: '',
+  owners: [],
+  totalScore: 0.0,
+  name: '',
+  email: '',
+  data: [],
+};
+
 export const useProgressStorage = () => {
   const isInitialized = useRef(false);
 
   const getProgress = () => {
     try {
       const raw = localStorage.getItem(KEY);
-      return raw ? JSON.parse(raw) : [];
+      return raw ? JSON.parse(raw) : { ...defaultProgress };
     } catch {
-      return [];
+      return { ...defaultProgress };
     }
   };
 
@@ -22,16 +32,16 @@ export const useProgressStorage = () => {
 
   const addQuestion = ({ id, question }) => {
     const current = getProgress();
-    const index = current.findIndex(item => item.id === id);
+    const index = current.data.findIndex(item => item.id === id);
 
     const newEntry = { id, question, answer: null, feedback: null, score: 0 };
 
-    if (index !== -1 && current[index].question === question) return;
+    if (index !== -1 && current.data[index].question === question) return;
 
     if (index !== -1) {
-      current[index] = newEntry;
+      current.data[index] = newEntry;
     } else {
-      current.push(newEntry);
+      current.data.push(newEntry);
     }
 
     setProgress(current);
@@ -39,13 +49,22 @@ export const useProgressStorage = () => {
 
   const updateAnswer = (id, answer) => {
     const current = getProgress();
-    const updated = current.map(item => (item.id === id ? { ...item, answer } : item));
-    setProgress(updated);
+    current.data = current.data.map(item => (item.id === id ? { ...item, answer } : item));
+    setProgress(current);
   };
 
   const updateFeedback = (id, feedback, score) => {
     const current = getProgress();
-    const updated = current.map(item => (item.id === id ? { ...item, feedback, score } : item));
+    current.data = current.data.map(item => (item.id === id ? { ...item, feedback, score } : item));
+    setProgress(current);
+  };
+
+  const setMeta = (meta = {}) => {
+    const current = getProgress();
+    const updated = {
+      ...current,
+      ...meta,
+    };
     setProgress(updated);
   };
 
@@ -57,7 +76,9 @@ export const useProgressStorage = () => {
     addQuestion,
     updateAnswer,
     updateFeedback,
+    setMeta,
     clearProgress,
     getProgress,
+    setProgress,
   };
 };

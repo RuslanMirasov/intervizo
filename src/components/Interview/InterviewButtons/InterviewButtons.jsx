@@ -15,7 +15,7 @@ const InterviewButtons = ({ _id, currentInterview = null, mutateCurrentInterview
     const interviewId = _id || currentInterview._id;
     if (!interviewId) return;
 
-    const link = `${window.location.origin}/connect?id=${interviewId}`;
+    const link = `${window.location.origin}/connect/${interviewId}`;
 
     try {
       await navigator.clipboard.writeText(link);

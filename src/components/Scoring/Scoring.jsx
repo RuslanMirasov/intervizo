@@ -10,14 +10,6 @@ const Scoring = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [progressItems, setProgressItems] = useState([]);
   const [hasStartedScoring, setHasStartedScoring] = useState(false);
-  const percent =
-    progressItems.length > 0
-      ? Math.round(
-          (progressItems.filter(item => item.status === 'fullfield' || item.status === 'rejected').length /
-            progressItems.length) *
-            100
-        )
-      : 0;
 
   const [progress, setProgress] = useLocalStorageState('progress', {
     defaultValue: [],
@@ -32,11 +24,20 @@ const Scoring = () => {
     method: 'POST',
   });
 
+  const percent =
+    progress?.data?.length > 0
+      ? Math.round(
+          (progressItems.filter(item => item.status === 'fullfield' || item.status === 'rejected').length /
+            progress.data.length) *
+            100
+        )
+      : 0;
+
   // Инициализация progressItems
   useEffect(() => {
-    if (progress && progress.length > 0) {
+    if (progress?.data?.length > 0) {
       setProgressItems(
-        progress.map((_, index) => ({
+        progress.data.map((_, index) => ({
           name: `Процесс обработки вопроса №${index + 1}`,
           status: 'pending',
         }))
@@ -51,13 +52,12 @@ const Scoring = () => {
 
   // Функция для запуска скорирования
   const startScoring = async () => {
-    if (hasStartedScoring || !progress || progress.length === 0) return;
+    if (hasStartedScoring || !progress?.data?.length) return;
 
     setHasStartedScoring(true);
 
     try {
-      // Создаем промисы для всех вопросов
-      const scoringPromises = progress.map(async (item, index) => {
+      const scoringPromises = progress.data.map(async (item, index) => {
         try {
           updateProgressItem(index, 'pending');
 
@@ -93,28 +93,25 @@ const Scoring = () => {
         }
       });
 
-      // Ждем завершения всех запросов
       const results = await Promise.allSettled(scoringPromises);
 
-      // Обрабатываем результаты
-      const updatedProgress = [...progress];
+      const updatedData = [...progress.data];
       let totalScore = 0;
       let validScores = 0;
 
       results.forEach((result, index) => {
         if (result.status === 'fulfilled') {
           const { score, feedback } = result.value;
-          updatedProgress[index] = {
-            ...updatedProgress[index],
+          updatedData[index] = {
+            ...updatedData[index],
             score,
             feedback,
           };
           totalScore += score;
           validScores++;
         } else {
-          // Fallback для неудачных запросов
-          updatedProgress[index] = {
-            ...updatedProgress[index],
+          updatedData[index] = {
+            ...updatedData[index],
             score: 3.0,
             feedback: 'Ошибка при оценке',
           };
@@ -123,25 +120,28 @@ const Scoring = () => {
         }
       });
 
-      // Вычисляем средний балл
       const averageScore = validScores > 0 ? totalScore / validScores : 3.0;
+      const roundedScore = Math.round(averageScore * 10) / 10;
 
-      // Сохраняем обновленные данные
-      setProgress(updatedProgress);
+      // Обновляем весь объект
+      setProgress(prev => ({
+        ...prev,
+        data: updatedData,
+        totalScore: roundedScore,
+      }));
+
       setInterview(prev => ({
         ...prev,
-        score: Math.round(averageScore * 10) / 10, // Округляем до 1 знака после запятой
+        score: roundedScore,
       }));
 
       setIsComplete(true);
     } catch (error) {
       console.error('Ошибка при скорировании:', error);
-      // В случае критической ошибки показываем результат с нейтральными оценками
       setIsComplete(true);
     }
   };
 
-  // Автоматический запуск скорирования при загрузке
   useEffect(() => {
     if (progressItems.length > 0 && !hasStartedScoring && !isComplete) {
       const timer = setTimeout(() => {
@@ -152,7 +152,7 @@ const Scoring = () => {
     }
   }, [progressItems, hasStartedScoring, isComplete]);
 
-  if (!progress || progress.length === 0) return <Preloader />;
+  if (!progress?.data?.length) return <Preloader />;
 
   return (
     <div className={css.Scoring}>

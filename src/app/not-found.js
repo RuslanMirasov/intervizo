@@ -11,8 +11,8 @@ const NotFound = () => {
       <Flex>
         <h1>Ошибка 404</h1>
         <p>Страница не найдена</p>
-        <Button href="./" className="small border">
-          Вернуться назад
+        <Button href="/" className="small border">
+          Вернуться на главную
         </Button>
       </Flex>
     </Section>
