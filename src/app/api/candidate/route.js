@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Candidate from '@/models/Candidate';
+import { ProgressSchema } from '@/models/Candidate';
 
 export async function GET(req) {
   try {
@@ -52,5 +53,30 @@ export async function GET(req) {
   } catch (error) {
     console.error('Ошибка при получении данных кондидата:', error);
     return NextResponse.json({ success: false, candidates: [], error: 'Ошибка при получении данных' }, { status: 500 });
+  }
+}
+
+export async function POST(req) {
+  try {
+    await dbConnect();
+
+    const body = await req.json();
+
+    // === ВАЛИДАЦИЯ ===
+    const result = ProgressSchema.safeParse(body);
+    if (!result.success) {
+      const errorMessages = result.error.errors.map((e, index) => `${index + 1}) ${e.message}`).join('; ');
+      return NextResponse.json({ message: errorMessages }, { status: 400 });
+    }
+
+    const data = result.data;
+
+    // === СОХРАНЕНИЕ БЕЗ ПРОВЕРКИ EMAIL ===
+    const candidate = await Candidate.create(data);
+
+    return NextResponse.json({ success: true, candidate }, { status: 201 });
+  } catch (error) {
+    console.error('Ошибка при создании кандидата:', error);
+    return NextResponse.json({ success: false, error: 'Ошибка при создании кандидата' }, { status: 500 });
   }
 }

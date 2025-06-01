@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react';
 import { Button, Input } from '@/components';
 import { useRouter } from 'next/navigation';
+import useRequest from '@/hooks/useRequest';
 import { useProgressStorage } from '@/hooks/useProgressStorage';
 import css from './ConnectForm.module.scss';
 
-const ConnectForm = ({ id }) => {
+const ConnectForm = ({ id, interviewId }) => {
   const router = useRouter();
   const { setMeta } = useProgressStorage();
 
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
@@ -22,19 +24,24 @@ const ConnectForm = ({ id }) => {
     return trimmed.length > 0 && !/\d/.test(trimmed);
   };
 
+  const validateEmail = async value => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+  };
+
   useEffect(() => {
     setNameInvalid(name !== '' && !validateName(name));
     setEmailInvalid(email !== '' && !validateEmail(email));
     setFormValid(validateName(name) && validateEmail(email));
   }, [name, email]);
 
-  const validateEmail = value => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-  };
+  const { trigger: checkCandidate, isMutating } = useRequest({
+    url: `/api/candidate/check`,
+    method: 'POST',
+  });
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-
+    setLoading(true);
     const isNameValid = validateName(name);
     const isEmailValid = validateEmail(email);
 
@@ -43,8 +50,15 @@ const ConnectForm = ({ id }) => {
 
     if (!isNameValid || !isEmailValid) return;
 
-    setMeta({ name: name.trim(), email: email.trim() });
-    router.replace(`/room/${id}`);
+    try {
+      await checkCandidate({ email, interviewId });
+      setMeta({ name: name.trim(), email: email.trim() });
+      router.replace(`/room/${id}`);
+    } catch {
+      return;
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -65,7 +79,7 @@ const ConnectForm = ({ id }) => {
         onChange={e => setEmail(e.target.value)}
         invalid={emailInvalid}
       />
-      <Button type="submit" className="full" disabled={!formValid}>
+      <Button type="submit" className="full" disabled={!formValid} loading={loading}>
         Подключится
       </Button>
     </form>

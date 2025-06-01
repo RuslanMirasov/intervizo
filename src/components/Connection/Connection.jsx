@@ -65,7 +65,7 @@ const Connection = ({ id }) => {
           <Icon name="logo" size="28" color="var(--color)" />
         </div>
         <p>InterVizo ИИ на связи</p>
-        <ConnectForm id={id} />
+        <ConnectForm id={id} interviewId={interview._id} />
         <span>InterVizo использует генеративный ИИ для проведения интервью</span>
       </Flex>
     </div>

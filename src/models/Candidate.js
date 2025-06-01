@@ -15,6 +15,7 @@ export const ProgressSchema = z.object({
   company: z.string().min(1, 'Не указана компания'),
   interviewId: z.string().min(1, 'Не указан ID интервью'),
   position: z.string().min(1, 'Должность не указана'),
+  video: z.string(),
   owners: z.array(z.string().email()).min(1, 'К интервью не закреплён ни один HR менеджер'),
   name: z.string().min(1, 'Имя и фамилия кандидата не указаны'),
   email: z.string().email('E-mail кандидата не указан либо введён в неправильном формате'),
@@ -49,6 +50,7 @@ const CandidateSchema = new Schema(
       },
     },
     name: { type: String, required: true },
+    video: { type: String, default: '' },
     email: { type: String, required: true, unique: true }, // уникальность на уровне базы
     totalScore: {
       type: Number,
