@@ -4,7 +4,7 @@ import css from './InterviewSingle.module.scss';
 const InterviewSingle = ({ interview }) => {
   if (!interview) return <Preloader />;
 
-  const { name, category, thumbnail, description, duration, difficulty } = interview;
+  const { _id, name, category, thumbnail, description, duration, difficulty } = interview;
 
   const difficultyClassMap = {
     Легкое: css.Green,
@@ -30,7 +30,7 @@ const InterviewSingle = ({ interview }) => {
       </div>
       <h1>{name}</h1>
       <p className={css.Description}>{description}</p>
-      <ResultsList />
+      <ResultsList interviewId={_id} />
     </>
   );
 };

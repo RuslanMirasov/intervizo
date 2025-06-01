@@ -37,6 +37,7 @@ const Connection = ({ id }) => {
       company: interview.company,
       interviewId: interview._id,
       owners: interview.owners,
+      position: interview.name || '',
       name: '',
       email: '',
       totalScore: 0.0,

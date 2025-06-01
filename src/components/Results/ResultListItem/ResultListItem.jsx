@@ -2,24 +2,24 @@ import { Score } from '@/components';
 import Link from 'next/link';
 import css from './ResultListItem.module.scss';
 
-const ResultListItem = ({ result }) => {
-  const { name, vacancy, avatar, date, rating = 0.0 } = result;
+const ResultListItem = ({ candidate, index }) => {
+  const { name, position, createdAt, totalScore = 0.0, interviewId, _id } = candidate;
 
   return (
-    <Link href="./" className={css.ResultListItem}>
+    <Link href={`/interviews/${interviewId}/${_id}`} className={css.ResultListItem}>
       <div className={css.ListProfile}>
-        <div className={css.Avatar}>
-          {avatar && <img src={avatar} alt={name ? name : 'Аватарка'} width={56} height={56} />}
-        </div>
+        <div
+          className={css.Avatar}
+          style={{ background: `url('/avatars/${String(index + 1).slice(-1)}.webp')no-repeat center center/cover` }}
+        ></div>
         <div className={css.Text}>
-          <h3>{name ? name : 'Неизвестно'}</h3>
-          {vacancy && <p>{vacancy}</p>}
+          <h3>{name}</h3>
+          {position && <p>{position}</p>}
         </div>
       </div>
       <div className={css.ListInfo}>
-        {date && <p>{date}</p>}
-        <Score score={rating} size="small" />
-        {/* <span>{String(rating)}</span> */}
+        {createdAt && <p>{createdAt}</p>}
+        <Score score={totalScore} size="small" />
       </div>
     </Link>
   );

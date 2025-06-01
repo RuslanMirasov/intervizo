@@ -14,6 +14,12 @@ const Header = () => {
               <span>Главная</span>
             </Link>
           </li>
+          <li>
+            <Link href="/interviews">
+              <Icon name="mike" size="22" color="currentColor" />
+              <span>Интервью</span>
+            </Link>
+          </li>
         </ul>
       </nav>
       <Link href="./" className={css.ProfileLink}>
