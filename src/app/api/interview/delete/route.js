@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
-import { Interview, validateInterview } from '@/models/Interview';
+import { Interview } from '@/models/Interview';
+import Candidate from '@/models/Candidate';
 
 export async function DELETE(req) {
   try {
@@ -8,10 +9,7 @@ export async function DELETE(req) {
     const { _id } = body;
 
     if (!_id) {
-      return new Response(JSON.stringify({ error: 'ID не передан' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return NextResponse.json({ message: 'ID не передан' }, { status: 400 });
     }
 
     await dbConnect();
@@ -19,21 +17,14 @@ export async function DELETE(req) {
     const deleted = await Interview.findByIdAndDelete(_id);
 
     if (!deleted) {
-      return new Response(JSON.stringify({ error: 'Интервью не найдено' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return NextResponse.json({ message: 'Интервью не найдено' }, { status: 404 });
     }
 
-    return new Response(JSON.stringify({ success: true, message: 'Интервью удалено' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    await Candidate.deleteMany({ interviewId: _id });
+
+    return NextResponse.json({ success: true, message: 'Интервью и связанные кандидаты удалены' }, { status: 200 });
   } catch (error) {
     console.error('Ошибка при удалении интервью:', error);
-    return new Response(JSON.stringify({ error: 'Ошибка удаления: ' + error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json({ message: 'Ошибка удаления: ' + error.message }, { status: 500 });
   }
 }
