@@ -18,7 +18,15 @@ const ResultListItem = ({ candidate, index }) => {
         </div>
       </div>
       <div className={css.ListInfo}>
-        {createdAt && <p>{createdAt}</p>}
+        {createdAt && (
+          <p>
+            {new Date(createdAt).toLocaleDateString('ru-RU', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            })}
+          </p>
+        )}
         <Score score={totalScore} size="small" />
       </div>
     </Link>

@@ -9,6 +9,7 @@ const defaultProgress = {
   totalScore: 0.0,
   name: '',
   email: '',
+  video: '',
   data: [],
 };
 

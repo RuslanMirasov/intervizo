@@ -4,18 +4,18 @@ import { z } from 'zod';
 // ==================== ZOD ВАЛИДАЦИЯ ====================
 
 const ProgressItemSchema = z.object({
-  id: z.number(),
-  question: z.string(),
-  answer: z.string(),
-  feedback: z.string(),
-  score: z.number().min(0).max(5),
+  id: z.number().optional(),
+  question: z.string().optional(),
+  answer: z.string().optional(),
+  feedback: z.string().optional(),
+  score: z.number().min(0).max(5).optional(),
 });
 
 export const ProgressSchema = z.object({
   company: z.string().min(1, 'Не указана компания'),
   interviewId: z.string().min(1, 'Не указан ID интервью'),
   position: z.string().min(1, 'Должность не указана'),
-  video: z.string(),
+  video: z.string().optional(),
   owners: z.array(z.string().email()).min(1, 'К интервью не закреплён ни один HR менеджер'),
   name: z.string().min(1, 'Имя и фамилия кандидата не указаны'),
   email: z.string().email('E-mail кандидата не указан либо введён в неправильном формате'),
@@ -51,7 +51,7 @@ const CandidateSchema = new Schema(
     },
     name: { type: String, required: true },
     video: { type: String, default: '' },
-    email: { type: String, required: true, unique: true }, // уникальность на уровне базы
+    email: { type: String, required: true }, // уникальность на уровне базы
     totalScore: {
       type: Number,
       required: true,
