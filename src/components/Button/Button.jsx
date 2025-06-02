@@ -9,7 +9,7 @@ const Button = ({ href, type = 'button', children, onClick, disabled, className,
   }
 
   if (loading) {
-    classes.push(css.Loading);
+    classes.push(css.loading); // добавляем класс, если loading === true
   }
 
   const classNames = classes.join(' ');

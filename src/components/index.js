@@ -47,3 +47,4 @@ export { default as ScoringResult } from './Scoring/ScoringResult/ScoringResult'
 export { default as Score } from './Scoring/Score/Score';
 export { default as ProgressBar } from './ProgressBar/ProgressBar';
 export { default as CandidateSingle } from './Candidate/CandidateSingle/CandidateSingle';
+export { default as CandidateDeleteBtn } from './Candidate/CandidateDeleteBtn/CandidateDeleteBtn';

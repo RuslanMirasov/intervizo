@@ -3,7 +3,7 @@ import { usePopup } from '@/hooks/usePopup';
 import css from './ConfirmPopup.module.scss';
 
 const ConfirmPopup = ({ params }) => {
-  const { title, subtitle, button = null, action } = params;
+  const { title, subtitle, button = null, loading = false, action } = params;
   const { closePopup } = usePopup();
 
   return (
@@ -15,7 +15,7 @@ const ConfirmPopup = ({ params }) => {
       {subtitle && <p className={css.Subtitle}>{subtitle}</p>}
       <div className={css.Buttons}>
         {button && (
-          <Button className="small red" onClick={action}>
+          <Button className="small red" onClick={action} loading={loading}>
             {button}
           </Button>
         )}

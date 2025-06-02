@@ -141,23 +141,29 @@
     pointer-events: none;
     opacity: 0.3;
   }
+}
 
-  &.Loading {
-    opacity: 1;
-    font-size: 0px;
-    pointer-events: none;
-    &:before {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-radius: 20px;
-      border-left: 2px solid currentColor;
-      border-top: 2px solid currentColor;
-      border-right: 2px solid rgba(0, 0, 0, 0);
-      border-bottom: 2px solid rgba(0, 0, 0, 0);
-      animation: spin 0.3s linear infinite;
-    }
+.Button.loading {
+  opacity: 1;
+  font-size: 0px;
+  pointer-events: none;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    border-left: 2px solid currentColor;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid transparent;
+    border-bottom: 2px solid transparent;
+    animation: spin 0.3s linear infinite;
+  }
+
+  &.small::before {
+    width: 16px;
+    height: 16px;
   }
 }
 

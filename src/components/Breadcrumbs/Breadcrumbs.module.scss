@@ -1,5 +1,7 @@
 .Breadcrumbs {
   display: inline-flex;
+  flex-wrap: wrap;
+  max-width: calc(100% - 125px);
 
   li {
     font-family: var(--inter);
@@ -8,6 +10,7 @@
     color: var(--black);
     a {
       transition: 0.3s;
+      white-space: nowrap;
     }
     a:hover {
       color: var(--color);

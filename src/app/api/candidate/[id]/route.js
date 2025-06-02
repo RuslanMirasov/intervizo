@@ -7,7 +7,7 @@ export async function GET(req, { params }) {
   const { id } = await params;
 
   if (!id || !isValidObjectId(id)) {
-    return NextResponse.json({ success: false, error: 'Некорректный ID' }, { status: 400 });
+    return NextResponse.json({ success: false, message: 'Некорректный ID' }, { status: 400 });
   }
 
   try {
@@ -16,7 +16,7 @@ export async function GET(req, { params }) {
     const candidate = await Candidate.findById(id).lean();
 
     if (!candidate) {
-      return NextResponse.json({ success: false, error: 'Кандедат не найден' }, { status: 404 });
+      return NextResponse.json({ success: false, message: 'Кандедат не найден' }, { status: 404 });
     }
 
     const response = NextResponse.json({
@@ -29,6 +29,29 @@ export async function GET(req, { params }) {
     return response;
   } catch (error) {
     console.error('Ошибка при получении данных кандидата:', error);
-    return NextResponse.json({ success: false, error: 'Ошибка сервера' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Ошибка сервера' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req, { params }) {
+  const { id } = await params;
+
+  if (!id || !isValidObjectId(id)) {
+    return NextResponse.json({ success: false, message: 'Некорректный ID' }, { status: 400 });
+  }
+
+  try {
+    await dbConnect();
+
+    const deleted = await Candidate.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return NextResponse.json({ success: false, message: 'Кандидат не найден' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: 'Кандидат удалён' });
+  } catch (error) {
+    console.error('Ошибка при удалении кандидата:', error);
+    return NextResponse.json({ success: false, message: 'Ошибка сервера' }, { status: 500 });
   }
 }

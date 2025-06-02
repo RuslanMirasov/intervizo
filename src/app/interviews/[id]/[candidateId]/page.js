@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { Breadcrumbs, Section, CandidateSingle } from '@/components';
+import { Breadcrumbs, Section, CandidateSingle, CandidateDeleteBtn } from '@/components';
 
 export const metadata = {
   title: 'InterVizo | Результат кандидата',
@@ -17,7 +17,7 @@ const CandidateSinglePage = async ({ params }) => {
 
   if (!candidate) return notFound();
 
-  const { interviewId, name, position } = candidate;
+  const { _id, interviewId, name, position } = candidate;
 
   return (
     <Section intop width="580px">
@@ -29,6 +29,7 @@ const CandidateSinglePage = async ({ params }) => {
           { label: name },
         ]}
       />
+      <CandidateDeleteBtn id={_id} interviewId={interviewId} />
       <CandidateSingle candidate={candidate} />
     </Section>
   );
