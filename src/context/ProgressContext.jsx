@@ -24,7 +24,7 @@ const ProgressContext = createContext(null);
 export const ProgressProvider = ({ children }) => {
   const router = useRouter();
   const [interview, , { isPersistent }] = useLocalStorageState('interview');
-  const { isSpeaking, triggerDetected, startRecord, stopRecord, resumeRecord } = useVoice();
+  const { isSpeaking, triggerDetected, startRecord, stopRecord, pauseRecord, resumeRecord } = useVoice();
   const { addQuestion, updateAnswer } = useProgressStorage();
 
   const video = useVideo();
@@ -90,7 +90,7 @@ export const ProgressProvider = ({ children }) => {
 
       //--------------------------------------------
 
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 800));
 
       const speakVariant = getRandomItemFromArray(['/video/speak1.mp4', '/video/speak2.mp4', '/video/speak3.mp4']);
       video.startVideo(speakVariant);
@@ -158,6 +158,7 @@ export const ProgressProvider = ({ children }) => {
   };
 
   const repeatQuastion = async () => {
+    await pauseRecord();
     const repeatVideo = getRandomItemFromArray(['/video/repeat1.mp4', '/video/repeat2.mp4', '/video/repeat3.mp4']);
     await new Promise(r => setTimeout(r, 200));
     await video.playVideo(repeatVideo);
