@@ -92,8 +92,7 @@ export const ProgressProvider = ({ children }) => {
 
       await new Promise(r => setTimeout(r, 800));
 
-      const speakVariant = getRandomItemFromArray(['/video/speak1.mp4', '/video/speak2.mp4', '/video/speak3.mp4']);
-      video.startVideo(speakVariant);
+      video.startVideo('/video/speak.mp4');
       await playAudio(audio);
       await video.stopVideo();
 
