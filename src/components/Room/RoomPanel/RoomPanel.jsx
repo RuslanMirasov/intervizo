@@ -5,12 +5,15 @@ import css from './RoomPanel.module.scss';
 const RoomPanel = () => {
   const { loading, countdown } = useProgressUi();
   return (
-    <div className={`${css.Robot} ${loading ? css.Loading : ''}`}>
-      <VideoBackground />
-      {countdown > 0 && <div className={css.Counter}>{countdown}</div>}
+    <>
+      <div className={`${css.Robot} ${loading ? css.Loading : ''}`}>
+        <VideoBackground />
 
-      <span>InterVizo</span>
-    </div>
+        <span>InterVizo</span>
+      </div>
+
+      {countdown > 0 && <div className={css.Counter}>{countdown}</div>}
+    </>
   );
 };
 
