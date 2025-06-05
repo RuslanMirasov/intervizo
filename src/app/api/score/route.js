@@ -8,8 +8,6 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Некорректные данные вопроса' }, { status: 400 });
     }
 
-    console.log(`Получен вопрос ${questionIndex + 1} для оценки:`, question);
-
     const prompt = `
 Ты эксперт по проведению интервью. Твоя задача - оценить один ответ кандидата.
 
@@ -89,8 +87,6 @@ export async function POST(request) {
     if (typeof evaluation.feedback !== 'string') {
       evaluation.feedback = 'Обратная связь временно недоступна.';
     }
-
-    console.log(`Обработанный результат для вопроса ${questionIndex + 1}:`, evaluation);
 
     return NextResponse.json({
       success: true,

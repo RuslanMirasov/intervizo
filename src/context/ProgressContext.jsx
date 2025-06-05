@@ -13,37 +13,53 @@ import { playAudio } from '@/lib/playAudio';
 import { saveAudio } from '@/lib/save';
 import { speak } from '@/lib/speak';
 import { speakInBrowser } from '@/lib/speakInBrowser';
+import { preloadMedia } from '@/lib/preloadMedia';
 import { ProgressUiProvider } from './ProgressUiContext';
 import { Preloader } from '@/components';
+import { useVideo } from '@/context/VideoContext';
+import { useCamera } from '@/context/CameraContext';
 
 const ProgressContext = createContext(null);
 
 export const ProgressProvider = ({ children }) => {
   const router = useRouter();
   const [interview, , { isPersistent }] = useLocalStorageState('interview');
-
   const { isSpeaking, triggerDetected, startRecord, stopRecord, resumeRecord } = useVoice();
   const { addQuestion, updateAnswer } = useProgressStorage();
+
+  const video = useVideo();
 
   const [step, setStep] = useState(null);
   const [showNextButton, setShowNextButton] = useState(false);
   const [countdown, setCountdown] = useState(null);
 
   const transcriptionPromises = useRef([]);
+  const lastStepRef = useRef(null);
+
+  const { startCamera, stopCamera, startRecording, stopRecording, videoUrl, playQuestionAudio } = useCamera();
 
   // ЗАПУСКАЕМ ИНТЕРВЬЮ
 
   const startInterview = useCallback(async () => {
     if (interview?.data?.length > 0) {
       //await playAudio('./intro.mp3');
+      await startCamera();
+      //await startRecording();
+      const allQuestionsAudioUrls = interview.data.map(url => url.audio);
+      const prelodeElementsArr = [...allQuestionsAudioUrls];
+      await preloadMedia(prelodeElementsArr);
       setStep(0);
     }
-  }, [interview]);
+  }, [interview, startRecording]);
 
   const finishInterview = useCallback(async () => {
     await Promise.allSettled(transcriptionPromises.current);
     router.push('/scoring');
-  }, [router]);
+
+    // const url = await stopRecording();
+    // alert(url);
+    // stopCamera();
+  }, [router, stopRecording, videoUrl]);
 
   //ПЕРЕХОД К CЛЕДУЮЩЕМУ ШАГУ
   const goToNextStep = useCallback(() => {
@@ -69,8 +85,19 @@ export const ProgressProvider = ({ children }) => {
 
       //await speakInBrowser(text);
       //await speak(text, '/api/speak-eleven');
-      await playAudio(audio);
+      //await playAudio(audio);
       //await saveAudio(text, { filename: 'repeat.mp3', voice: 'onyx' }); //nova
+
+      //--------------------------------------------
+
+      await new Promise(r => setTimeout(r, 1000));
+
+      const speakVariant = getRandomItemFromArray(['/video/speak1.mp4', '/video/speak2.mp4', '/video/speak3.mp4']);
+      video.startVideo(speakVariant);
+      await playAudio(audio);
+      await video.stopVideo();
+
+      // ---------------------------------------------
 
       if (type === 'message') {
         setShowNextButton(false);
@@ -92,6 +119,7 @@ export const ProgressProvider = ({ children }) => {
   );
 
   const transcribeAnswer = async (id, blob) => {
+    console.log('Я транскрибирую BLOB: ', blob);
     const transcriptionPromise = transcribeVoice(blob)
       .then(transcription => {
         updateAnswer(id, transcription);
@@ -105,7 +133,7 @@ export const ProgressProvider = ({ children }) => {
     return transcriptionPromise;
   };
 
-  const saveAnswer = async () => {
+  const saveAnswer = async (isNext = true) => {
     await startCountdown(0, () => setCountdown(0), setCountdown);
     await setShowNextButton(false);
     const recordedBlob = await stopRecord();
@@ -113,18 +141,34 @@ export const ProgressProvider = ({ children }) => {
     if (recordedBlob) {
       transcribeAnswer(step, recordedBlob);
     }
-
+    if (isNext) {
+      await new Promise(r => setTimeout(r, 300));
+      const confirmVideo = getRandomItemFromArray([
+        '/video/confirm1.mp4',
+        '/video/confirm2.mp4',
+        '/video/confirm3.mp4',
+        '/video/confirm4.mp4',
+        '/video/confirm5.mp4',
+        '/video/confirm6.mp4',
+        '/video/confirm7.mp4',
+      ]);
+      await video.playVideo(confirmVideo);
+    }
     goToNextStep();
   };
 
   const repeatQuastion = async () => {
-    await playAudio(getRandomItemFromArray(['/repeat.mp3', '/repeat2.mp3', '/repeat3.mp3']));
+    const repeatVideo = getRandomItemFromArray(['/video/repeat1.mp4', '/video/repeat2.mp4', '/video/repeat3.mp4']);
+    await new Promise(r => setTimeout(r, 200));
+    await video.playVideo(repeatVideo);
     goToStep(step, true);
   };
 
   const nextQuastion = async () => {
-    await playAudio(getRandomItemFromArray(['/next.mp3', '/next2.mp3', '/next3.mp3']));
-    saveAnswer();
+    const nextQuestionVideo = getRandomItemFromArray(['/video/next1.mp4', '/video/next2.mp4', '/video/next3.mp4']);
+    await new Promise(r => setTimeout(r, 200));
+    await video.playVideo(nextQuestionVideo);
+    saveAnswer(false);
   };
   // ========================================================================= ЭФФЕКТЫ
 
@@ -138,6 +182,10 @@ export const ProgressProvider = ({ children }) => {
   //ЭФФЕКТ ЗАПУСКАЕТ СЛЕДУЮЩИЙ ШАГ ПРИ ИЗМЕНЕНИИ STEP
   useEffect(() => {
     if (step === null || !interview?.data || !interview.data[step]) return;
+
+    if (lastStepRef.current === step) return;
+    lastStepRef.current = step;
+
     goToStep(step);
   }, [step, interview]);
 
@@ -168,8 +216,11 @@ export const ProgressProvider = ({ children }) => {
     () => ({
       startInterview,
       step,
+      startVideo: video.startVideo,
+      stopVideo: video.stopVideo,
+      playVideo: video.playVideo,
     }),
-    [startInterview, step]
+    [startInterview, step, video]
   );
 
   const uiValue = useMemo(

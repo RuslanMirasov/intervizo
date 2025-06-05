@@ -5,7 +5,7 @@ import { useCamera } from '@/context/CameraContext';
 import css from './RoomTime.module.scss';
 
 const RoomTime = () => {
-  const { cameraStartTime, recordingStartTime } = useCamera();
+  const { cameraStartTime, recordingStartTime, isRecording } = useCamera();
   const [elapsedTime, setElapsedTime] = useState('00:00');
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const RoomTime = () => {
     return () => clearInterval(interval);
   }, [cameraStartTime, recordingStartTime]);
 
-  return <span className={`${css.Time} ${recordingStartTime ? css.Rec : ''}`}>{elapsedTime}</span>;
+  return <span className={`${css.Time} ${isRecording ? css.Rec : ''}`}>{elapsedTime}</span>;
 };
 
 export default RoomTime;

@@ -232,6 +232,13 @@ const Scoring = () => {
         progress.data.map(async (item, index) => {
           updateProgressItem(index, 'pending');
 
+          const answer = item.answer?.trim();
+
+          if (!answer) {
+            updateProgressItem(index, 'rejected');
+            return { index, score: 3.0, feedback: 'Ответ отсутствует' };
+          }
+
           try {
             const result = await scoreTrigger({
               question: item.question,

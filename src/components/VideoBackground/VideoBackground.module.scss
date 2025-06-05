@@ -1,0 +1,27 @@
+.VideoBackground {
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border: none;
+  video {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.3s;
+  }
+}
+
+.OverlayVideo {
+  opacity: 0;
+  &.Visible {
+    opacity: 1;
+  }
+}

@@ -2,12 +2,11 @@
 
 import { useInterview } from '@/hooks/useInterview';
 import { Camera, RoomButtons, RoomPanel, RoomQuestion } from '@/components';
+
 import css from './Room.module.scss';
 
 const Room = ({ id }) => {
   const { interview, isPersistent } = useInterview();
-
-  console.log('%c🧱 Room Component готов', 'color: green');
 
   if (!isPersistent) return null;
 

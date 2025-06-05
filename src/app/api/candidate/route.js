@@ -62,7 +62,6 @@ export async function POST(req) {
 
     const body = await req.json();
 
-    // === ВАЛИДАЦИЯ ===
     const result = ProgressSchema.safeParse(body);
     if (!result.success) {
       const errorMessages = result.error.errors.map((e, index) => `${index + 1}) ${e.message}`).join('; ');
@@ -71,7 +70,6 @@ export async function POST(req) {
 
     const data = result.data;
 
-    // === СОХРАНЕНИЕ БЕЗ ПРОВЕРКИ EMAIL ===
     const candidate = await Candidate.create(data);
 
     return NextResponse.json({ success: true, candidate }, { status: 201 });

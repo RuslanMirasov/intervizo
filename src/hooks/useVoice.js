@@ -72,6 +72,7 @@ export function useVoice({
     recognition: null,
     isActive: false,
     isPaused: false,
+    hadTranscript: false,
   });
 
   const isMountedRef = useRef(true);
@@ -225,9 +226,27 @@ export function useVoice({
     event => {
       if (speechRefs.current.isPaused) return;
 
+      // let transcript = '';
+      // for (let i = event.resultIndex; i < event.results.length; i++) {
+      //   transcript += event.results[i][0].transcript.toLowerCase();
+      // }
+
       let transcript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript.toLowerCase();
+        const partial = event.results[i][0].transcript.trim().toLowerCase();
+
+        // Строгая проверка: минимум 2 слова и хотя бы одно из них длиной >= 4
+        const words = partial.split(/\s+/).filter(Boolean);
+        const hasEnoughWords = words.length >= 2;
+        const hasLongWord = words.some(word => word.length >= 4);
+
+        if (hasEnoughWords && hasLongWord) {
+          transcript += partial;
+          speechRefs.current.hadTranscript = true;
+          console.log('✔ речевая фраза:', partial);
+        } else {
+          console.log('✘ игнор:', partial);
+        }
       }
 
       const isRepeatTrigger = repeatTriggers.some(phrase => transcript.includes(phrase));
@@ -306,6 +325,24 @@ export function useVoice({
     return true;
   }, [lang, handleSpeechResult, handleSpeechError, handleSpeechEnd]);
 
+  const isSilentBlob = async blob => {
+    if (!blob || blob.size === 0) return true;
+
+    try {
+      const arrayBuffer = await blob.arrayBuffer();
+      const audioContext = new AudioContext();
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      const data = audioBuffer.getChannelData(0);
+
+      const rms = Math.sqrt(data.reduce((sum, sample) => sum + sample * sample, 0) / data.length);
+
+      return rms < 0.01;
+    } catch (e) {
+      console.warn('Ошибка анализа аудио на тишину', e);
+      return false;
+    }
+  };
+
   const createAudioBlob = useCallback(() => {
     const { chunks } = recordingRefs.current;
 
@@ -375,16 +412,26 @@ export function useVoice({
       const { mediaRecorder } = recordingRefs.current;
 
       if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
-        mediaRecorder.onstop = () => {
+        mediaRecorder.onstop = async () => {
           const blob = createAudioBlob();
+          const silent = await isSilentBlob(blob);
+          const hadSpeech = speechRefs.current.hadTranscript;
+          speechRefs.current.hadTranscript = false;
+
           cleanupAllResources();
-          resolve(blob);
+          resolve(!hadSpeech || silent ? null : blob);
         };
         mediaRecorder.stop();
       } else {
-        const blob = createAudioBlob();
-        cleanupAllResources();
-        resolve(blob);
+        (async () => {
+          const blob = createAudioBlob();
+          const silent = await isSilentBlob(blob);
+          const hadSpeech = speechRefs.current.hadTranscript;
+          speechRefs.current.hadTranscript = false;
+
+          cleanupAllResources();
+          resolve(!hadSpeech || silent ? null : blob);
+        })();
       }
     });
   }, [cleanupSpeechResources, stopVoiceDetection, createAudioBlob, cleanupAllResources]);

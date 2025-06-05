@@ -24,7 +24,7 @@ const ConnectForm = ({ id, interviewId }) => {
     return trimmed.length > 0 && !/\d/.test(trimmed);
   };
 
-  const validateEmail = async value => {
+  const validateEmail = value => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
   };
 
