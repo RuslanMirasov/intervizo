@@ -356,17 +356,69 @@ export function useVoice({
     return blob;
   }, []);
 
+  // const startRecord = useCallback(async () => {
+  //   if (speechRefs.current.isActive) return;
+
+  //   recordingRefs.current.lastBlob = null;
+  //   speechRefs.current.isPaused = false;
+
+  //   const audioInitialized = await initializeAudio();
+  //   if (!audioInitialized) return;
+
+  //   const speechInitialized = initializeSpeechRecognition();
+  //   if (!speechInitialized) return;
+
+  //   try {
+  //     const mediaRecorder = new MediaRecorder(audioRefs.current.stream);
+  //     recordingRefs.current.chunks = [];
+
+  //     mediaRecorder.ondataavailable = event => {
+  //       if (event.data.size > 0) {
+  //         recordingRefs.current.chunks.push(event.data);
+  //       }
+  //     };
+
+  //     mediaRecorder.start();
+  //     recordingRefs.current.mediaRecorder = mediaRecorder;
+
+  //     startVoiceDetection();
+  //     speechRefs.current.recognition.start();
+
+  //     speechRefs.current.isActive = true;
+  //     setIsRecording(true);
+  //     setIsPaused(false);
+  //     setTriggerDetected(null);
+  //   } catch (error) {
+  //     console.error('Recording start error:', error);
+  //     speechRefs.current.isActive = false;
+  //     cleanupAllResources();
+  //   }
+  // }, [initializeAudio, initializeSpeechRecognition, startVoiceDetection, cleanupAllResources]);
+
   const startRecord = useCallback(async () => {
     if (speechRefs.current.isActive) return;
 
     recordingRefs.current.lastBlob = null;
     speechRefs.current.isPaused = false;
+    speechRefs.current.hadTranscript = false;
 
-    const audioInitialized = await initializeAudio();
-    if (!audioInitialized) return;
-
+    // 1. Сначала запускаем распознавание
     const speechInitialized = initializeSpeechRecognition();
     if (!speechInitialized) return;
+
+    try {
+      speechRefs.current.recognition.start();
+    } catch (error) {
+      console.error('Speech recognition start error:', error);
+      return;
+    }
+
+    // 2. Ждём немного (даем системе переключиться на speech)
+    await new Promise(r => setTimeout(r, 1200));
+
+    // 3. Только потом запрашиваем микрофон
+    const audioInitialized = await initializeAudio();
+    if (!audioInitialized) return;
 
     try {
       const mediaRecorder = new MediaRecorder(audioRefs.current.stream);
@@ -382,7 +434,6 @@ export function useVoice({
       recordingRefs.current.mediaRecorder = mediaRecorder;
 
       startVoiceDetection();
-      speechRefs.current.recognition.start();
 
       speechRefs.current.isActive = true;
       setIsRecording(true);
@@ -390,7 +441,6 @@ export function useVoice({
       setTriggerDetected(null);
     } catch (error) {
       console.error('Recording start error:', error);
-      speechRefs.current.isActive = false;
       cleanupAllResources();
     }
   }, [initializeAudio, initializeSpeechRecognition, startVoiceDetection, cleanupAllResources]);
@@ -437,15 +487,33 @@ export function useVoice({
     });
   }, [cleanupSpeechResources, stopVoiceDetection, createAudioBlob, cleanupAllResources]);
 
+  // const pauseRecord = useCallback(() => {
+  //   const { isActive, isPaused } = speechRefs.current;
+
+  //   if (!isActive || isPaused) return;
+
+  //   speechRefs.current.isPaused = true;
+  //   setIsPaused(true);
+  //   setIsSpeaking(false);
+
+  //   cleanupSpeechResources();
+  //   stopVoiceDetection();
+
+  //   const { mediaRecorder } = recordingRefs.current;
+  //   if (mediaRecorder?.state === 'recording') {
+  //     mediaRecorder.pause();
+  //   }
+  // }, [cleanupSpeechResources, stopVoiceDetection]);
+
   const pauseRecord = useCallback(() => {
     const { isActive, isPaused } = speechRefs.current;
-
     if (!isActive || isPaused) return;
 
     speechRefs.current.isPaused = true;
     setIsPaused(true);
     setIsSpeaking(false);
 
+    // НЕ трогаем getUserMedia — только speech
     cleanupSpeechResources();
     stopVoiceDetection();
 
