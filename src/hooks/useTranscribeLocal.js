@@ -124,6 +124,7 @@ export function useTranscribeLocal() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
         console.error('Распознавание речи не поддерживается в этом браузере');
+        alert('Распознавание речи не поддерживается в этом браузере');
         resolve('');
         return;
       }

@@ -308,6 +308,7 @@ export function useVoice({
 
   const initializeSpeechRecognition = useCallback(() => {
     if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+      alert('Распознавание речи не поддерживается в этом браузере');
       console.error('Speech recognition not supported');
       return false;
     }
