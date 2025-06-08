@@ -141,9 +141,7 @@ export const ProgressProvider = ({ children }) => {
       transcribeAnswer(step, recordedBlob);
     }
 
-    console.log(step);
     const isLast = interview?.data && step + 1 >= interview.data.length - 1;
-    console.log(isLast);
 
     if (isNext && !isLast) {
       await new Promise(r => setTimeout(r, 300));
@@ -170,9 +168,14 @@ export const ProgressProvider = ({ children }) => {
   };
 
   const nextQuastion = async () => {
-    const nextQuestionVideo = getRandomItemFromArray(['/video/next1.mp4', '/video/next2.mp4', '/video/next3.mp4']);
-    await new Promise(r => setTimeout(r, 200));
-    await video.playVideo(nextQuestionVideo);
+    const isLast = interview?.data && step + 1 >= interview.data.length - 1;
+
+    if (!isLast) {
+      const nextQuestionVideo = getRandomItemFromArray(['/video/next1.mp4', '/video/next2.mp4', '/video/next3.mp4']);
+      await new Promise(r => setTimeout(r, 200));
+      await video.playVideo(nextQuestionVideo);
+    }
+
     saveAnswer(false);
   };
   // ========================================================================= ЭФФЕКТЫ
