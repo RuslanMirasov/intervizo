@@ -112,7 +112,7 @@ export const ProgressProvider = ({ children }) => {
         await startRecord();
       }
 
-      startCountdown(15, () => saveAnswer(), setCountdown);
+      startCountdown(30, () => saveAnswer(), setCountdown);
     },
     [interview]
   );
@@ -140,7 +140,12 @@ export const ProgressProvider = ({ children }) => {
     if (recordedBlob) {
       transcribeAnswer(step, recordedBlob);
     }
-    if (isNext) {
+
+    console.log(step);
+    const isLast = interview?.data && step + 1 >= interview.data.length - 1;
+    console.log(isLast);
+
+    if (isNext && !isLast) {
       await new Promise(r => setTimeout(r, 300));
       const confirmVideo = getRandomItemFromArray([
         '/video/confirm1.mp4',

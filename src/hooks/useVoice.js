@@ -28,16 +28,17 @@ const DEFAULT_REPEAT_TRIGGERS = [
   'вопрос ещё раз',
   'вопрос повторить',
   'повторите пожалуйста вопрос',
+  'повтори пожалуйста вопрос',
   'повторить вопрос',
   'можно ещё раз вопрос',
   'не расслышал вопрос',
-  'что вы сказали',
   'не понял вопрос',
   'можно повтор',
   'ещё раз пожалуйста',
   'скажите ещё раз',
   'повторите пожалуйста',
   'повторить пожалуйста',
+  'повтори пожалуйста',
 ];
 
 const DEFAULT_NEXT_TRIGGERS = ['следующий вопрос', 'к следующему вопросу', 'пропустить вопрос', 'вопрос пропустить'];
@@ -224,6 +225,7 @@ export function useVoice({
 
   const handleSpeechResult = useCallback(
     event => {
+      console.log('📍 handleSpeechResult START', event);
       if (speechRefs.current.isPaused) return;
 
       // let transcript = '';
@@ -308,7 +310,6 @@ export function useVoice({
 
   const initializeSpeechRecognition = useCallback(() => {
     if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-      alert('Распознавание речи не поддерживается в этом браузере');
       console.error('Speech recognition not supported');
       return false;
     }
@@ -355,45 +356,6 @@ export function useVoice({
 
     return blob;
   }, []);
-
-  // const startRecord = useCallback(async () => {
-  //   if (speechRefs.current.isActive) return;
-
-  //   recordingRefs.current.lastBlob = null;
-  //   speechRefs.current.isPaused = false;
-
-  //   const audioInitialized = await initializeAudio();
-  //   if (!audioInitialized) return;
-
-  //   const speechInitialized = initializeSpeechRecognition();
-  //   if (!speechInitialized) return;
-
-  //   try {
-  //     const mediaRecorder = new MediaRecorder(audioRefs.current.stream);
-  //     recordingRefs.current.chunks = [];
-
-  //     mediaRecorder.ondataavailable = event => {
-  //       if (event.data.size > 0) {
-  //         recordingRefs.current.chunks.push(event.data);
-  //       }
-  //     };
-
-  //     mediaRecorder.start();
-  //     recordingRefs.current.mediaRecorder = mediaRecorder;
-
-  //     startVoiceDetection();
-  //     speechRefs.current.recognition.start();
-
-  //     speechRefs.current.isActive = true;
-  //     setIsRecording(true);
-  //     setIsPaused(false);
-  //     setTriggerDetected(null);
-  //   } catch (error) {
-  //     console.error('Recording start error:', error);
-  //     speechRefs.current.isActive = false;
-  //     cleanupAllResources();
-  //   }
-  // }, [initializeAudio, initializeSpeechRecognition, startVoiceDetection, cleanupAllResources]);
 
   const startRecord = useCallback(async () => {
     if (speechRefs.current.isActive) return;
@@ -486,24 +448,6 @@ export function useVoice({
       }
     });
   }, [cleanupSpeechResources, stopVoiceDetection, createAudioBlob, cleanupAllResources]);
-
-  // const pauseRecord = useCallback(() => {
-  //   const { isActive, isPaused } = speechRefs.current;
-
-  //   if (!isActive || isPaused) return;
-
-  //   speechRefs.current.isPaused = true;
-  //   setIsPaused(true);
-  //   setIsSpeaking(false);
-
-  //   cleanupSpeechResources();
-  //   stopVoiceDetection();
-
-  //   const { mediaRecorder } = recordingRefs.current;
-  //   if (mediaRecorder?.state === 'recording') {
-  //     mediaRecorder.pause();
-  //   }
-  // }, [cleanupSpeechResources, stopVoiceDetection]);
 
   const pauseRecord = useCallback(() => {
     const { isActive, isPaused } = speechRefs.current;

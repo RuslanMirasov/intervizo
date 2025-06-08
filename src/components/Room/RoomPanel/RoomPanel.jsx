@@ -12,7 +12,7 @@ const RoomPanel = () => {
         <span>InterVizo</span>
       </div>
 
-      {countdown > 0 && <div className={css.Counter}>{countdown}</div>}
+      {/* {countdown > 0 && <div className={css.Counter}>{countdown}</div>} */}
     </>
   );
 };
