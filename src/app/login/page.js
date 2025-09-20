@@ -15,10 +15,10 @@ const LoginPage = () => {
           <h1>Войдите в учетную запись</h1>
           <Suspense fallback={null}>
             <LoginForm />
+            <hr />
+            <p>Или войдите через</p>
+            <GoogleSignInButton />
           </Suspense>
-          <hr />
-          <p>Или войдите через</p>
-          <GoogleSignInButton />
         </div>
         <p>
           <span>
