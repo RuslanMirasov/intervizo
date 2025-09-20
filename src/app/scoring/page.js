@@ -7,7 +7,7 @@ export const metadata = {
 
 const ScoringPage = () => {
   return (
-    <Section width="248px">
+    <Section width="340px">
       <Scoring />
     </Section>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { InterviewArticle, InterviewListSkeleton, Button } from '@/components';
 import useRequest from '@/hooks/useRequest';
@@ -8,6 +9,7 @@ import css from './InterviewList.module.scss';
 
 const InterviewList = () => {
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
   const [page, setPage] = useState(1);
   const [interviews, setInterviews] = useState([]);
   const [pagination, setPagination] = useState(null);
@@ -16,7 +18,7 @@ const InterviewList = () => {
   queryString.set('page', page.toString());
 
   const { data, error, isLoading } = useRequest({
-    url: `/api/interview?${queryString.toString()}`,
+    url: `/api/interview?company=${session?.user?.id}&${queryString.toString()}`,
     method: 'GET',
   });
 
@@ -33,7 +35,13 @@ const InterviewList = () => {
   return (
     <div className={css.Wrapper}>
       <ul className={css.InterviewList}>
-        {interviews.length === 0 && <p className={css.Empty}>Нет ни одного интервью</p>}
+        {interviews.length === 0 && (
+          <li className={css.Empty}>
+            <Button href="/add-new-interview" className="small">
+              Создать первое интервью
+            </Button>
+          </li>
+        )}
         {interviews.length > 0 &&
           interviews.map(interview => (
             <li key={interview._id} className={css.Item}>

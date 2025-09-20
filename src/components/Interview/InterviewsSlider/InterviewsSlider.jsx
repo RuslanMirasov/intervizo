@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import useRequest from '@/hooks/useRequest';
+import { useSession } from 'next-auth/react';
 import { Button, Icon, InterviewArticle, InterviewsSliderSkeleton } from '@/components';
 import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -10,7 +11,8 @@ import css from './InterviewsSlider.module.scss';
 
 const InterviewsSlider = () => {
   const [interviews, setInterviews] = useState([]);
-  const { data, isLoading, error } = useRequest({ url: '/api/interview?limit=10' });
+  const { data: session } = useSession();
+  const { data, isLoading, error } = useRequest({ url: `/api/interview?limit=10&company=${session?.user?.id}` });
 
   useEffect(() => {
     if (data) {

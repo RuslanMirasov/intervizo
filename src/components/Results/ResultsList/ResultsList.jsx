@@ -1,6 +1,7 @@
 'use client';
 
 import useRequest from '@/hooks/useRequest';
+import { useSession } from 'next-auth/react';
 import { debounce } from '@/lib/debounce';
 import { Input, ResultListItem, ResultsListSkeleton } from '@/components';
 import css from './ResultsList.module.scss';
@@ -8,6 +9,7 @@ import { useState, useMemo, useEffect } from 'react';
 
 const ResultsList = ({ interviewId = '' }) => {
   const [search, setSearch] = useState('');
+  const { data: session } = useSession();
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const debouncedUpdate = useMemo(
@@ -24,7 +26,7 @@ const ResultsList = ({ interviewId = '' }) => {
   }, [search, debouncedUpdate]);
 
   const { data, error, isLoading } = useRequest({
-    url: `/api/candidate?interviewId=${interviewId}&s=${debouncedSearch}`,
+    url: `/api/candidate?interviewId=${interviewId}&s=${debouncedSearch}&company=${session?.user?.id}`,
     method: 'GET',
   });
 

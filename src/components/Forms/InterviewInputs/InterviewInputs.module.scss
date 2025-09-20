@@ -6,7 +6,13 @@
   justify-content: flex-start;
   align-content: center;
   gap: 12px;
-  flex-wrap: wrap;
   align-items: center;
   z-index: 20;
+  margin-top: 30px;
+  margin-bottom: -20px;
+
+  > div,
+  > label {
+    flex: 1;
+  }
 }

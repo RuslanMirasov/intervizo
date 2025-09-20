@@ -1,0 +1,14 @@
+.Form {
+  display: flex;
+  position: relative;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 20px;
+
+  label {
+    width: 100%;
+  }
+}

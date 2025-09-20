@@ -79,8 +79,8 @@ const ConnectForm = ({ id, interviewId }) => {
         onChange={e => setEmail(e.target.value)}
         invalid={emailInvalid}
       />
-      <Button type="submit" className="full" disabled={!formValid} loading={loading}>
-        Подключится
+      <Button type="submit" disabled={!formValid} loading={loading} full>
+        Подключиться
       </Button>
     </form>
   );

@@ -11,4 +11,15 @@
   min-height: 100vh;
   padding: 70px;
   gap: 56px;
+
+  @media (max-width: 1279px) {
+    padding: 50px 30px;
+  }
+
+  @media (max-width: 767px) {
+    width: 100%;
+    padding: 30px 20px;
+    padding-bottom: 120px;
+    gap: 30px;
+  }
 }

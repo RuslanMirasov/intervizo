@@ -262,7 +262,7 @@ export function useVoice({
         stopRecord();
       }
     },
-    [repeatTriggers, nextTriggers]
+    [repeatTriggers, nextTriggers, pauseRecord, stopRecord]
   );
 
   const restartRecognition = useCallback(() => {

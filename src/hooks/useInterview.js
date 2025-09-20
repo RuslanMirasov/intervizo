@@ -1,8 +1,9 @@
 import useLocalStorageState from 'use-local-storage-state';
+import { useSession } from 'next-auth/react';
 
-const defaultInterview = {
-  company: 'my company',
-  owners: ['info@mirasov.dev', 'hello@brainst.pro'],
+const interviewTemplate = {
+  company: null,
+  owners: [],
   slug: '',
   name: '',
   category: '',
@@ -15,8 +16,10 @@ const defaultInterview = {
 };
 
 export const useInterview = () => {
+  const { data: session } = useSession();
+
   const [interview, setInterview, { isPersistent }] = useLocalStorageState('interview', {
-    defaultValue: defaultInterview,
+    defaultValue: { ...interviewTemplate, company: session?.user?.id || null, owners: [session?.user?.email] },
     ssr: false,
   });
 
@@ -25,13 +28,16 @@ export const useInterview = () => {
     ssr: false,
   });
 
-  const resetInterview = () => {
-    setInterview(defaultInterview);
-  };
+  const resetInterview = () => setInterview(interviewTemplate);
+  const resetUpdates = () => setUpdates({});
 
-  const resetUpdates = () => {
-    setUpdates({});
-  };
+  if (session?.user?.id && interview.company !== session.user.id) {
+    setInterview(prev => ({
+      ...prev,
+      company: session.user.id,
+      owners: session.user.email ? [session.user.email] : [],
+    }));
+  }
 
   return {
     interview,

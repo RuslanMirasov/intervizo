@@ -1,0 +1,23 @@
+.ProfileHeader {
+  display: flex;
+  width: 100%;
+  position: relative;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: center;
+  gap: 20px;
+
+  label {
+    margin-top: 20px;
+  }
+}
+
+.Avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--grey-border);
+}

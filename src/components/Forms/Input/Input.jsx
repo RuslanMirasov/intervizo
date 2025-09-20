@@ -1,37 +1,48 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import clsx from 'clsx';
 import css from './Input.module.scss';
 
-const Input = ({ name, type, size, placeholder, onChange, invalid, value }) => {
+const Input = ({ name, type, size, placeholder, onChange, value, label, checked, required, full, disabled }) => {
   const [inputValue, setInputValue] = useState('');
+  const isToggle = type === 'checkbox' || type === 'radio';
 
-  const classes = [css.Input, size === 'small' && css.Small, invalid && css.Invalid].filter(Boolean).join(' ');
+  const classes = clsx(css.Input, {
+    [css.Small]: size === 'small',
+    [css.Full]: full,
+  });
 
   useEffect(() => {
-    if (value !== undefined && value !== inputValue) {
+    if (!isToggle && value !== undefined && value !== inputValue) {
       setInputValue(value);
     }
-  }, [value]);
+  }, [value, isToggle]);
 
   const handleChange = e => {
-    e.preventDefault();
-    setInputValue(e.target.value);
-    if (onChange) {
-      onChange(e);
+    if (!isToggle) {
+      setInputValue(e.target.value);
     }
+    onChange?.(e);
   };
 
   return (
-    <label className={css.InputLabel}>
+    <label className={`${css.InputLabel} ${disabled ? css.Disabled : ''}`}>
+      {type !== 'radio' && type !== 'checkbox' && label && <span className={css.LabelText}>{label}</span>}
+
       <input
         type={type}
         name={name}
-        value={inputValue}
+        {...(isToggle ? { value } : { value: inputValue })}
+        {...(isToggle && checked !== undefined ? { checked } : {})}
         placeholder={placeholder}
         className={classes}
         onChange={handleChange}
+        required={required}
+        disabled={disabled}
       />
+
+      {(type === 'radio' || type === 'checkbox') && label && <span className={css.RadioText}>{label}</span>}
     </label>
   );
 };

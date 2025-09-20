@@ -8,7 +8,7 @@
   min-height: 50px;
   min-width: 135px;
   gap: 6px;
-  padding: 16px 18px;
+  padding: 14px 18px;
   background: var(--color);
   color: var(--white);
   font-family: var(--inter);
@@ -25,7 +25,8 @@
     background: var(--hover);
   }
 
-  &.full {
+  &.Full {
+    flex-shrink: 0;
     width: 100%;
   }
 
@@ -40,6 +41,17 @@
     &:hover {
       background: var(--color);
       color: var(--white);
+    }
+  }
+
+  &.Google {
+    background: rgba(0, 0, 0, 0);
+    border: 1px solid #d8d8d8;
+    color: var(--black);
+    flex-direction: row;
+    gap: 8px;
+    &:hover {
+      background: #f5f5f5;
     }
   }
 
@@ -143,6 +155,7 @@
   }
 }
 
+.Button.Loading,
 .Button.loading {
   opacity: 1;
   font-size: 0px;
@@ -171,4 +184,9 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.Full {
+  flex-shrink: 0;
+  width: 100%;
 }

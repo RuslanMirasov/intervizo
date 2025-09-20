@@ -1,25 +1,40 @@
 import Link from 'next/link';
+import clsx from 'clsx';
+import { Icon } from '@/components';
 import css from './Button.module.scss';
 
-const Button = ({ href, type = 'button', children, onClick, disabled, className, loading = false }) => {
-  const classes = [css.Button];
+const Button = ({
+  href,
+  type = 'button',
+  children,
+  onClick,
+  disabled,
+  className,
+  loading = false,
+  variant,
+  full = false,
+  icon,
+}) => {
+  const mappedClasses = className
+    ?.split(' ')
+    .map(cls => css[cls] || cls)
+    .filter(Boolean);
 
-  if (className) {
-    className.split(' ').forEach(cls => classes.push(css[cls]));
-  }
-
-  if (loading) {
-    classes.push(css.loading); // добавляем класс, если loading === true
-  }
-
-  const classNames = classes.join(' ');
+  const classes = clsx(css.Button, mappedClasses, {
+    [css.Google]: variant === 'google',
+    [css.Loading]: loading,
+    [css.Full]: full,
+    [css.Disabled]: disabled,
+  });
 
   return href ? (
-    <Link href={href} className={classNames} disabled={disabled}>
+    <Link href={href} className={classes} disabled={disabled}>
+      {icon && !loading && <Icon name={icon} />}
       {children}
     </Link>
   ) : (
-    <button type={type} className={classNames} onClick={onClick} disabled={disabled}>
+    <button type={type} className={classes} onClick={onClick} disabled={disabled}>
+      {icon && !loading && <Icon name={icon} />}
       {children}
     </button>
   );

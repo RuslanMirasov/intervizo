@@ -55,7 +55,7 @@ const UpdateInterviewPopup = ({ params }) => {
     const queue = [...data];
     let index = 0;
 
-    const workers = Array.from({ length: 3 }, async () => {
+    const workers = Array.from({ length: 2 }, async () => {
       while (queue.length > 0) {
         const item = queue.shift();
         const currentIndex = index++;

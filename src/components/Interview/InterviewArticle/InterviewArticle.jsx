@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import css from './InterviewArticle.module.scss';
 
@@ -16,7 +15,6 @@ const InterviewArticle = ({ interview = {} }) => {
   return (
     <article className={css.InterviewArticle}>
       <div className={css.Thumbnail} style={{ backgroundColor: thumbnail }}>
-        {/* {thumbnail && <Image src={thumbnail} alt={name} width={260} height={138} />} */}
         {category && <span>{category}</span>}
       </div>
       <div className={css.TitleBox}>

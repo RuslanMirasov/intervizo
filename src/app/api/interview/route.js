@@ -8,6 +8,7 @@ export async function GET(req) {
 
     const { searchParams } = new URL(req.url);
 
+    const company = searchParams.get('company')?.trim() || '';
     const search = searchParams.get('s')?.trim() || '';
     const category = searchParams.get('category')?.trim() || '';
     const rawDifficulty = searchParams.get('difficulty') || '';
@@ -20,6 +21,7 @@ export async function GET(req) {
 
     const query = {};
 
+    if (company) query.company = company;
     if (category) query.category = category;
     if (difficulty.length > 0) {
       query.difficulty = { $in: difficulty };

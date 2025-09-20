@@ -1,3 +1,12 @@
+.InputLabel {
+  width: 100%;
+  &.Disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
 .Input {
   display: inline-block;
   width: 248px;
@@ -11,7 +20,16 @@
   color: var(--black);
   transition: 0.3s;
 
-  &.Invalid {
+  &:disabled {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  &.Full {
+    width: 100%;
+  }
+
+  &[class*='invalid'] {
     border: 1px solid var(--invalid);
   }
 
@@ -20,18 +38,39 @@
     opacity: 1;
   }
 
-  &:focus {
+  &:focus:not([class*='invalid']) {
     border: 1px solid var(--color);
     &::placeholder {
       opacity: 0;
     }
   }
 
-  &:hover {
-    border: 1px solid var(--color);
-  }
-
   &.Small {
     height: 32px;
+  }
+}
+
+.LabelText {
+  display: block;
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #888888;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.RadioText {
+  font-size: 14px;
+}
+
+.Input[type='radio'],
+.Input[type='checkbox'] {
+  //display: none;
+
+  &[class*='invalid'] {
+    + .RadioText {
+      color: var(--invalid);
+    }
   }
 }

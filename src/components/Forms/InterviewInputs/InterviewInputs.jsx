@@ -2,9 +2,11 @@
 
 import { Input, InputSelect, Skeleton } from '@/components';
 import { useInterview } from '@/hooks/useInterview';
+//import { useSession } from 'next-auth/react';
 import css from './InterviewInputs.module.scss';
 
 const InterviewInputs = () => {
+  //const { data: session } = useSession();
   const { interview, setInterview } = useInterview();
 
   const difficulty = [
@@ -38,6 +40,7 @@ const InterviewInputs = () => {
     setInterview(prev => {
       return {
         ...prev,
+        //company: session?.user?.id || null,
         [name]: label ? label : value,
         thumbnail: thumbnail ? thumbnail : prev.thumbnail,
       };
@@ -70,6 +73,7 @@ const InterviewInputs = () => {
         type="number"
         size="small"
         name="duration"
+        full
         placeholder="Длительность (мин.)"
         onChange={updateInterview}
         value={durationValue}

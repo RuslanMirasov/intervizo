@@ -9,8 +9,6 @@ import css from './AddNewInterviewForm.module.scss';
 import { useRouter } from 'next/navigation';
 
 const AddNewInterviewForm = ({ id }) => {
-  console.log('AddNewInterviewForm RERENDER');
-
   const router = useRouter();
   const {
     data: currentInterview,
