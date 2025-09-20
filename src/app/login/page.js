@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { Section, ContentArea, LoginForm, GoogleSignInButton } from '@/components';
 
@@ -12,7 +13,9 @@ const LoginPage = () => {
       <ContentArea align="center">
         <div className="form-wrapper">
           <h1>Войдите в учетную запись</h1>
-          <LoginForm />
+          <Suspense fallback={null}>
+            <LoginForm />
+          </Suspense>
           <hr />
           <p>Или войдите через</p>
           <GoogleSignInButton />
