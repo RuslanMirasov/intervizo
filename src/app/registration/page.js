@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Section, ContentArea, RegisterForm, GoogleSignInButton } from '@/components';
 import Link from 'next/link';
 
@@ -12,10 +13,12 @@ const RegistrationPage = () => {
       <ContentArea align="center">
         <div className="form-wrapper">
           <h1>Регистрация</h1>
-          <RegisterForm />
-          <hr />
-          <p>Или авторизоваться через</p>
-          <GoogleSignInButton />
+          <Suspense fallback={null}>
+            <RegisterForm />
+            <hr />
+            <p>Или авторизоваться через</p>
+            <GoogleSignInButton />
+          </Suspense>
         </div>
         <p>
           <span>
