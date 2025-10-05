@@ -3,66 +3,45 @@
 import { useRouter } from 'next/navigation';
 import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
-
-//import { useVoice } from '@/hooks/useVoice';
 import { useWhisperVoice } from '@/hooks/useWhisperVoice';
-
 import { useProgressStorage } from '@/hooks/useProgressStorage';
 import { startCountdown } from '@/lib/startCountdown';
 import { getRandomItemFromArray } from '@/lib/getRandomItemFromArray';
-import { transcribeVoice } from '@/lib/transcribeVoice';
 import { playAudio } from '@/lib/playAudio';
-import { saveAudio } from '@/lib/save';
-import { speak } from '@/lib/speak';
-import { speakInBrowser } from '@/lib/speakInBrowser';
 import { preloadMedia } from '@/lib/preloadMedia';
 import { ProgressUiProvider } from './ProgressUiContext';
 import { Preloader } from '@/components';
 import { useVideo } from '@/context/VideoContext';
-import { useCamera } from '@/context/CameraContext';
 
 const ProgressContext = createContext(null);
 
 export const ProgressProvider = ({ children }) => {
   const router = useRouter();
   const [interview, , { isPersistent }] = useLocalStorageState('interview');
-
-  // const { isSpeaking, triggerDetected, startRecord, stopRecord, pauseRecord, resumeRecord } = useVoice();
   const { isSpeaking, triggerDetected, startRecord, stopRecord, pauseRecord, resumeRecord, connect, disconnect } =
     useWhisperVoice();
-
   const { addQuestion, updateAnswer } = useProgressStorage();
-
   const video = useVideo();
-
   const [step, setStep] = useState(null);
   const [showNextButton, setShowNextButton] = useState(false);
   const [countdown, setCountdown] = useState(null);
-
-  const transcriptionPromises = useRef([]);
   const lastStepRef = useRef(null);
-
-  const { startCamera, stopCamera, startRecording, stopRecording, videoUrl, playQuestionAudio } = useCamera();
 
   // ЗАПУСКАЕМ ИНТЕРВЬЮ
 
   const startInterview = useCallback(async () => {
     if (interview?.data?.length > 0) {
-      await connect();
-
       const allQuestionsAudioUrls = interview.data.map(url => url.audio);
       const prelodeElementsArr = [...allQuestionsAudioUrls];
+
       await preloadMedia(prelodeElementsArr);
       setStep(0);
     }
-  }, [interview, connect]);
+  }, [interview]);
 
   const finishInterview = useCallback(async () => {
-    // await Promise.allSettled(transcriptionPromises.current);
-
-    disconnect();
     router.push('/scoring');
-  }, [router, disconnect]);
+  }, [router]);
 
   const goToNextStep = useCallback(() => {
     setStep(prev => {
@@ -84,16 +63,13 @@ export const ProgressProvider = ({ children }) => {
 
       const { text, type, audio } = stepData;
 
-      //await speakInBrowser(text);
-      //await speak(text, '/api/speak-eleven');
-      //await playAudio(audio);
-      //await saveAudio(text, { filename: 'repeat.mp3', voice: 'onyx' }); //nova
-
       //--------------------------------------------
 
       await new Promise(r => setTimeout(r, 800));
-
       video.startVideo('/video/speak.mp4');
+      if (!isRepeat) {
+        connect();
+      }
       await playAudio(audio);
       await video.stopVideo();
 
@@ -118,31 +94,12 @@ export const ProgressProvider = ({ children }) => {
     [interview]
   );
 
-  // const transcribeAnswer = async (id, blob) => {
-  //   console.log('Я транскрибирую BLOB: ', blob);
-  //   const transcriptionPromise = transcribeVoice(blob)
-  //     .then(transcription => {
-  //       updateAnswer(id, transcription);
-  //       return { id, transcription, success: true };
-  //     })
-  //     .catch(error => {
-  //       return { id, transcription: null, success: false, error };
-  //     });
-
-  //   transcriptionPromises.current.push(transcriptionPromise);
-  //   return transcriptionPromise;
-  // };
-
   const saveAnswer = async (isNext = true) => {
     await startCountdown(0, () => setCountdown(0), setCountdown);
     await setShowNextButton(false);
-    // const recordedBlob = await stopRecord();
-
-    // if (recordedBlob) {
-    //   transcribeAnswer(step, recordedBlob);
-    // }
 
     const transcription = await stopRecord();
+    await disconnect();
 
     if (transcription) {
       updateAnswer(step, transcription);
@@ -206,6 +163,7 @@ export const ProgressProvider = ({ children }) => {
 
   // РЕАГИРУЕМ НА ГОЛОС
   useEffect(() => {
+    console.log('isSpeaking: ', isSpeaking);
     if (!isSpeaking) return;
     setShowNextButton(true);
     startCountdown(5, () => saveAnswer(), setCountdown);
