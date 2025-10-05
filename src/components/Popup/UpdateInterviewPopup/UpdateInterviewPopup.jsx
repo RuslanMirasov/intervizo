@@ -80,7 +80,6 @@ const UpdateInterviewPopup = ({ params }) => {
 
           updateProgressItem(currentIndex + 1, 'fullfield');
         } catch (error) {
-          console.log('Ошибка в обработке Firebase:', error);
           updateProgressItem(currentIndex + 1, 'rejected');
         }
       }
@@ -123,7 +122,6 @@ const UpdateInterviewPopup = ({ params }) => {
       await new Promise(res => setTimeout(res, 1500));
       closePopup();
     } catch (error) {
-      console.log('При обновлении интервью в MongoDB произошла ошибка', error);
       updateProgressItem(0, 'rejected');
     }
   };

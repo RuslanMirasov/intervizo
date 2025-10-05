@@ -102,8 +102,6 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Некорректный ответ от сервиса транскрибации' }, { status: 502 });
     }
 
-    console.log(`Транскрибация выполнена успешно. Длина текста: ${result.text.length} символов`);
-
     return NextResponse.json({
       text: result.text,
 

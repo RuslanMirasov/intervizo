@@ -44,7 +44,6 @@ export const playAudio = src => {
         cleanup();
 
         if (err.name === 'NotAllowedError') {
-          console.log('Аудио не может быть воспроизведено без действия пользователя');
           window.history.back();
         }
 

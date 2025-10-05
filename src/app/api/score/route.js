@@ -56,8 +56,6 @@ export async function POST(request) {
     const data = await response.json();
     let content = data.choices[0].message.content;
 
-    console.log(`Ответ от OpenAI для вопроса ${questionIndex + 1}:`, content);
-
     // Убираем markdown разметку если она есть
     content = content
       .replace(/```json\s*/g, '')

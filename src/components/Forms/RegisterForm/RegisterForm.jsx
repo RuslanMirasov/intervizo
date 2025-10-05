@@ -32,7 +32,6 @@ const RegisterForm = () => {
           console.error('Регистрация прошла успешно, но не удалось войти автоматически. Попробуйте войти вручную.');
           router.push('/login');
         } else if (logIn?.ok) {
-          console.log('Регистрация и вход выполнены успешно!');
           router.push('/');
         }
       }

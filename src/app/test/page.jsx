@@ -83,7 +83,6 @@ export default function AudioTranscription() {
   const addDebugLog = message => {
     const timestamp = new Date().toLocaleTimeString();
     const logMessage = `[${timestamp}] ${message}`;
-    console.log('[asr]', logMessage);
     setDebugLogs(prev => [...prev.slice(-199), logMessage]);
   };
 

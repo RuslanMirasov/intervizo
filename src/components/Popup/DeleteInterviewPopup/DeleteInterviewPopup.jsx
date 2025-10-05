@@ -92,7 +92,6 @@ const DeleteInterviewPopup = ({ params }) => {
       router.replace('/add-new-interview');
       closePopup();
     } catch (error) {
-      console.log('Ошибка в процессе удаления интервью:', error);
       updateProgressItem(0, 'rejected');
       updateProgressItem(1, 'rejected');
     }

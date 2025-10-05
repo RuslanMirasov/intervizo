@@ -59,7 +59,6 @@ export function useTranscribeLocal() {
 
       mediaRecorder.start(100); // Собираем данные каждые 100мс
       mediaRecorderRef.current = mediaRecorder;
-      console.log('Запись аудио началась');
     } catch (err) {
       console.error('Ошибка запуска записи аудио:', err);
     }
@@ -79,7 +78,6 @@ export function useTranscribeLocal() {
       mediaRecorderRef.current.onstop = async () => {
         try {
           if (audioChunksRef.current.length === 0) {
-            console.log('Нет данных для транскрипции');
             resolve('');
             return;
           }
@@ -95,7 +93,6 @@ export function useTranscribeLocal() {
           setTranscription(result);
           setIsTranscribing(false);
 
-          console.log('Транскрипция завершена:', result);
           resolve(result);
         } catch (err) {
           console.error('Ошибка при транскрипции:', err);

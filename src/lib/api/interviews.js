@@ -20,8 +20,6 @@ export class InterviewService {
         audioStatus: 'processing', // Помечаем как обрабатывается
       });
 
-      console.log(`✅ Интервью создано в MongoDB: ${interview._id}`);
-
       // Запускаем генерацию аудио в фоне
       this.generateInterviewAudio(interview).catch(error => {
         console.error(`❌ Ошибка генерации аудио для интервью ${interview._id}:`, error);
@@ -44,8 +42,6 @@ export class InterviewService {
   // Генерация аудио для интервью
   static async generateInterviewAudio(interview) {
     try {
-      console.log(`🎵 Начинаем генерацию аудио для интервью ${interview._id}`);
-
       // Генерируем и загружаем аудио файлы
       const audioResults = await FirebaseStorageService.uploadAllInterviewAudio(
         interview.company,
@@ -70,7 +66,6 @@ export class InterviewService {
         audioError: '',
       });
 
-      console.log(`✅ Аудио генерация завершена для интервью ${interview._id}`);
       return audioResults;
     } catch (error) {
       console.error(`❌ Ошибка генерации аудио:`, error);

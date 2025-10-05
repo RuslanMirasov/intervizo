@@ -225,7 +225,6 @@ export function useVoice({
 
   const handleSpeechResult = useCallback(
     event => {
-      console.log('📍 handleSpeechResult START', event);
       if (speechRefs.current.isPaused) return;
 
       // let transcript = '';
@@ -245,9 +244,6 @@ export function useVoice({
         if (hasEnoughWords && hasLongWord) {
           transcript += partial;
           speechRefs.current.hadTranscript = true;
-          console.log('✔ речевая фраза:', partial);
-        } else {
-          console.log('✘ игнор:', partial);
         }
       }
 

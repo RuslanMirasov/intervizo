@@ -18,7 +18,6 @@ export class FirebaseStorageService {
   static async ensureCompanyStructure(companyName) {
     const exists = await this.checkCompanyFolder(companyName);
     if (!exists) {
-      console.log(`📁 Создаем структуру для компании: ${companyName}`);
       // Папки создаются автоматически при загрузке первого файла
     }
     return true;
@@ -50,9 +49,6 @@ export class FirebaseStorageService {
       // Получаем публичный URL
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      console.log(`✅ Uploaded: ${filePath}`);
-      console.log(`🔗 URL: ${downloadURL}`);
-
       return {
         success: true,
         url: downloadURL,
@@ -68,17 +64,11 @@ export class FirebaseStorageService {
 
   // Загрузка всех аудио для интервью
   static async uploadAllInterviewAudio(companyName, interviewId, questionsData) {
-    console.log(`🚀 Начинаем загрузку аудио для интервью ${interviewId} компании ${companyName}`);
-
     // Фильтруем только вопросы и сообщения с текстом
     const itemsToProcess = questionsData.filter(item => item.text && item.text.trim().length > 0);
 
-    console.log(`📝 Обрабатываем ${itemsToProcess.length} элементов`);
-
     const uploadPromises = itemsToProcess.map(async (item, index) => {
       try {
-        console.log(`🎵 Генерируем аудио для элемента ${index}: "${item.text.substring(0, 50)}..."`);
-
         // Генерируем аудио
         const audioBuffer = await this.generateAudio(item.text);
 
@@ -107,16 +97,8 @@ export class FirebaseStorageService {
       }
     });
 
-    console.log(`⏳ Ожидаем завершения ${uploadPromises.length} загрузок...`);
     const results = await Promise.allSettled(uploadPromises);
-
     const processedResults = results.map(result => (result.status === 'fulfilled' ? result.value : result.reason));
-
-    const successCount = processedResults.filter(r => r.success).length;
-    const failCount = processedResults.filter(r => !r.success).length;
-
-    console.log(`✅ Загрузка завершена: ${successCount} успешно, ${failCount} ошибок`);
-
     return processedResults;
   }
 
@@ -146,7 +128,6 @@ export class FirebaseStorageService {
       const deletePromises = result.items.map(item => deleteObject(item));
       await Promise.all(deletePromises);
 
-      console.log(`🗑️ Удалено ${result.items.length} файлов для интервью ${interviewId}`);
       return { success: true, deletedCount: result.items.length };
     } catch (error) {
       console.error('Delete failed:', error);

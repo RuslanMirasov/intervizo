@@ -18,8 +18,17 @@ const ProgressContext = createContext(null);
 export const ProgressProvider = ({ children }) => {
   const router = useRouter();
   const [interview, , { isPersistent }] = useLocalStorageState('interview');
-  const { isSpeaking, triggerDetected, startRecord, stopRecord, pauseRecord, resumeRecord, connect, disconnect } =
-    useWhisperVoice();
+  const {
+    isSpeaking,
+    triggerDetected,
+    setTriggerDetected,
+    startRecord,
+    stopRecord,
+    pauseRecord,
+    resumeRecord,
+    connect,
+    disconnect,
+  } = useWhisperVoice();
   const { addQuestion, updateAnswer } = useProgressStorage();
   const video = useVideo();
   const [step, setStep] = useState(null);
@@ -68,7 +77,7 @@ export const ProgressProvider = ({ children }) => {
       await new Promise(r => setTimeout(r, 800));
       video.startVideo('/video/speak.mp4');
       if (!isRepeat) {
-        connect();
+        await connect();
       }
       await playAudio(audio);
       await video.stopVideo();
@@ -95,6 +104,7 @@ export const ProgressProvider = ({ children }) => {
   );
 
   const saveAnswer = async (isNext = true) => {
+    console.log('Сохранение результатов');
     await startCountdown(0, () => setCountdown(0), setCountdown);
     await setShowNextButton(false);
 
@@ -124,6 +134,7 @@ export const ProgressProvider = ({ children }) => {
   };
 
   const repeatQuastion = async () => {
+    console.log('Повтор вопроса сработала функция repeatQuastion()');
     await pauseRecord();
     const repeatVideo = getRandomItemFromArray(['/video/repeat1.mp4', '/video/repeat2.mp4', '/video/repeat3.mp4']);
     await new Promise(r => setTimeout(r, 200));
@@ -163,7 +174,6 @@ export const ProgressProvider = ({ children }) => {
 
   // РЕАГИРУЕМ НА ГОЛОС
   useEffect(() => {
-    console.log('isSpeaking: ', isSpeaking);
     if (!isSpeaking) return;
     setShowNextButton(true);
     startCountdown(5, () => saveAnswer(), setCountdown);
@@ -171,6 +181,7 @@ export const ProgressProvider = ({ children }) => {
 
   // РЕАГИРУЕМ НА ТРИГЕРЫ
   useEffect(() => {
+    console.log('Сработал UseEffect на triggerDetected: ', triggerDetected || null);
     if (!triggerDetected) return;
 
     startCountdown(0, () => setCountdown(0), setCountdown);

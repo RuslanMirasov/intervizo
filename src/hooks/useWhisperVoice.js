@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { throttle } from '@/lib/throttle';
 
 const DEFAULT_REPEAT_TRIGGERS = [
   // Russian
@@ -77,18 +78,21 @@ export const useWhisperVoice = () => {
   const analyserRef = useRef(null);
   const dataArrayRef = useRef(null);
   const voiceDetectionIntervalRef = useRef(null);
+  const recordingStartTimeRef = useRef(0);
+  const lastTriggerTimeRef = useRef(0);
+  const throttledSetTriggerRef = useRef(null);
 
   const detectTrigger = useCallback(text => {
     const lowerText = text.toLowerCase();
 
     for (const trigger of DEFAULT_REPEAT_TRIGGERS) {
-      if (lowerText.includes(trigger.toLowerCase())) {
+      if (lowerText.includes(trigger)) {
         return 'repeat';
       }
     }
 
     for (const trigger of DEFAULT_NEXT_TRIGGERS) {
-      if (lowerText.includes(trigger.toLowerCase())) {
+      if (lowerText.includes(trigger)) {
         return 'next';
       }
     }
@@ -156,11 +160,8 @@ export const useWhisperVoice = () => {
 
       for (const url of WS_URLS) {
         try {
-          console.log(`[v0] Trying to connect to: ${url}`);
-
           await new Promise((resolveUrl, rejectUrl) => {
             const connectionTimeout = setTimeout(() => {
-              console.error(`[v0] Connection timeout for ${url}`);
               rejectUrl(new Error(`Connection timeout for ${url}`));
             }, 10000);
 
@@ -170,7 +171,6 @@ export const useWhisperVoice = () => {
             let serverReady = false;
 
             ws.onopen = () => {
-              console.log(`[v0] WebSocket opened: ${url}`);
               const options = {
                 uid: `web-${Date.now()}`,
                 auth: 'mysecret123',
@@ -185,7 +185,6 @@ export const useWhisperVoice = () => {
                 enable_translation: false,
                 target_language: 'fr',
               };
-              console.log(`[v0] Sending options:`, options);
               ws.send(JSON.stringify(options));
             };
 
@@ -197,31 +196,24 @@ export const useWhisperVoice = () => {
               try {
                 msg = JSON.parse(text);
               } catch (e) {
-                console.error('[v0] JSON parse error:', e);
                 return;
               }
 
-              console.log('[v0] Received message:', msg);
-
               if ('status' in msg) {
                 if (msg.status === 'ERROR') {
-                  console.error(`[v0] Server error: ${msg?.message || 'ASR error'}`);
                   clearTimeout(connectionTimeout);
                   rejectUrl(new Error(msg?.message || 'ASR error'));
                   return;
                 }
                 if (msg.status === 'WAIT') {
-                  console.log(`[v0] Server busy: ${msg.message}`);
                   return;
                 }
                 if (msg.status === 'WARNING') {
-                  console.warn(`[v0] Warning: ${msg.message}`);
                   return;
                 }
               }
 
               if (msg.message === 'SERVER_READY') {
-                console.log('[v0] SERVER_READY received');
                 serverReady = true;
                 clearTimeout(connectionTimeout);
                 resolveUrl();
@@ -229,13 +221,19 @@ export const useWhisperVoice = () => {
               }
 
               if (msg.message === 'DISCONNECT') {
-                console.log('[v0] Server disconnected');
                 return;
               }
 
               if (msg.segments && msg.segments.length > 0) {
-                // Находим последний незавершённый сегмент
-                const lastIncompleteSegment = msg.segments
+                const currentRecordingStart = recordingStartTimeRef.current;
+                const relevantSegments = msg.segments.filter(seg => seg.start >= currentRecordingStart);
+
+                if (relevantSegments.length === 0) {
+                  // All segments are from previous questions, ignore them
+                  return;
+                }
+
+                const lastIncompleteSegment = relevantSegments
                   .slice()
                   .reverse()
                   .find(seg => !seg.completed && seg.text);
@@ -243,15 +241,20 @@ export const useWhisperVoice = () => {
                 if (lastIncompleteSegment) {
                   const trigger = detectTrigger(lastIncompleteSegment.text);
                   if (trigger) {
-                    console.log(`[v0] Trigger detected in latest segment: ${trigger}`);
-                    setTriggerDetected(trigger);
-                    setTimeout(() => setTriggerDetected(null), 3000);
+                    if (!throttledSetTriggerRef.current) {
+                      throttledSetTriggerRef.current = throttle(detectedTrigger => {
+                        setTriggerDetected(detectedTrigger);
+                        //setTimeout(() => setTriggerDetected(null), 3000);
+                      }, 3000);
+                    }
+
+                    throttledSetTriggerRef.current(trigger);
                   }
+
                   currentSegmentRef.current = lastIncompleteSegment.text.trim();
                 }
 
-                // Сохраняем только завершённые сегменты в историю
-                msg.segments.forEach(seg => {
+                relevantSegments.forEach(seg => {
                   if (seg.completed && seg.text && seg.text.trim()) {
                     const trimmedText = seg.text.trim();
                     if (!segmentsRef.current.includes(trimmedText)) {
@@ -263,7 +266,6 @@ export const useWhisperVoice = () => {
             };
 
             ws.onerror = error => {
-              console.error(`[v0] WebSocket error for ${url}:`, error);
               clearTimeout(connectionTimeout);
               if (!serverReady) {
                 rejectUrl(new Error(`WebSocket error for ${url}`));
@@ -271,7 +273,6 @@ export const useWhisperVoice = () => {
             };
 
             ws.onclose = event => {
-              console.log(`[v0] WebSocket closed: code=${event.code}, reason=${event.reason}`);
               clearTimeout(connectionTimeout);
               if (!serverReady) {
                 rejectUrl(new Error(`WebSocket closed before SERVER_READY (code=${event.code})`));
@@ -279,11 +280,9 @@ export const useWhisperVoice = () => {
             };
           });
 
-          console.log(`[v0] Successfully connected to ${url}`);
           resolve();
           return;
         } catch (error) {
-          console.error(`[v0] Failed to connect to ${url}:`, error.message);
           lastError = error;
         }
       }
@@ -356,21 +355,19 @@ export const useWhisperVoice = () => {
 
       segmentsRef.current = [];
       currentSegmentRef.current = '';
+      recordingStartTimeRef.current = audioContext.currentTime;
       setIsRecording(true);
       setIsPaused(false);
       isPausedRef.current = false;
 
       startVoiceDetection();
     } catch (error) {
-      console.error('[v0] Start record error:', error);
       throw error;
     }
   }, [startVoiceDetection]);
 
   const stopRecord = useCallback(() => {
     return new Promise(resolve => {
-      // Server should keep connection open for next question
-
       stopVoiceDetection();
 
       setTimeout(() => {
@@ -379,11 +376,6 @@ export const useWhisperVoice = () => {
           processorRef.current = null;
         }
 
-        if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-          audioContextRef.current.close().catch(err => {
-            console.error('[v0] Error closing AudioContext:', err);
-          });
-        }
         audioContextRef.current = null;
 
         if (streamRef.current) {
@@ -437,7 +429,6 @@ export const useWhisperVoice = () => {
       const encoder = new TextEncoder();
       const endBytes = encoder.encode('END_OF_AUDIO');
       wsRef.current.send(endBytes);
-      console.log('[v0] Sent END_OF_AUDIO to server');
     }
   }, []);
 
@@ -462,12 +453,17 @@ export const useWhisperVoice = () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
+
+      if (throttledSetTriggerRef.current) {
+        throttledSetTriggerRef.current.cancel();
+      }
     };
   }, [disconnect, stopVoiceDetection]);
 
   return {
     isSpeaking,
     triggerDetected,
+    setTriggerDetected,
     isRecording,
     isPaused,
     startRecord,
@@ -476,6 +472,6 @@ export const useWhisperVoice = () => {
     resumeRecord,
     connect,
     disconnect,
-    endAudio, // Export new function
+    endAudio,
   };
 };

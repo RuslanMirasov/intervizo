@@ -212,7 +212,6 @@ websocket.send("END_OF_AUDIO");`;
     this.ws = new WebSocket(\`\\\${protocol}://\\\${this.host}:\\\${this.port}\`);
     
     this.ws.onopen = () => {
-      console.log('Connected to Whisper Live Server');
       this.ws.send(JSON.stringify(this.options));
     };
     
@@ -225,9 +224,6 @@ websocket.send("END_OF_AUDIO");`;
       console.error('WebSocket error:', error);
     };
     
-    this.ws.onclose = (event) => {
-      console.log('Connection closed:', event.code, event.reason);
-    };
   }
 
   handleMessage(data) {
