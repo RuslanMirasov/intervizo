@@ -94,6 +94,7 @@ export const ProgressProvider = ({ children }) => {
 
       if (isRepeat) {
         await resumeRecord();
+        await setTriggerDetected(null);
       } else {
         await startRecord();
       }
@@ -181,7 +182,6 @@ export const ProgressProvider = ({ children }) => {
 
   // РЕАГИРУЕМ НА ТРИГЕРЫ
   useEffect(() => {
-    console.log('Сработал UseEffect на triggerDetected: ', triggerDetected || null);
     if (!triggerDetected) return;
 
     startCountdown(0, () => setCountdown(0), setCountdown);
