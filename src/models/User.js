@@ -48,7 +48,7 @@ const UserSchema = new mongoose.Schema(
 );
 
 // Индексы для оптимизации
-UserSchema.index({ email: 1 }, { unique: true });
+// UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ provider: 1, providerId: 1 }, { unique: false });
 
 // Хэширование пароля перед сохранением
@@ -92,11 +92,10 @@ UserSchema.statics.findOrCreateOAuthUser = async function (profile, provider) {
     (await this.findOne({ provider, providerId: profile.id }));
 
   if (user) {
-    // не затираем существующие данные без нужды
-    user.name = user.name || profile.name || null;
-    user.image = user.image || profile.picture || null;
-    user.provider = provider;
-    user.providerId = profile.id;
+    if (!user.providerId) user.providerId = profile.id;
+    if (!user.image && profile.picture) user.image = profile.picture;
+    if (!user.name && profile.name) user.name = profile.name;
+
     await user.save();
     return user;
   }

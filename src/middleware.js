@@ -1,16 +1,15 @@
 import { withAuth } from 'next-auth/middleware';
 
-export default withAuth(function middleware(req) {}, {
+const publicRoutes = ['/login', '/registration', '/rules', '/policy', '/auth/error', '/scoring', '/404', '/500'];
+
+export default withAuth(function middleware(_req) {}, {
   callbacks: {
     authorized: ({ token, req }) => {
       const { pathname } = req.nextUrl;
-      const publicRoutes = ['/login', '/registration', '/rules', '/policy', '/auth/error', '/scoring'];
 
-      if (publicRoutes.includes(pathname) || pathname.startsWith('/connect/') || pathname.startsWith('/room/')) {
-        return true;
-      }
+      if (publicRoutes.includes(pathname)) return true;
 
-      if (pathname.startsWith('/api/')) {
+      if (pathname.startsWith('/connect/') || pathname.startsWith('/room/')) {
         return true;
       }
 
@@ -22,8 +21,7 @@ export default withAuth(function middleware(req) {}, {
   },
 });
 
+// ВАЖНО: матчером исключаем API, _next, и системные страницы
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|mp4|webm|ogg|mp3|wav|pdf|txt|xml|json|webmanifest|map|css|js|woff2?|ttf|otf)).*)',
-  ],
+  matcher: ['/((?!api|_next|favicon.ico|robots.txt|sitemap.xml|404|500).*)'],
 };
