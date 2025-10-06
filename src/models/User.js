@@ -13,7 +13,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Email обязателен'],
       unique: true,
-      lowercase: true,
       trim: true,
       match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Пожалуйста, введите корректный email'],
     },
@@ -23,12 +22,11 @@ const UserSchema = new mongoose.Schema(
         // Пароль обязателен только для credentials авторизации
         return !this.provider || this.provider === 'credentials';
       },
-      minlength: [6, 'Пароль должен содержать минимум 6 символов'],
       select: false, // По умолчанию не включать пароль в запросы
     },
     role: {
       type: String,
-      enum: ['hr', 'boss'], // только 2 роли как просил пользователь
+      enum: ['hr', 'boss', 'admin'], // только 2 роли как просил пользователь
       default: 'hr', // по умолчанию hr
     },
     image: {
@@ -46,15 +44,16 @@ const UserSchema = new mongoose.Schema(
       default: null,
     },
   },
-  {}
+  { timestamps: true }
 );
 
 // Индексы для оптимизации
-UserSchema.index({ provider: 1, providerId: 1 });
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ provider: 1, providerId: 1 }, { unique: false });
 
 // Хэширование пароля перед сохранением
 UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password') || !this.password) return next();
 
   try {
     this.password = await bcrypt.hash(this.password, 12);
@@ -66,20 +65,18 @@ UserSchema.pre('save', async function (next) {
 
 // Метод для проверки пароля
 UserSchema.methods.comparePassword = async function (candidatePassword) {
-  if (!this.password) {
-    return false;
-  }
+  if (!this.password) return false;
+
   try {
-    const result = await bcrypt.compare(candidatePassword, this.password);
-    return result;
-  } catch (error) {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch {
     return false;
   }
 };
 
 UserSchema.methods.toPublicJSON = function () {
   return {
-    id: this._id,
+    id: this._id.toString(),
     name: this.name,
     email: this.email,
     image: this.image,
@@ -90,27 +87,25 @@ UserSchema.methods.toPublicJSON = function () {
 
 // Статический метод для поиска или создания пользователя OAuth
 UserSchema.statics.findOrCreateOAuthUser = async function (profile, provider) {
-  let user = await this.findOne({
-    $or: [{ email: profile.email }, { provider: provider, providerId: profile.id }],
-  });
+  let user =
+    (profile.email && (await this.findOne({ email: profile.email }))) ||
+    (await this.findOne({ provider, providerId: profile.id }));
 
   if (user) {
-    user.name = user.name || profile.name;
-    user.image = user.image || profile.picture;
-    // Добавляем OAuth данные если их не было
-    if (!user.provider || user.provider === 'credentials') {
-      user.provider = provider;
-      user.providerId = profile.id;
-    }
+    // не затираем существующие данные без нужды
+    user.name = user.name || profile.name || null;
+    user.image = user.image || profile.picture || null;
+    user.provider = provider;
+    user.providerId = profile.id;
     await user.save();
     return user;
   }
 
-  // Создаем нового пользователя
+  // создаём нового
   user = new this({
-    name: profile.name,
+    name: profile.name || null,
     email: profile.email,
-    image: profile.picture,
+    image: profile.picture || null,
     provider: provider,
     providerId: profile.id,
   });

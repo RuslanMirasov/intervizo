@@ -13,35 +13,32 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        try {
-          await dbConnect();
-          const user = await User.findOne({ email: credentials.email }).select('+password');
+        await dbConnect();
+        const user = await User.findOne({ email: credentials.email }).select('+password');
 
-          if (!user) {
-            throw new Error('E-mail или пароль \n указаны не верно!');
-          }
-
-          if (user.provider === 'google') {
-            throw new Error('Этот email зарегистрирован через Google. Войдите нажав на кнопку "Google".');
-          }
-
-          const isValidPassword = await user.comparePassword(credentials.password);
-          if (!isValidPassword) {
-            throw new Error('E-mail или пароль \n указаны не верно!');
-          }
-
-          const { _id, email, name, role, image } = user;
-
-          return {
-            id: _id.toString(),
-            email,
-            name,
-            role,
-            image,
-          };
-        } catch (error) {
-          throw error;
+        if (!user) {
+          throw new Error('E-mail или пароль \n указаны не верно!');
         }
+
+        // Если email уже привязан к Google — запрещаем вход по паролю
+        if (user.provider === 'google') {
+          throw new Error('Этот email зарегистрирован через Google. Войдите нажав на кнопку "Google".');
+        }
+
+        const isValidPassword = await user.comparePassword(credentials.password);
+
+        if (!isValidPassword) {
+          throw new Error('E-mail или пароль \n указаны не верно!');
+        }
+
+        const { _id, email, name, role, image } = user;
+        return {
+          id: _id.toString(),
+          email,
+          name,
+          role,
+          image,
+        };
       },
     }),
 
@@ -67,12 +64,24 @@ export const authOptions = {
       if (account.provider === 'google') {
         try {
           await dbConnect();
-          const existingUser = await User.findOne({ email: profile.email });
 
-          if (existingUser && existingUser.provider === 'credentials') {
-            existingUser.googleId = profile.sub;
-            existingUser.image = profile.picture;
+          const providerId = account.providerAccountId;
+          const normalizedProfile = {
+            id: providerId,
+            name: profile?.name,
+            email: profile?.email,
+            picture: profile?.picture,
+          };
+
+          let existingUser = normalizedProfile.email ? await User.findOne({ email: normalizedProfile.email }) : null;
+
+          if (existingUser) {
+            existingUser.provider = 'google';
+            existingUser.providerId = providerId;
+            existingUser.image = existingUser.image || normalizedProfile.picture || null;
+            existingUser.name = existingUser.name || normalizedProfile.name || null;
             await existingUser.save();
+
             user.id = existingUser._id.toString();
             user.role = existingUser.role;
             user.image = existingUser.image;
@@ -80,7 +89,8 @@ export const authOptions = {
             return true;
           }
 
-          const dbUser = await User.findOrCreateOAuthUser(profile, 'google');
+          // Иначе создаём нового
+          const dbUser = await User.findOrCreateOAuthUser(normalizedProfile, 'google');
           user.id = dbUser._id.toString();
           user.role = dbUser.role;
           user.image = dbUser.image;
@@ -97,27 +107,28 @@ export const authOptions = {
     },
 
     async jwt({ token, user, account }) {
-      if (account?.provider === 'google' || user) {
+      // При первом входе user есть, дальше работаем по токену
+      if (user?.id) {
+        token.id = user.id;
+        token.role = user.role;
+        token.image = user.image;
+        token.name = user.name;
+        return token;
+      }
+
+      // Обновляем данные из БД при наличии токена
+      if (token?.id) {
         try {
           await dbConnect();
-          const dbUser = await User.findById(user?.id || token.id);
-
+          const dbUser = await User.findById(token.id);
           if (dbUser) {
             token.role = dbUser.role;
-            token.id = dbUser._id.toString();
             token.image = dbUser.image;
             token.name = dbUser.name;
           }
         } catch (error) {
           console.error('Ошибка загрузки данных пользователя:', error);
         }
-      }
-
-      if (user) {
-        token.role = user.role;
-        token.id = user.id;
-        token.image = user.image;
-        token.name = user.name;
       }
 
       return token;
