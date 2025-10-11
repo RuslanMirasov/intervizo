@@ -72,14 +72,12 @@ export const useWhisperVoice = () => {
   const streamRef = useRef(null);
   const segmentsRef = useRef([]);
   const currentSegmentRef = useRef('');
-  const keepAliveIntervalRef = useRef(null);
   const isPausedRef = useRef(false);
   const silenceTimeoutRef = useRef(null);
   const analyserRef = useRef(null);
   const dataArrayRef = useRef(null);
   const voiceDetectionIntervalRef = useRef(null);
   const recordingStartTimeRef = useRef(0);
-  const lastTriggerTimeRef = useRef(0);
   const throttledSetTriggerRef = useRef(null);
 
   const detectTrigger = useCallback(text => {

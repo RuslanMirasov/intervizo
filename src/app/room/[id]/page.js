@@ -21,7 +21,7 @@ const RoomPage = async ({ params }) => {
   return (
     <Section>
       <Suspense fallback={<Preloader />}>
-        <VideoProvider>
+        <VideoProvider key={id}>
           <CameraProvider>
             <ProgressProvider>
               <Room id={id} />

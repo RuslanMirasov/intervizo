@@ -16,6 +16,7 @@ export const CameraProvider = ({ children }) => {
   const micSourceRef = useRef(null);
   const audioSourceRef = useRef(null);
   const destinationRef = useRef(null);
+  const questionGainRef = useRef(null);
 
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -34,11 +35,16 @@ export const CameraProvider = ({ children }) => {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
-          width: { exact: width },
-          height: { exact: height },
+          width: { ideal: width },
+          height: { ideal: height },
           frameRate: { ideal: 12, max: 15 },
         },
         audio: true,
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: false,
+        },
       });
 
       mediaStreamRef.current = stream;
@@ -68,7 +74,20 @@ export const CameraProvider = ({ children }) => {
 
       const audioSource = audioContext.createMediaElementSource(audio);
       audioSourceRef.current = audioSource;
-      audioSource.connect(destination);
+      //audioSource.connect(destination);
+
+      const questionGain = audioContext.createGain();
+      questionGain.gain.value = 0.8; // можно подкрутить 0.5–1.0 по вкусу
+      questionGainRef.current = questionGain;
+
+      // поток вопроса -> гейн
+      audioSource.connect(questionGain);
+      // 1) в запись (микс с микрофоном)
+      questionGain.connect(destination);
+      // 2) в устройство воспроизведения (чтобы слышать вопрос)
+      questionGain.connect(audioContext.destination);
+      // если раньше где-то делал volume = 0, верни слышимость:
+      audio.volume = 0.8;
 
       setIsCameraOn(true);
       setCameraStartTime(Date.now());
@@ -101,6 +120,16 @@ export const CameraProvider = ({ children }) => {
       document.body.removeChild(audioElementRef.current);
       audioElementRef.current = null;
     }
+
+    try {
+      // безопасно разрываем граф
+      questionGainRef.current?.disconnect();
+      audioSourceRef.current?.disconnect();
+      micSourceRef.current?.disconnect();
+    } catch (_) {}
+    questionGainRef.current = null;
+    audioSourceRef.current = null;
+    micSourceRef.current = null;
 
     if (audioContextRef.current) {
       audioContextRef.current.close();

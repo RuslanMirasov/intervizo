@@ -12,6 +12,7 @@ import { preloadMedia } from '@/lib/preloadMedia';
 import { ProgressUiProvider } from './ProgressUiContext';
 import { Preloader } from '@/components';
 import { useVideo } from '@/context/VideoContext';
+import { useCamera } from '@/context/CameraContext';
 
 const ProgressContext = createContext(null);
 
@@ -35,6 +36,8 @@ export const ProgressProvider = ({ children }) => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [countdown, setCountdown] = useState(null);
   const lastStepRef = useRef(null);
+  const [finalVideoUrl, setFinalVideoUrl] = useState(null);
+  const { isCameraOn, startRecording, stopRecording, isRecording, playQuestionAudio } = useCamera();
 
   // ЗАПУСКАЕМ ИНТЕРВЬЮ
 
@@ -48,9 +51,19 @@ export const ProgressProvider = ({ children }) => {
     }
   }, [interview]);
 
+  // const finishInterview = useCallback(async () => {
+  //   router.push('/scoring');
+  // }, [router]);
+
   const finishInterview = useCallback(async () => {
-    router.push('/scoring');
-  }, [router]);
+    try {
+      const url = await stopRecording();
+      if (url) {
+        setFinalVideoUrl(url);
+        return;
+      }
+    } catch {}
+  }, [stopRecording]);
 
   const goToNextStep = useCallback(() => {
     setStep(prev => {
@@ -79,7 +92,10 @@ export const ProgressProvider = ({ children }) => {
       if (!isRepeat) {
         await connect();
       }
-      await playAudio(audio);
+
+      //await playAudio(audio);
+      await playQuestionAudio(audio);
+
       await video.stopVideo();
 
       // ---------------------------------------------
@@ -163,6 +179,15 @@ export const ProgressProvider = ({ children }) => {
     }
   }, [isPersistent, interview]);
 
+  // как только step=0 и камера включена — стартуем видео запись
+  useEffect(() => {
+    if (step === 0 && isCameraOn && !isRecording) {
+      try {
+        startRecording();
+      } catch {}
+    }
+  }, [step, isCameraOn, isRecording, startRecording]);
+
   //ЭФФЕКТ ЗАПУСКАЕТ СЛЕДУЮЩИЙ ШАГ ПРИ ИЗМЕНЕНИИ STEP
   useEffect(() => {
     if (step === null || !interview?.data || !interview.data[step]) return;
@@ -203,8 +228,9 @@ export const ProgressProvider = ({ children }) => {
       startVideo: video.startVideo,
       stopVideo: video.stopVideo,
       playVideo: video.playVideo,
+      finalVideoUrl,
     }),
-    [startInterview, step, video]
+    [startInterview, step, video, finalVideoUrl]
   );
 
   const uiValue = useMemo(
@@ -217,6 +243,20 @@ export const ProgressProvider = ({ children }) => {
   );
 
   if (!isPersistent || !interview) return <Preloader />;
+
+  if (finalVideoUrl) {
+    return (
+      <div style={{ padding: 16 }}>
+        <h2>Готовое видео</h2>
+        <p>
+          <a href={finalVideoUrl} download="interview.webm">
+            Скачать файл
+          </a>
+        </p>
+        <video src={finalVideoUrl} controls playsInline style={{ width: '100%', maxWidth: 640 }} />
+      </div>
+    );
+  }
 
   return (
     <ProgressContext.Provider value={contextValue}>
