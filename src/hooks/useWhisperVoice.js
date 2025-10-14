@@ -56,8 +56,8 @@ const ANALYSER_CONFIG = {
 };
 
 const VOICE_DETECTION_CONFIG = {
-  threshold: 15,
-  checkInterval: 100,
+  threshold: 8,
+  checkInterval: 50,
 };
 
 export const useWhisperVoice = () => {

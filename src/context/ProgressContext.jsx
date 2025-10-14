@@ -7,7 +7,6 @@ import { useWhisperVoice } from '@/hooks/useWhisperVoice';
 import { useProgressStorage } from '@/hooks/useProgressStorage';
 import { startCountdown } from '@/lib/startCountdown';
 import { getRandomItemFromArray } from '@/lib/getRandomItemFromArray';
-import { playAudio } from '@/lib/playAudio';
 import { preloadMedia } from '@/lib/preloadMedia';
 import { ProgressUiProvider } from './ProgressUiContext';
 import { Preloader } from '@/components';
@@ -51,19 +50,13 @@ export const ProgressProvider = ({ children }) => {
     }
   }, [interview]);
 
-  // const finishInterview = useCallback(async () => {
-  //   router.push('/scoring');
-  // }, [router]);
-
   const finishInterview = useCallback(async () => {
     try {
-      const url = await stopRecording();
-      if (url) {
-        setFinalVideoUrl(url);
-        return;
-      }
-    } catch {}
-  }, [stopRecording]);
+      await stopRecording?.();
+    } finally {
+      router.push('/scoring');
+    }
+  }, [router, stopRecording]);
 
   const goToNextStep = useCallback(() => {
     setStep(prev => {
@@ -88,12 +81,13 @@ export const ProgressProvider = ({ children }) => {
       //--------------------------------------------
 
       await new Promise(r => setTimeout(r, 800));
-      video.startVideo('/video/speak.mp4');
+
       if (!isRepeat) {
         await connect();
       }
 
       //await playAudio(audio);
+      video.startVideo('/video/speak.mp4');
       await playQuestionAudio(audio);
 
       await video.stopVideo();

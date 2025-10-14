@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import mongoose from 'mongoose';
 import { Section, Connection, Preloader } from '@/components';
-import { CameraProvider } from '@/context/CameraContext';
 
 export const metadata = {
   title: 'InterVizo | Подключение',
@@ -19,9 +18,7 @@ const ConnectUserPage = async ({ params }) => {
   return (
     <Section width="924px">
       <Suspense fallback={<Preloader />}>
-        <CameraProvider>
-          <Connection id={id} />
-        </CameraProvider>
+        <Connection id={id} />
       </Suspense>
     </Section>
   );

@@ -1,13 +1,19 @@
 'use client';
 
+import { useCamera } from '@/context/CameraContext';
+import { storage, auth } from '@/lib/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { signInAnonymously } from 'firebase/auth';
+
 import { useState, useEffect } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 import useRequest from '@/hooks/useRequest';
-import { Button, Preloader, ProgressBar, Score } from '@/components';
+import { Preloader, ProgressBar } from '@/components';
 import css from './Scoring.module.scss';
 import Image from 'next/image';
 
 const Scoring = () => {
+  const { videoBlob } = useCamera();
   const [isComplete, setIsComplete] = useState(false);
   const [progressItems, setProgressItems] = useState([]);
   const [hasStartedScoring, setHasStartedScoring] = useState(false);
@@ -38,6 +44,35 @@ const Scoring = () => {
   const updateProgressItem = (index, status) => {
     setProgressItems(prev => prev.map((item, i) => (i === index ? { ...item, status } : item)));
   };
+
+  async function uploadInterviewVideoAndGetUrl() {
+    if (!videoBlob) throw new Error('Видео отсутствует');
+    try {
+      if (!auth.currentUser) await signInAnonymously(auth);
+    } catch {}
+
+    const company = (progress?.company || 'default').toString();
+    const interviewId = (progress?._id || progress?.clientId || 'temp').toString();
+    const rawEmail = (progress?.item?.email || progress?.email || 'unknown').toString();
+    const email = rawEmail
+      .toLowerCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9._-]/g, '');
+    const ext = videoBlob.type?.includes('mp4') ? 'mp4' : videoBlob.type?.includes('webm') ? 'webm' : 'webm';
+
+    const storagePath = `InterVizo/${company}/${interviewId}/video_${email}.${ext}`;
+    const fileRef = ref(storage, storagePath);
+    const metadata = {
+      contentType: videoBlob.type || 'video/webm',
+      cacheControl: 'public, max-age=31536000, immutable',
+    };
+
+    const task = uploadBytesResumable(fileRef, videoBlob, metadata);
+    await new Promise((resolve, reject) => {
+      task.on('state_changed', () => {}, reject, resolve);
+    });
+    return await getDownloadURL(fileRef);
+  }
 
   useEffect(() => {
     if (progress?.data?.length > 0) {
@@ -102,15 +137,31 @@ const Scoring = () => {
       const average = validScores > 0 ? totalScore / validScores : 3.0;
       const roundedScore = Math.round(average * 10) / 10;
 
-      // Добавляем шаг "Сохранение в базу"
-      const finalIndex = progressItems.length;
+      // Этап "Загрузка видео"
+      const uploadIndex = progressItems.length;
+      setProgressItems(prev => [...prev, { name: 'Загрузка видео', status: 'pending' }]);
+      let videoUrl = null;
+      try {
+        videoUrl = await uploadInterviewVideoAndGetUrl();
+        updateProgressItem(uploadIndex, 'fullfield');
+      } catch {
+        updateProgressItem(uploadIndex, 'rejected');
+      }
+
+      // Этап "Сохранение в базу"
+      const finalIndex = uploadIndex + 1;
       setProgressItems(prev => [...prev, { name: 'Сохранение результатов в базу', status: 'pending' }]);
+
+      // Добавляем шаг "Сохранение в базу"
+      // const finalIndex = progressItems.length;
+      // setProgressItems(prev => [...prev, { name: 'Сохранение результатов в базу', status: 'pending' }]);
 
       try {
         const res = await submitCandidate({
           ...progress,
           data: updatedData,
           totalScore: roundedScore,
+          video: videoUrl || null, // ТОЛЬКО строка
         });
 
         setProgress(prev => ({

@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import mongoose from 'mongoose';
 import { Section, Room, Preloader } from '@/components';
-import { CameraProvider } from '@/context/CameraContext';
 import { ProgressProvider } from '@/context/ProgressContext';
 import { VideoProvider } from '@/context/VideoContext';
 
@@ -22,11 +21,9 @@ const RoomPage = async ({ params }) => {
     <Section>
       <Suspense fallback={<Preloader />}>
         <VideoProvider key={id}>
-          <CameraProvider>
-            <ProgressProvider>
-              <Room id={id} />
-            </ProgressProvider>
-          </CameraProvider>
+          <ProgressProvider>
+            <Room id={id} />
+          </ProgressProvider>
         </VideoProvider>
       </Suspense>
     </Section>

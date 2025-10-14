@@ -1,4 +1,5 @@
 import { PopupProvider } from '@/context/PopupContext';
+import { CameraProvider } from '@/context/CameraContext';
 import AuthSessionProvider from '@/context/SessionContext';
 import { ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -27,7 +28,9 @@ const RootLayout = ({ children }) => {
           <PopupProvider>
             <FormsValidator />
             <Header />
-            <Main>{children}</Main>
+            <CameraProvider>
+              <Main>{children}</Main>
+            </CameraProvider>
             <Popup />
           </PopupProvider>
         </AuthSessionProvider>

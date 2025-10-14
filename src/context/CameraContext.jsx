@@ -29,21 +29,22 @@ export const CameraProvider = ({ children }) => {
   const startCamera = useCallback(async () => {
     try {
       const isPortrait = window.matchMedia('(orientation: portrait)').matches;
-      const height = 330;
-      const width = isPortrait ? 168 : 578;
+      const targetWidth = isPortrait ? 360 : 640;
+      const targetHeight = isPortrait ? 640 : 360;
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
-          width: { ideal: width },
-          height: { ideal: height },
-          frameRate: { ideal: 12, max: 15 },
+          width: { ideal: targetWidth, max: targetWidth },
+          height: { ideal: targetHeight, max: targetHeight },
+          frameRate: { ideal: 8, max: 10 },
         },
         audio: true,
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: false,
+          channelCount: 1,
         },
       });
 
@@ -152,9 +153,29 @@ export const CameraProvider = ({ children }) => {
       ...destinationRef.current.stream.getAudioTracks(),
     ]);
 
-    const recorder = new MediaRecorder(mixedStream, {
-      mimeType: 'video/webm; codecs=vp8',
-    });
+    // const recorder = new MediaRecorder(mixedStream, {
+    //   mimeType: 'video/webm; codecs=vp8',
+    // });
+
+    // подбираем подходящий mimeType и сразу задаём низкие битрейты
+    const pickRecorderOptions = () => {
+      const candidates = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+      let mimeType = '';
+      for (const t of candidates) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) {
+          mimeType = t;
+          break;
+        }
+      }
+      // целимся в "лёгкое" видео
+      const videoBitsPerSecond = 220_000; // ~220 kbps
+      const audioBitsPerSecond = 32_000; // ~32 kbps (моно)
+      return mimeType
+        ? { mimeType, videoBitsPerSecond, audioBitsPerSecond }
+        : { videoBitsPerSecond, audioBitsPerSecond };
+    };
+
+    const recorder = new MediaRecorder(mixedStream, pickRecorderOptions());
 
     recorder.ondataavailable = e => {
       if (e.data.size > 0) {
