@@ -52,8 +52,8 @@ const Scoring = () => {
     } catch {}
 
     const company = (progress?.company || 'default').toString();
-    const interviewId = (progress?._id || progress?.clientId || 'temp').toString();
-    const rawEmail = (progress?.item?.email || progress?.email || 'unknown').toString();
+    const interviewId = progress?.interviewId.toString();
+    const rawEmail = progress?.email.toString();
     const email = rawEmail
       .toLowerCase()
       .replace(/\s+/g, '_')
@@ -151,10 +151,6 @@ const Scoring = () => {
       // Этап "Сохранение в базу"
       const finalIndex = uploadIndex + 1;
       setProgressItems(prev => [...prev, { name: 'Сохранение результатов в базу', status: 'pending' }]);
-
-      // Добавляем шаг "Сохранение в базу"
-      // const finalIndex = progressItems.length;
-      // setProgressItems(prev => [...prev, { name: 'Сохранение результатов в базу', status: 'pending' }]);
 
       try {
         const res = await submitCandidate({

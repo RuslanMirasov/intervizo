@@ -86,7 +86,6 @@ export const ProgressProvider = ({ children }) => {
         await connect();
       }
 
-      //await playAudio(audio);
       video.startVideo('/video/speak.mp4');
       await playQuestionAudio(audio);
 

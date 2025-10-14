@@ -23,12 +23,18 @@
 .Buttons {
   width: 248px;
   text-align: center;
+  margin: 0 auto;
   p {
     color: var(--grey-dark);
   }
   span {
     font-size: 12px;
     line-height: 1.4;
+  }
+
+  @media (max-width: 767px) {
+    width: 100%;
+    max-width: 248px;
   }
 }
 

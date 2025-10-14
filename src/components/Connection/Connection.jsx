@@ -66,7 +66,7 @@ const Connection = ({ id }) => {
         </div>
         <p>InterVizo ИИ на связи</p>
         <ConnectForm id={id} interviewId={interview._id} />
-        <span>InterVizo использует генеративный ИИ для проведения интервью</span>
+        <span>InterVizo использует генеративный ИИ&nbsp;для&nbsp;проведения интервью</span>
       </Flex>
     </div>
   );
