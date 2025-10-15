@@ -57,3 +57,4 @@ export { default as ContentArea } from './ContentArea/ContentArea';
 export { default as GoogleSignInButton } from './GoogleSignInButton/GoogleSignInButton';
 export { default as ProfileButtons } from './Profile/ProfileButtons/ProfileButtons';
 export { default as ProfileHeader } from './Profile/ProfileHeader/ProfileHeader';
+export { default as VideoPlayer } from './VideoPlayer/VideoPlayer';

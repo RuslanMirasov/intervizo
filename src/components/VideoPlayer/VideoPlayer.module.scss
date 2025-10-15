@@ -1,0 +1,46 @@
+.VideoPlayer {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 330px;
+  border-radius: 25px;
+  overflow: hidden;
+  z-index: 1;
+  background: var(--grey-border);
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 8px;
+  font-size: 16px;
+  p {
+    font-size: 12px;
+    text-align: center;
+  }
+}
+
+.Message {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  width: 100%;
+  max-width: 220px;
+  position: absolute;
+  text-align: center;
+}
+
+.Player {
+  display: block;
+  border: none;
+  outline: none;
+  width: 100%;
+  height: auto;
+  min-height: 330px;
+  transition: 0.3s;
+  opacity: 1;
+  &.Loading {
+    opacity: 0;
+  }
+}
