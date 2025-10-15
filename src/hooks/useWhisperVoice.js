@@ -169,14 +169,13 @@ export const useWhisperVoice = () => {
                 auth: 'mysecret123',
                 language: 'ru',
                 task: 'transcribe',
-                model: 'small',
-                use_vad: true,
-                send_last_n_segments: 10,
-                no_speech_thresh: 0.45,
+                model: 'medium',
+                use_vad: false,
+                send_last_n_segments: 20,
+                no_speech_thresh: 0.3,
                 clip_audio: false,
-                same_output_threshold: 10,
+                same_output_threshold: 3,
                 enable_translation: false,
-                target_language: 'fr',
               };
               ws.send(JSON.stringify(options));
             };
@@ -359,41 +358,47 @@ export const useWhisperVoice = () => {
   }, [startVoiceDetection]);
 
   const stopRecord = useCallback(() => {
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
       stopVoiceDetection();
 
-      setTimeout(() => {
-        if (processorRef.current) {
-          processorRef.current.disconnect();
-          processorRef.current = null;
-        }
+      // ЭТУ ШТУКУ GPT ПОСОВЕТОВАЛ ПРОБНО=============================
+      await new Promise(r => setTimeout(r, 300));
 
-        audioContextRef.current = null;
+      endAudio();
 
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach(track => track.stop());
-          streamRef.current = null;
-        }
+      await new Promise(r => setTimeout(r, 700));
+      // =============================================================
 
-        if (silenceTimeoutRef.current) {
-          clearTimeout(silenceTimeoutRef.current);
-          silenceTimeoutRef.current = null;
-        }
+      if (processorRef.current) {
+        processorRef.current.disconnect();
+        processorRef.current = null;
+      }
 
-        analyserRef.current = null;
-        dataArrayRef.current = null;
+      audioContextRef.current = null;
 
-        const fullTranscription = segmentsRef.current.join(' ').trim();
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
 
-        segmentsRef.current = [];
-        currentSegmentRef.current = '';
-        setIsSpeaking(false);
-        setIsRecording(false);
-        setIsPaused(false);
-        isPausedRef.current = false;
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+        silenceTimeoutRef.current = null;
+      }
 
-        resolve(fullTranscription);
-      }, 500);
+      analyserRef.current = null;
+      dataArrayRef.current = null;
+
+      const fullTranscription = segmentsRef.current.join(' ').trim();
+
+      segmentsRef.current = [];
+      currentSegmentRef.current = '';
+      setIsSpeaking(false);
+      setIsRecording(false);
+      setIsPaused(false);
+      isPausedRef.current = false;
+
+      resolve(fullTranscription);
     });
   }, [stopVoiceDetection]);
 
