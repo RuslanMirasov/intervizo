@@ -4,49 +4,44 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { throttle } from '@/lib/throttle';
 
 const DEFAULT_REPEAT_TRIGGERS = [
-  // Russian
   'повторите вопрос',
+  'повторить вопрос',
   'повтори вопрос',
   'вопрос ещё раз',
   'вопрос повторить',
+  'вопрос повторите',
+  'вопрос повтори',
   'повторите пожалуйста вопрос',
   'повтори пожалуйста вопрос',
   'можно ещё раз вопрос',
   'не расслышал вопрос',
   'не понял вопрос',
-  // English
   'repeat the question',
   'can you repeat the question',
   'say the question again',
-  'could you repeat the question please',
+  'could you repeat the question',
   "i didn't hear the question",
   "i didn't get the question",
-  // German
   'wiederholen sie die frage',
   'wiederhole die frage',
   'nochmal die frage',
   'frage wiederholen',
-  'können sie die frage wiederholen',
-  'ich habe die frage nicht verstanden',
-  'ich habe die frage nicht gehört',
+  'frage nicht verstanden',
+  'frage nicht gehört',
 ];
 
 const DEFAULT_NEXT_TRIGGERS = [
-  // Russian
   'следующий вопрос',
   'к следующему вопросу',
   'пропустить вопрос',
+  'пропусти вопрос',
   'вопрос пропустить',
-  // English
   'next question',
-  'go to the next question',
   'skip the question',
   'skip this question',
-  // German
   'nächste frage',
   'zur nächsten frage',
   'frage überspringen',
-  'diese frage überspringen',
 ];
 
 const ANALYSER_CONFIG = {
@@ -242,7 +237,6 @@ export const useWhisperVoice = () => {
                     if (!throttledSetTriggerRef.current) {
                       throttledSetTriggerRef.current = throttle(detectedTrigger => {
                         setTriggerDetected(detectedTrigger);
-                        //setTimeout(() => setTriggerDetected(null), 3000);
                       }, 3000);
                     }
 

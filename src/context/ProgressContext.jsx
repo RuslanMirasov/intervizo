@@ -35,7 +35,6 @@ export const ProgressProvider = ({ children }) => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [countdown, setCountdown] = useState(null);
   const lastStepRef = useRef(null);
-  const [finalVideoUrl, setFinalVideoUrl] = useState(null);
   const { isCameraOn, startRecording, stopRecording, isRecording, playQuestionAudio } = useCamera();
 
   // ЗАПУСКАЕМ ИНТЕРВЬЮ
@@ -204,12 +203,12 @@ export const ProgressProvider = ({ children }) => {
 
     startCountdown(0, () => setCountdown(0), setCountdown);
     setShowNextButton(false);
-    if (triggerDetected === 'repeat') {
-      repeatQuastion();
-    }
-    if (triggerDetected === 'next') {
-      nextQuastion();
-    }
+
+    if (triggerDetected === 'repeat') repeatQuastion();
+    if (triggerDetected === 'next') nextQuastion();
+
+    const t = setTimeout(() => setTriggerDetected(null), 1000);
+    return () => clearTimeout(t);
   }, [triggerDetected]);
 
   // ========================================================================= ЭФФЕКТЫ КОНЕЦ
@@ -221,9 +220,8 @@ export const ProgressProvider = ({ children }) => {
       startVideo: video.startVideo,
       stopVideo: video.stopVideo,
       playVideo: video.playVideo,
-      finalVideoUrl,
     }),
-    [startInterview, step, video, finalVideoUrl]
+    [startInterview, step, video]
   );
 
   const uiValue = useMemo(
@@ -236,20 +234,6 @@ export const ProgressProvider = ({ children }) => {
   );
 
   if (!isPersistent || !interview) return <Preloader />;
-
-  if (finalVideoUrl) {
-    return (
-      <div style={{ padding: 16 }}>
-        <h2>Готовое видео</h2>
-        <p>
-          <a href={finalVideoUrl} download="interview.webm">
-            Скачать файл
-          </a>
-        </p>
-        <video src={finalVideoUrl} controls playsInline style={{ width: '100%', maxWidth: 640 }} />
-      </div>
-    );
-  }
 
   return (
     <ProgressContext.Provider value={contextValue}>
