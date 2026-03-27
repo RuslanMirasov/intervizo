@@ -14,6 +14,17 @@
   overflow: hidden;
   z-index: 1;
 
+  @media (max-width: 767px) {
+    width: 140px;
+    height: 140px;
+    right: 10px;
+    bottom: 10px;
+    border-radius: 18px;
+    span {
+      display: none;
+    }
+  }
+
   span {
     position: absolute;
     left: 20px;

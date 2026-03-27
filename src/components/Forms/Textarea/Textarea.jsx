@@ -1,26 +1,44 @@
-import { Skeleton } from '@/components';
-import { slugify } from '@/lib/slugify';
-import { useInterview } from '@/hooks/useInterview';
+'use client';
 
-const Textarea = ({ name, placeholder }) => {
-  const { interview, setInterview } = useInterview();
+import { useEffect, useRef } from 'react';
 
-  if (!interview) return <Skeleton width="40%" height="14px" radius="4px" />;
+const resizeTextarea = el => {
+  if (!el) return;
 
-  return (
-    <textarea
-      name={name}
-      placeholder={placeholder}
-      value={interview[name]}
-      onChange={e =>
-        setInterview(prev => ({
-          ...prev,
-          [name]: e.target.value,
-          slug: name === 'name' ? slugify(e.target.value) : prev.slug,
-        }))
-      }
-    ></textarea>
-  );
+  el.style.height = '0px';
+  const newHeight = el.scrollHeight;
+  el.style.height = newHeight + 'px';
+};
+
+const Textarea = ({ value = '', onChange, name, placeholder }) => {
+  const ref = useRef(null);
+
+  // resize при изменении value
+  useEffect(() => {
+    resizeTextarea(ref.current);
+  }, [value]);
+
+  // resize при изменении размера окна / ориентации
+  useEffect(() => {
+    const handleResize = () => {
+      resizeTextarea(ref.current);
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, []);
+
+  const handleChange = e => {
+    onChange?.(e);
+    resizeTextarea(e.target);
+  };
+
+  return <textarea ref={ref} name={name} placeholder={placeholder} value={value} onChange={handleChange} />;
 };
 
 export default Textarea;

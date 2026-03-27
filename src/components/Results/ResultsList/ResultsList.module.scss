@@ -3,6 +3,9 @@
   position: relative;
   width: 100%;
   margin-top: 50px;
+  @media (max-width: 767px) {
+    margin-top: 30px;
+  }
 }
 
 .ResultsList {
@@ -34,4 +37,9 @@
   align-items: flex-end;
   align-content: flex-end;
   gap: 20px;
+  @media (max-width: 767px) {
+    input {
+      width: 100%;
+    }
+  }
 }

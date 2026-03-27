@@ -5,15 +5,15 @@ import { useSession } from 'next-auth/react';
 import css from './ProfileHeader.module.scss';
 
 const ProfileHeader = () => {
-  const { data: session, status } = useSession();
-  const isAuthenticated = status === 'authenticated';
+  const { data: session } = useSession();
+  const avatar = session?.user?.image || '/avatars/1.webp';
 
   return (
     <div className={css.ProfileHeader}>
       <div
         className={css.Avatar}
         style={{
-          background: `url(${session?.user?.image ? session.user.image : '/avatars/1.webp'}) center/cover no-repeat`,
+          background: `url(${avatar})no-repeat center/cover`,
         }}
       ></div>
       <h1>{session?.user?.name || 'Загрузка...'}</h1>

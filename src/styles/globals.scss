@@ -181,6 +181,9 @@ a:hover {
 .swiper-wrapper {
   align-items: stretch;
   align-content: stretch;
+  @media (max-width: 767px) {
+    overflow: visible;
+  }
 }
 
 .swiper-wrapper-fixed {
@@ -237,7 +240,9 @@ a:hover {
   font-weight: 500;
   color: var(--black);
   padding: 16px 20px;
-  box-shadow: none;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+  max-width: 90%;
+  margin: 5px 0px;
 }
 
 .Toastify__toast-icon {

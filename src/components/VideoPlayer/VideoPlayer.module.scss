@@ -19,6 +19,9 @@
     font-size: 12px;
     text-align: center;
   }
+  @media (max-width: 767px) {
+    min-height: 1px;
+  }
 }
 
 .Message {
@@ -40,6 +43,9 @@
   min-height: 330px;
   transition: 0.3s;
   opacity: 1;
+  @media (max-width: 767px) {
+    min-height: 1px;
+  }
   &.Loading {
     opacity: 0;
   }

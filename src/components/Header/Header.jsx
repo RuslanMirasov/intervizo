@@ -9,9 +9,6 @@ const Header = () => {
   const { data: session, status } = useSession();
   const isAuthenticated = status === 'authenticated';
 
-  if (session) {
-    console.log(session);
-  }
   return (
     <header className={css.Header}>
       <Icon name="logo" color="var(--color)" />
@@ -40,9 +37,9 @@ const Header = () => {
           href="/profile"
           className={css.ProfileLink}
           style={{
-            background: session?.user?.image
-              ? "url('" + session.user.image + "')no-repeat center center/cover"
-              : 'none',
+            background: `url("${
+              session?.user?.image ? session.user.image : '/avatars/1.webp'
+            }") center/cover no-repeat`,
           }}
         >
           {!session?.user?.image && <Icon name="profile" color="currentColor" />}

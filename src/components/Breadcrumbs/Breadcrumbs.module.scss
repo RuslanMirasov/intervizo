@@ -21,9 +21,18 @@
       padding: 0px 6px;
     }
     &:last-child {
+      color: var(--color);
       &:after {
         content: none;
       }
+    }
+  }
+
+  @media (max-width: 767px) {
+    width: 100%;
+    max-width: 100%;
+    li {
+      font-size: 12px;
     }
   }
 }

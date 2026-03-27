@@ -23,7 +23,7 @@ const RoomPage = async ({ params }) => {
         <VideoProvider key={id}>
           <ProgressProvider>
             <Room id={id} />
-          </ProgressProvider>
+          </ProgressProvider> 
         </VideoProvider>
       </Suspense>
     </Section>

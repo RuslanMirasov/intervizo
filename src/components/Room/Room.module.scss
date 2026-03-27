@@ -16,6 +16,10 @@
     font-size: 14px;
     margin-bottom: 16px;
   }
+
+  @media (max-width: 767px) {
+    padding: 20px;
+  }
 }
 
 .Camera {
@@ -27,4 +31,10 @@
   overflow: hidden;
   z-index: 1;
   flex: 1;
+  @media (max-width: 767px) {
+    border-radius: 10px;
+    > * {
+      border-radius: 0px;
+    }
+  }
 }

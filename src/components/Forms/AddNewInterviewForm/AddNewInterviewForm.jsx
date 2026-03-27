@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
 import useRequest from '@/hooks/useRequest';
+import { useInterview } from '@/hooks/useInterview';
+import { slugify } from '@/lib/slugify';
 import { SectionsEditor, PromtGeneratorForm, Textarea, InterviewInputs, InterviewButtons } from '@/components';
-import { initTextareaAutoResize } from '@/lib/initTextareaAutoResize';
 
 import css from './AddNewInterviewForm.module.scss';
 import { useRouter } from 'next/navigation';
 
 const AddNewInterviewForm = ({ id }) => {
   const router = useRouter();
+  const { interview, setInterview } = useInterview();
   const {
     data: currentInterview,
     error,
@@ -20,10 +21,15 @@ const AddNewInterviewForm = ({ id }) => {
     method: 'GET',
   });
 
-  useEffect(() => {
-    const cleanup = initTextareaAutoResize();
-    return cleanup;
-  }, []);
+  const handleTextareaChange = e => {
+    const { name, value } = e.target;
+
+    setInterview(prev => ({
+      ...prev,
+      [name]: value,
+      slug: name === 'name' ? slugify(value) : prev.slug,
+    }));
+  };
 
   if (id && isLoading) return null;
 
@@ -38,8 +44,18 @@ const AddNewInterviewForm = ({ id }) => {
         mutateCurrentInterview={mutateCurrentInterview}
       />
       <div className={css.AddNewInterviewForm}>
-        <Textarea name="name" placeholder="Введите название" />
-        <Textarea name="description" placeholder="Введите описание вакансии" />
+        <Textarea
+          name="name"
+          placeholder="Введите название"
+          value={interview?.name || ''}
+          onChange={handleTextareaChange}
+        />
+        <Textarea
+          name="description"
+          placeholder="Введите описание вакансии"
+          value={interview?.description || ''}
+          onChange={handleTextareaChange}
+        />
         <InterviewInputs />
         <PromtGeneratorForm />
         <SectionsEditor currentInterview={currentInterview?.interview} />

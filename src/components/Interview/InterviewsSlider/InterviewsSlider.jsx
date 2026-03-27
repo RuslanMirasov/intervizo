@@ -37,8 +37,7 @@ const InterviewsSlider = () => {
         <Button href="./add-new-interview" className="add">
           <Icon name="border" />
           <Icon name="plus" size="56" />
-          Добавить
-          <br />
+          Добавить <br />
           интервью
         </Button>
 
@@ -47,7 +46,16 @@ const InterviewsSlider = () => {
             {isLoading ? (
               <InterviewsSliderSkeleton />
             ) : (
-              <Swiper slidesPerView={4} spaceBetween={12} className="swiper-wrapper-fixed">
+              <Swiper
+                spaceBetween={12}
+                className="swiper-wrapper-fixed"
+                breakpoints={{
+                  0: { slidesPerView: 1 },
+                  768: { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+                  1280: { slidesPerView: 4 },
+                }}
+              >
                 {interviews &&
                   interviews?.map(interview => (
                     <SwiperSlide key={interview._id}>

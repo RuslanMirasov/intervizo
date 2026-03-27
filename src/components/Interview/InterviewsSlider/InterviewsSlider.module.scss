@@ -19,6 +19,20 @@
     z-index: 2;
     pointer-events: none;
   }
+
+  @media (max-width: 767px) {
+    width: calc(100% + 40px);
+    margin-left: -20px;
+    margin-top: -20px;
+    margin-bottom: -20px;
+    padding: 20px;
+    article {
+      margin: 0px 0px;
+    }
+    &:before {
+      content: none;
+    }
+  }
 }
 
 .InterviewsSlider {
@@ -28,4 +42,19 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 5px;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    gap: 20px;
+    overflow: visible;
+    :global(.swiper) {
+      max-width: 250px;
+      float: left;
+      overflow: visible;
+      margin-right: auto;
+    }
+    > a {
+      order: 2;
+    }
+  }
 }

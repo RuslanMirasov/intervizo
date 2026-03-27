@@ -1,6 +1,7 @@
 .ResultListItem {
   display: flex;
   width: 100%;
+  position: relative;
   justify-content: space-between;
   align-items: center;
   align-content: center;
@@ -15,6 +16,15 @@
     h3 {
       color: var(--color);
     }
+  }
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+    padding: 10px;
+    padding-right: 70px;
   }
 }
 
@@ -35,6 +45,24 @@
       margin-top: 4px;
     }
   }
+
+  @media (max-width: 767px) {
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+
+    .Text {
+      h3 {
+        font-size: 14px;
+        padding-top: 2px;
+      }
+      p {
+        font-size: 12px;
+      }
+    }
+  }
 }
 
 .Avatar {
@@ -45,6 +73,11 @@
   height: 52px;
   border-radius: 10px;
   background: var(--grey-light);
+  @media (max-width: 767px) {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
 }
 
 .ListInfo {
@@ -60,5 +93,22 @@
     background: var(--green-light);
     border-radius: 10px;
     padding: 4.5px 10px;
+  }
+  @media (max-width: 767px) {
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    font-size: 10px;
+    width: 50px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    p {
+      order: 2;
+    }
+    span {
+      font-size: 10px;
+      order: 1;
+    }
   }
 }

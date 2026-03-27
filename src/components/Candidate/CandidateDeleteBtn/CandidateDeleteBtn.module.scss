@@ -3,4 +3,9 @@
   > button {
     min-width: 100px;
   }
+
+  @media (max-width: 767px) {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }

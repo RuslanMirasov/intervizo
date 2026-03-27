@@ -12,7 +12,7 @@ const LoginPage = () => {
     <Section width="430px">
       <ContentArea align="center">
         <div className="form-wrapper">
-          <h1>Войдите в учетную запись</h1>
+          <h1>Войдите в&nbsp;учетную&nbsp;запись</h1>
           <Suspense fallback={null}>
             <LoginForm />
             <hr />

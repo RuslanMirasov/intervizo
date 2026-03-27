@@ -1,9 +1,8 @@
 'use client';
 
-import { debounce } from '@/lib/debounce';
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useInterview } from '@/hooks/useInterview';
-import { Button, Icon } from '@/components';
+import { Button, Icon, Textarea } from '@/components';
 import { generateId } from '@/lib/generateId';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -68,7 +67,8 @@ const SortableSection = ({ section, originalSection, onUpdate, playingId, setPla
           <Icon name="sound" size="16" color={isPlaying ? 'var(--green)' : isUpdated ? 'var(--red)' : 'var(--color)'} />
         </span>
       )}
-      <textarea
+
+      <Textarea
         placeholder={`Введите ${section.type === 'question' ? 'вопрос' : 'сообщение'}...`}
         value={section.text}
         onChange={e => onUpdate(section.id, e.target.value)}

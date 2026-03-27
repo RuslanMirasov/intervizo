@@ -7,4 +7,17 @@
   align-items: center;
   align-content: center;
   gap: 12px;
+
+  @media (max-width: 767px) {
+    gap: 10px;
+    width: 100%;
+    button,
+    a {
+      flex: 1;
+      font-size: 12px;
+      width: auto;
+      min-width: 1px;
+      padding: 4px 14px !important;
+    }
+  }
 }

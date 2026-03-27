@@ -6,21 +6,23 @@
   gap: 16px;
 
   > textarea {
-    min-height: 17px;
-    height: 17px;
     font-size: 14px;
-    line-height: 1.2;
+    line-height: 1.5;
+    color: var(--grey);
+    resize: none;
   }
 
   textarea[name='name'] {
     width: 100%;
-    min-height: 29px;
-    height: 29px;
     font-family: var(--inter);
     font-weight: 700;
     color: var(--black);
     font-size: 24px;
     line-height: 1.2;
+  }
+
+  @media (max-width: 767px) {
+    margin-top: 0px;
   }
 }
 

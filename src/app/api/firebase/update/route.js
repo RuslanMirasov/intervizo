@@ -3,6 +3,8 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage
 import dbConnect from '@/lib/mongodb';
 import { Interview } from '@/models/Interview';
 
+const VOICE_ID = process.env.ELEVENLABS_VOICE_ID;
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -13,7 +15,7 @@ export async function POST(req) {
     }
 
     // Генерация аудио через ElevenLabs
-    const elevenLabsRes = await fetch('https://api.elevenlabs.io/v1/text-to-speech/ycbyWsnf4hqZgdpKHqiU', {
+    const elevenLabsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
       method: 'POST',
       headers: {
         Accept: 'audio/mpeg',
@@ -34,7 +36,11 @@ export async function POST(req) {
 
     if (!elevenLabsRes.ok) {
       const errorText = await elevenLabsRes.text();
-      console.error('Ошибка генерации аудио:', errorText);
+      console.error('❌ ElevenLabs ERROR:', {
+        status: elevenLabsRes.status,
+        statusText: elevenLabsRes.statusText,
+        body: errorText,
+      });
       return new Response(JSON.stringify({ error: 'Ошибка генерации аудио' }), { status: 500 });
     }
 
@@ -77,7 +83,7 @@ export async function PATCH(req) {
     }
 
     // Генерация нового аудио через ElevenLabs
-    const elevenLabsRes = await fetch('https://api.elevenlabs.io/v1/text-to-speech/ycbyWsnf4hqZgdpKHqiU', {
+    const elevenLabsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
       method: 'POST',
       headers: {
         Accept: 'audio/mpeg',
@@ -98,7 +104,11 @@ export async function PATCH(req) {
 
     if (!elevenLabsRes.ok) {
       const errorText = await elevenLabsRes.text();
-      console.error('Ошибка генерации аудио:', errorText);
+      console.error('❌ ElevenLabs ERROR:', {
+        status: elevenLabsRes.status,
+        statusText: elevenLabsRes.statusText,
+        body: errorText,
+      });
       return new Response(JSON.stringify({ error: 'Ошибка генерации аудио: ' + errorText }), { status: 500 });
     }
 

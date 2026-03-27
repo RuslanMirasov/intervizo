@@ -8,8 +8,6 @@ import css from './CandidateSingle.module.scss';
 const CandidateSingle = ({ candidate }) => {
   const { position, totalScore, data, video = null } = candidate;
 
-  console.log('video', video);
-
   return (
     <div className={css.CandidateSingle}>
       <h1>{position}</h1>

@@ -18,6 +18,11 @@
     align-content: center;
     gap: 20px;
     z-index: 20;
+    @media (max-width: 767px) {
+      flex-direction: column;
+      align-items: flex-start;
+      align-content: flex-start;
+    }
   }
   > h1 {
     flex: 1;
@@ -37,6 +42,20 @@
   > label {
     max-width: 237.5px;
   }
+
+  @media (max-width: 767px) {
+    justify-content: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    > div,
+    > label {
+      width: 100%;
+      max-width: 100%;
+      input {
+        width: 100%;
+      }
+    }
+  }
 }
 
 .Dificulty {
@@ -47,6 +66,16 @@
   margin-bottom: auto;
   @media (max-width: 1023px) {
     width: 120px;
+  }
+  @media (max-width: 767px) {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px 25px;
+    strong {
+      display: block;
+      width: 100%;
+    }
   }
 }
 
@@ -70,7 +99,9 @@
       border-radius: 4px;
       border: 1px solid #e6e7eb;
       background: rgba(0, 0, 0, 0);
-      transition: background-color 0.3s, border 0.3s;
+      transition:
+        background-color 0.3s,
+        border 0.3s;
     }
   }
 

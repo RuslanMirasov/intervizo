@@ -40,6 +40,10 @@
   background: #fff;
   border-radius: 25px;
 
+  @media (max-width: 767px) {
+    padding: 32px 30px;
+  }
+
   hr {
     display: block;
     position: relative;

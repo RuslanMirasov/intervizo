@@ -156,7 +156,7 @@ export const useWhisperVoice = () => {
           await new Promise((resolveUrl, rejectUrl) => {
             const connectionTimeout = setTimeout(() => {
               rejectUrl(new Error(`Connection timeout for ${url}`));
-            }, 10000);
+            }, 20000);
 
             const ws = new WebSocket(url);
             ws.binaryType = 'arraybuffer';
