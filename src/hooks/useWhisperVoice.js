@@ -55,6 +55,19 @@ const VOICE_DETECTION_CONFIG = {
   checkInterval: 50,
 };
 
+const ASR_AUDIO_CONFIG = {
+  sampleRate: 16000,
+  format: 'float32',
+};
+
+const ASR_FINALIZATION_CONFIG = {
+  quietMs: 1000,
+  timeoutMs: 5000,
+  checkIntervalMs: 100,
+};
+
+const DEBUG_ASR = false;
+
 export const useWhisperVoice = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [triggerDetected, setTriggerDetected] = useState(null);
@@ -73,6 +86,7 @@ export const useWhisperVoice = () => {
   const dataArrayRef = useRef(null);
   const voiceDetectionIntervalRef = useRef(null);
   const recordingStartTimeRef = useRef(0);
+  const lastSegmentUpdateAtRef = useRef(0);
   const throttledSetTriggerRef = useRef(null);
 
   const detectTrigger = useCallback(text => {
@@ -100,6 +114,37 @@ export const useWhisperVoice = () => {
       if (data instanceof ArrayBuffer) return new TextDecoder().decode(data);
     } catch {}
     return null;
+  };
+
+  const buildTranscription = () => {
+    return segmentsRef.current
+      .map(seg => seg.text?.trim())
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+  };
+
+  const waitForAsrFinalization = () => {
+    lastSegmentUpdateAtRef.current = Date.now();
+
+    return new Promise(resolve => {
+      const startedAt = Date.now();
+
+      const check = () => {
+        const now = Date.now();
+        const quietFor = now - lastSegmentUpdateAtRef.current;
+        const waitedFor = now - startedAt;
+
+        if (quietFor >= ASR_FINALIZATION_CONFIG.quietMs || waitedFor >= ASR_FINALIZATION_CONFIG.timeoutMs) {
+          resolve();
+          return;
+        }
+
+        setTimeout(check, ASR_FINALIZATION_CONFIG.checkIntervalMs);
+      };
+
+      setTimeout(check, ASR_FINALIZATION_CONFIG.checkIntervalMs);
+    });
   };
 
   const startVoiceDetection = useCallback(() => {
@@ -170,8 +215,10 @@ export const useWhisperVoice = () => {
                 language: 'ru',
                 task: 'transcribe',
                 model: 'medium',
+                sample_rate: ASR_AUDIO_CONFIG.sampleRate,
+                format: ASR_AUDIO_CONFIG.format,
                 use_vad: false,
-                send_last_n_segments: 20,
+                send_last_n_segments: 200,
                 no_speech_thresh: 0.3,
                 clip_audio: false,
                 same_output_threshold: 3,
@@ -189,6 +236,28 @@ export const useWhisperVoice = () => {
                 msg = JSON.parse(text);
               } catch (e) {
                 return;
+              }
+
+              if (DEBUG_ASR) {
+                console.log('[ASR message]', {
+                  message: msg.message,
+                  status: msg.status,
+                  text: msg.text,
+                  segmentCount: msg.segments?.length,
+                  keys: Object.keys(msg),
+                });
+
+                if (msg.segments?.length) {
+                  console.table(
+                    msg.segments.map(seg => ({
+                      id: seg.id,
+                      start: seg.start,
+                      end: seg.end,
+                      completed: seg.completed,
+                      text: seg.text,
+                    }))
+                  );
+                }
               }
 
               if ('status' in msg) {
@@ -225,6 +294,8 @@ export const useWhisperVoice = () => {
                   return;
                 }
 
+                lastSegmentUpdateAtRef.current = Date.now();
+
                 const lastIncompleteSegment = relevantSegments
                   .slice()
                   .reverse()
@@ -243,16 +314,14 @@ export const useWhisperVoice = () => {
                   }
 
                   currentSegmentRef.current = lastIncompleteSegment.text.trim();
+                } else {
+                  currentSegmentRef.current = '';
                 }
 
-                relevantSegments.forEach(seg => {
-                  if (seg.completed && seg.text && seg.text.trim()) {
-                    const trimmedText = seg.text.trim();
-                    if (!segmentsRef.current.includes(trimmedText)) {
-                      segmentsRef.current.push(trimmedText);
-                    }
-                  }
-                });
+                segmentsRef.current = relevantSegments
+                  .filter(seg => seg.text && seg.text.trim())
+                  .map(seg => ({ ...seg, text: seg.text.trim() }))
+                  .sort((a, b) => (a.start ?? 0) - (b.start ?? 0));
               }
             };
 
@@ -312,7 +381,7 @@ export const useWhisperVoice = () => {
       streamRef.current = stream;
 
       const audioContext = new (window.AudioContext || window.webkitAudioContext)({
-        sampleRate: 16000,
+        sampleRate: ASR_AUDIO_CONFIG.sampleRate,
       });
       audioContextRef.current = audioContext;
 
@@ -346,6 +415,7 @@ export const useWhisperVoice = () => {
 
       segmentsRef.current = [];
       currentSegmentRef.current = '';
+      lastSegmentUpdateAtRef.current = 0;
       recordingStartTimeRef.current = audioContext.currentTime;
       setIsRecording(true);
       setIsPaused(false);
@@ -366,7 +436,7 @@ export const useWhisperVoice = () => {
 
       endAudio();
 
-      await new Promise(r => setTimeout(r, 700));
+      await waitForAsrFinalization();
       // =============================================================
 
       if (processorRef.current) {
@@ -389,10 +459,24 @@ export const useWhisperVoice = () => {
       analyserRef.current = null;
       dataArrayRef.current = null;
 
-      const fullTranscription = segmentsRef.current.join(' ').trim();
+      const fullTranscription = buildTranscription();
+
+      if (DEBUG_ASR) {
+        console.log('[ASR final transcription]', {
+          fullTranscription,
+          segments: segmentsRef.current.map(seg => ({
+            id: seg.id,
+            start: seg.start,
+            end: seg.end,
+            completed: seg.completed,
+            text: seg.text,
+          })),
+        });
+      }
 
       segmentsRef.current = [];
       currentSegmentRef.current = '';
+      lastSegmentUpdateAtRef.current = 0;
       setIsSpeaking(false);
       setIsRecording(false);
       setIsPaused(false);
