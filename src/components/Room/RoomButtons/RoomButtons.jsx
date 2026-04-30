@@ -1,6 +1,5 @@
 import { Button, Icon, RoomTime } from '@/components';
 import { useProgressUi } from '@/context/ProgressUiContext';
-//import { useProgress } from '@/context/ProgressContext';
 import css from './RoomButtons.module.scss';
 
 const RoomButtons = ({ id }) => {

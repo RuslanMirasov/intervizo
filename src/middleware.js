@@ -23,5 +23,7 @@ export default withAuth(function middleware(_req) {}, {
 
 // ВАЖНО: матчером исключаем API, _next, и системные страницы
 export const config = {
-  matcher: ['/((?!api|_next|favicon.ico|robots.txt|sitemap.xml|404|500|video|audio).*)'],
+  matcher: [
+    '/((?!api|_next|favicon.ico|robots.txt|sitemap.xml|404|500|video|audio|avatars|worklet|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|mp3|mp4|webm|wav|ogg|js)$).*)',
+  ],
 };

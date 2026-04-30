@@ -206,7 +206,7 @@ const Scoring = () => {
             Спасибо <br />
             за&nbsp;прохождение интервью
           </h1>
-          <Image src="/end.webp" alt="InterVizo" width="178" height="169" />
+          <Image src="/end.webp" alt="InterVizo" width="178" height="169" priority />
           <p>Мы скоро с&nbsp;Вами свяжемся</p>
         </>
       )}

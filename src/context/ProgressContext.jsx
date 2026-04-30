@@ -107,13 +107,12 @@ export const ProgressProvider = ({ children }) => {
         await startRecord();
       }
 
-      startCountdown(30, () => saveAnswer(), setCountdown);
+      startCountdown(20, () => saveAnswer(), setCountdown);
     },
     [interview]
   );
 
   const saveAnswer = async (isNext = true) => {
-    console.log('Сохранение результатов');
     await startCountdown(0, () => setCountdown(0), setCountdown);
     await setShowNextButton(false);
 
@@ -194,7 +193,7 @@ export const ProgressProvider = ({ children }) => {
   useEffect(() => {
     if (!isSpeaking) return;
     setShowNextButton(true);
-    startCountdown(5, () => saveAnswer(), setCountdown);
+    startCountdown(20, () => saveAnswer(), setCountdown);
   }, [isSpeaking]);
 
   // РЕАГИРУЕМ НА ТРИГЕРЫ
